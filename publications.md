@@ -2,7 +2,7 @@
 layout: page
 title: Publications
 permalink: /publications/
-published: false
+published: true
 ---
 
 Below is a thematic list of my publications. For a complete list of paper I
@@ -18,43 +18,92 @@ reflexion/refraction/scattering). Because of its predictive nature, this tool
 can be used to predict denoising kernels for unconverged light transport
 simulation or to adapt the sampling budget locally.
 
- + **Antialiasing Complex Global Illumination Effects in Path-space**.
-   Laurent Belcour, Ling-Qi Yan, Ravi Ramamoorthi, and Derek Nowrouzezahrai.
-   *University of Montréal Technical Report* #1375
-
- +	**A Local Frequency Analysis of Light Scattering and Absorption**.
-   Laurent Belcour, Kavita Bala, Cyril Soler.
-   *ACM Transactions on Graphics*, 2014, 33 (5)
-
- + **5D Covariance Tracing for Efficient Defocus and Motion Blur**.
-   Laurent Belcour, Cyril Soler, Kartic Subr, Nicolas Holzschuch, Frédo Durand.
-   *ACM Transactions on Graphics*, 2013, 32 (3)
-
- + **Interactive Rendering of Acquired Materials on Dynamic Geometry Using Frequency Analysis**.
-   Mahdi Bagher, Cyril Soler, Kartic Subr, Laurent Belcour, Nicolas Holzschuch.
-   *IEEE Transactions on Visualization and Computer Graphics*, 2013, 19(5)
+<table>
+<tr>
+  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2014/07/turntable-snails-filters-e1442479819617-150x150.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></td>
+  <td style="vertical-align:top;"><b>Antialiasing Complex Global Illumination Effects in Path-space</b> <br />
+      Laurent Belcour, Ling-Qi Yan, Ravi Ramamoorthi, and Derek Nowrouzezahrai <br />
+      University of Montréal Technical Report #1375
+      <a href="http://laurent-belcour.fr/2015/09/covariance-filtering/">project</a> <a href="https://hal.inria.fr/hal-01200710v1/document">paper</a> <a href="https://hal.inria.fr/hal-01200710v1/bibtex">bib</a> <a href="https://www.youtube.com/watch?v=lgldxBcuIj0">video</a>
+  </td>
+</tr>
+<tr>
+  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2015/07/halloween-fppb-150x150.png" alt="covariance-volume" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></td>
+  <td style="vertical-align:top;"><b>A Local Frequency Analysis of Light Scattering and Absorption</b> <br />
+      Laurent Belcour, Kavita Bala, Cyril Soler <br />
+      <em>ACM Transactions on Graphics</em>, 2014, 33 (5)
+      <a href="https://hal.archives-ouvertes.fr/hal-00957242/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-00957242/bibtex">bib</a> <a href="https://hal.archives-ouvertes.fr/hal-00957242/file/CovVolumes.pdf">presentation</a>
+  </td>
+</tr>
+<tr>
+  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2015/07/chopper_cov-150x150.png" alt="chopper_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td style="vertical-align:top;"><b>5D Covariance Tracing for Efficient Defocus and Motion Blur</b> <br />
+      Laurent Belcour, Cyril Soler, Kartic Subr, Nicolas Holzschuch, Frédo Durand <br />
+      <em>ACM Transactions on Graphics</em>, 2013, 32 (3)
+      <a href="https://hal.archives-ouvertes.fr/hal-00814164/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-00814164v1/bibtex">bib</a>
+  </td>
+</tr>
+<tr>
+  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2014/07/fourier-materials.png" alt="fourier-materials" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></td>
+  <td style="vertical-align:top;"><b>Interactive Rendering of Acquired Materials on Dynamic Geometry Using Frequency Analysis</b> <br />
+      Mahdi Bagher, Cyril Soler, Kartic Subr, Laurent Belcour, Nicolas Holzschuch<br />
+      <em>IEEE Transactions on Visualization and Computer Graphics</em><em>, 2013, 19(5),
+      <a href="https://hal.archives-ouvertes.fr/hal-00814104v1/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-00814104v1/bibtex">bib</a> <a href="https://hal.archives-ouvertes.fr/hal-00652066v4">I3D paper</a>
+  </em></td>
+</tr>
+</table>
+<br />
 
 
 ### Appearance Edition
 
- + **MatCap Decomposition for Dynamic Appearance Manipulation**.
-   Carlos Jorge Zubiaga, Adolfo Muñoz, Laurent Belcour, Carles Bosch and Pascal Barla.
-   *Proceedings of the Eurographics Symposium on Rendering* (EI&I track), 2015
+<table>
+<tr>
+  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2015/07/robot3.png" alt="chopper_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td style="vertical-align:top;"><b>MatCap Decomposition for Dynamic Appearance Manipulation</b> <br />
+      Carlos Jorge Zubiaga, Adolfo Muñoz, Laurent Belcour, Carles Bosch and Pascal Barla <br />
+      <em>Proceedings of  the Euroographics Symposium on Rendering (EI&I track)</em>, 2015
+      <a href="https://hal.archives-ouvertes.fr/hal-01164590/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01164590/bibtex">bib</a> <a href="https://vimeo.com/132005080">video</a>
+  </td>
+</tr>
+</table>
+<br />
+
 
 ### BRDF Modelisation and Analysis
 
- + **In Praise of an Alternative BRDF Parametrization**.
-   Pascal Barla, Laurent Belcour, Romain Pacanowski.
-   *Workshop on Material Appearance Modeling*, June 2015, Darmstadt, Germany
-
- + **Statistical Analysis of Bidirectional Reflectance Distribution Functions**.
-   Carlos Zubiaga, Laurent Belcour, Carles Bosch, Adolfo Muñoz, Pascal Barla 
-   *SPIE Measuring, Modeling, and Reproducing Material Appearance*, February 2015
-
- + **ALTA: A BRDF analysis library**.
-   Laurent Belcour, Pascal Barla, Romain Pacanowski.
-   *Workshop on Material Appearance Modeling*, June 2014, Lyon, France
-
- + **BRDF Measurements and Analysis of Retroreflective Materials**.
-   Laurent Belcour, Romain Pacanowski, Marion Delahaie, Aude Laville-Geay, Laure Eupherte.
-   *Journal of the Optical Society of America*, Optical Society of America, 2014, JOSA A, 31 (12)
+<table>
+<tr>
+  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2015/02/export.png" alt="BRDF-filter" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td style="vertical-align:top;"><b>In Praise of an Alternative BRDF Parametrization </b> <br />
+      Pascal Barla, Laurent Belcour, Romain Pacanowski  <br />
+      <em>Workshop on Material Appearance Modeling</em>, June 2015, Darmstadt, Germany
+      <a href="https://hal.archives-ouvertes.fr/hal-01172118/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01172118/bibtex">bib</a>
+  </td>
+</tr>
+<tr>
+  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2015/02/filterViz-pearlPaint.png" alt="BRDF-param" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td style="vertical-align:top;"><b>Statistical Analysis of Bidirectional Reflectance Distribution Functions</b> <br />
+      Carlos Zubiaga, Laurent Belcour, Carles Bosch, Adolfo Muñoz, Pascal Barla  <br />
+      <em>SPIE Measuring, Modeling, and Reproducing Material Appearance</em>, February 2015
+      <a href="https://hal.archives-ouvertes.fr/hal-01123655/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01123655v1/bibtex">bib</a>
+  </td>
+</tr>
+<tr>
+  <td><img src="http://alta.gforge.inria.fr/alta_logo.svg" alt="ALTA" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td style="vertical-align:top;"><b>ALTA: A BRDF analysis library </b> <br />
+      Laurent Belcour, Pascal Barla, Romain Pacanowski  <br />
+      <em>Workshop on Material Appearance Modeling</em>, June 2014, Lyon, France
+      <a href="https://hal.archives-ouvertes.fr/hal-01016531/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01016531/bibtex">bib</a>
+  </td>
+</tr>
+<tr>
+  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2015/02/thumb.png" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td style="vertical-align:top;"><b>BRDF Measurements and Analysis of Retroreflective Materials </b> <br />
+       Laurent Belcour, Romain Pacanowski, Marion Delahaie, Aude Laville-Geay, Laure Eupherte  <br />
+      <em>Journal of the Optical Society of America, Optical Society of America</em>, 2014, JOSA A, 31 (12)
+      <a href="https://hal.archives-ouvertes.fr/hal-01083366/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01083366/bibtex">bib</a>
+  </td>
+</tr>
+</table>
+<br />
