@@ -4,20 +4,46 @@ layout: default
 
 <div class="home">
 
-  <h1 class="page-heading">Posts</h1>
+<p>
+<div style="font-size:80%;margin:0px 20px 0px 20px;padding:10px 15px 10px 15px;background-color:#EEEEEE;border-radius:5px;">
+   <strong>Lastest News:</strong>
+   <table style="padding-left:10pt">
+      <tr>
+         <td style="vertical-align:top;padding-right:10pt;font-weight:bold;color:#777777;">01-09-2015</td>
+         <td>Our tech-report on antialasing kernels for Global Illumination <a href="http://laurent-belcour.fr/2015/09/covariance-filtering/">is out!</a></td>
+      </tr>
+      <tr>
+         <td style="vertical-align:top;font-weight:bold;color:#777777;">01-06-2015</td>
+         <td>Carlo will present <a href="https://hal.archives-ouvertes.fr/hal-01164590/">our IE&amp;I paper</a> at EGSR and Pascal will present <a href="https://hal.archives-ouvertes.fr/hal-01172118/">our position paper</a> at the EGSR workshop on materials.</td>
+      </tr>
+      <tr>
+         <td style="vertical-align:top;font-weight:bold;color:#777777;">01-03-2015</td>
+         <td>I will serve on the Papers Committee of the <a href="http://egsr2015.gcc.tu-darmstadt.de/">Eurographics Symposium on Rendering 2015</a>.</td>
+      </tr>
+      <tr>
+         <td style="vertical-align:top;font-weight:bold;color:#777777;">01-02-2015</td>
+         <td><a href="https://hal.inria.fr/hal-01123655">our paper</a> on material appearance has been presented at SPIE by <a href="http://prism-network.eu/network/earlystageresearcher/carlos-jorge.zubiaga-pena">Carlos</a>.</td>
+      </tr>
+   </table>
+</div>
+</p>
 
+<p>I am a post-doctoral researcher at the University of Montréal, in the <a href="http://ligum.umontreal.ca">LIGUM team</a> since March 2014. Previously, I did a one year post-doc at Inria Bordeaux, in the <a href="http://manao.inria.fr">MANAO team</a>. I defended my Ph.D. in October 2012 at the University of Grenoble under the supervision of <a href="http://maverick.inria.fr/~Cyril.Soler/">Cyril Soler</a> and <a href="http://maverick.inria.fr/~Nicolas.Holzschuch/">Nicolas Holzschuch</a>.</p>
+
+<p>My research focuses on understanding the structure and coherence of light transport as a signal. The physical phenomenon behind light transport in scenes is highly structured and this structure can be exploited to perform denoising, adapt the behaviour of simulation, estimate material properties, <em>etc</em>. Most importantly, I like the challenge of computer graphics as the intersection of optics, statistics, signal processing and computer science.</p>
+
+  <h1 class="page-heading">Posts</h1>
   <ul class="post-list">
     {% for post in site.posts %}
       <li>
-        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
-
-        <h2>
-          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        </h2>
+        <span class="post-meta">{{ post.date | date: "%d-%m-%Y" }}</span>
+        <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
       </li>
     {% endfor %}
   </ul>
 
+  <!--
   <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
+   -->
 
 </div>
