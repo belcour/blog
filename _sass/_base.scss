@@ -204,3 +204,44 @@ pre {
         }
     }
 }
+
+span.h3 {
+   font-size: 14pt;
+}
+
+span.h4 {
+   font-size: 12pt;
+}
+
+ul.iconlist {
+   margin-top: 10px;
+   margin-left: 0px;
+   list-style-type: none;
+}
+
+ul.iconlist li::before {
+    font-family: "webdings";
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    font-size: inherit;
+    text-rendering: auto;
+    content: "";
+    float: left;
+    width: 1.4em;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+ul li.work::before {
+   content: "";
+}
+
+ul li.space::before {
+   opacity: 0;
+   content: "";
+}
+
+ul li.email::before {
+   content: "";
+}
