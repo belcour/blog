@@ -20,7 +20,7 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
-  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2014/07/turntable-snails-filters-e1442479819617-150x150.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_CovFiltering.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></td>
   <td style="vertical-align:top;"><b>Antialiasing Complex Global Illumination Effects in Path-space</b> <br />
       Laurent Belcour, Ling-Qi Yan, Ravi Ramamoorthi, and Derek Nowrouzezahrai <br />
       University of Montréal Technical Report #1375
@@ -28,7 +28,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2015/07/halloween-fppb-150x150.png" alt="covariance-volume" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_CovVolume.png" alt="covariance-volume" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></td>
   <td style="vertical-align:top;"><b>A Local Frequency Analysis of Light Scattering and Absorption</b> <br />
       Laurent Belcour, Kavita Bala, Cyril Soler <br />
       <em>ACM Transactions on Graphics</em>, 2014, 33 (5)
@@ -36,7 +36,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2015/07/chopper_cov-150x150.png" alt="chopper_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_CovTracing.png" alt="chopper_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
   <td style="vertical-align:top;"><b>5D Covariance Tracing for Efficient Defocus and Motion Blur</b> <br />
       Laurent Belcour, Cyril Soler, Kartic Subr, Nicolas Holzschuch, Frédo Durand <br />
       <em>ACM Transactions on Graphics</em>, 2013, 32 (3)
@@ -44,7 +44,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2014/07/fourier-materials.png" alt="fourier-materials" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_BwdBuffer.png" alt="fourier-materials" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></td>
   <td style="vertical-align:top;"><b>Interactive Rendering of Acquired Materials on Dynamic Geometry Using Frequency Analysis</b> <br />
       Mahdi Bagher, Cyril Soler, Kartic Subr, Laurent Belcour, Nicolas Holzschuch<br />
       <em>IEEE Transactions on Visualization and Computer Graphics</em><em>, 2013, 19(5),
@@ -59,7 +59,7 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
-  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2015/07/robot3.png" alt="chopper_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_MatCaps.png" alt="chopper_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
   <td style="vertical-align:top;"><b>MatCap Decomposition for Dynamic Appearance Manipulation</b> <br />
       Carlos Jorge Zubiaga, Adolfo Muñoz, Laurent Belcour, Carles Bosch and Pascal Barla <br />
       <em>Proceedings of  the Euroographics Symposium on Rendering (EI&I track)</em>, 2015
@@ -74,7 +74,7 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
-  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2015/02/export.png" alt="BRDF-filter" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_BrdfParam.png" alt="BRDF-filter" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
   <td style="vertical-align:top;"><b>In Praise of an Alternative BRDF Parametrization </b> <br />
       Pascal Barla, Laurent Belcour, Romain Pacanowski  <br />
       <em>Workshop on Material Appearance Modeling</em>, June 2015, Darmstadt, Germany
@@ -82,7 +82,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2015/02/filterViz-pearlPaint.png" alt="BRDF-param" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_BrdfStats.png" alt="BRDF-param" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
   <td style="vertical-align:top;"><b>Statistical Analysis of Bidirectional Reflectance Distribution Functions</b> <br />
       Carlos Zubiaga, Laurent Belcour, Carles Bosch, Adolfo Muñoz, Pascal Barla  <br />
       <em>SPIE Measuring, Modeling, and Reproducing Material Appearance</em>, February 2015
@@ -90,7 +90,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="http://alta.gforge.inria.fr/alta_logo.svg" alt="ALTA" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Alta.svg" alt="ALTA" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
   <td style="vertical-align:top;"><b>ALTA: A BRDF analysis library </b> <br />
       Laurent Belcour, Pascal Barla, Romain Pacanowski  <br />
       <em>Workshop on Material Appearance Modeling</em>, June 2014, Lyon, France
@@ -98,7 +98,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="http://laurent-belcour.fr/wp-content/uploads/2015/02/thumb.png" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Retro.png" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
   <td style="vertical-align:top;"><b>BRDF Measurements and Analysis of Retroreflective Materials </b> <br />
        Laurent Belcour, Romain Pacanowski, Marion Delahaie, Aude Laville-Geay, Laure Eupherte  <br />
       <em>Journal of the Optical Society of America, Optical Society of America</em>, 2014, JOSA A, 31 (12)
