@@ -7,7 +7,7 @@ published: true
 
 <table>
 <tr>
-  <td><img src="http://alta.gforge.inria.fr/alta_logo.svg" alt="alta" width="100px" height="100px" /></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Alta.svg" alt="alta" width="100px" height="100px" /></td>
   <td style="vertical-align:top;">
       <b>ALTA</b> <br />
       is an open-source library for BRDF analysis. It can read a wide variety of BRDF
