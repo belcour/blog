@@ -17,6 +17,9 @@ body {
     font: $base-font-weight #{$base-font-size}/#{$base-line-height} $base-font-family;
     color: $text-color;
     background-color: $background-color;
+    //background-image: url("/blog/data/images/picture.jpg");
+    //background-repeat: no-repeat;
+    //background-size: cover;
     -webkit-text-size-adjust: 100%;
     -webkit-font-feature-settings: "kern" 1;
     -moz-font-feature-settings: "kern" 1;
@@ -129,10 +132,11 @@ blockquote {
  */
 pre,
 code {
-    font-size: 15px;
+    font-family: $code-font-family;
+    font-size: 11px;
     border: 1px solid $grey-color-light;
     border-radius: 3px;
-    background-color: #eef;
+    background-color: #eee;
 }
 
 code {
