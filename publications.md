@@ -3,6 +3,8 @@ layout: page
 title: Publications
 permalink: /publications/
 published: true
+javascripts:
+   - my_script
 ---
 
 Below is a thematic list of my publications. For a complete list of paper I
