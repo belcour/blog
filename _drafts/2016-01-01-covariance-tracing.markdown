@@ -34,8 +34,6 @@ In order to describe the radiance for small perturbation of a given ray, we need
 
 <center>
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_twoplanes.svg" width="604px" id="draw_cov_twoplanes"></object><br />
-<!--<canvas id="draw_cov_twoplanes" width="600px" height="250px">
-</canvas><br />-->
 <div style="width:600px;"><em><a name="figure1">Fig.1 -</a> The local tangent frame of a 2D ray is described by a two plane parametrization. The first plane describes the relative position and the second plane the relative direction. Click over the \((\delta x, \delta u)\) space to change the ray.</em></div>
 </center><br />
 
@@ -52,6 +50,11 @@ Expressing the rendering equation <a href="#citations">[6]</a> or the radiative 
 Remember that we are interested not in the resulting radiance, but to its covariance. What we really want is <strong>how an operator affects the covariance</strong>. Fortunately, under a first order assumption (equivalent to paraxial optics), we can formulate analytically how operators modify the covariance matrix.
 
 <strong>Travel operator</strong> is the simplest of all. It describes the local radiance given that we now the local radiance from a previous position along the ray.
+
+<center>
+<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_travel.svg" width="600px" id="draw_cov_travel"></object><br />
+<div style="width:600px;"><em><a name="figure2">Fig.2 -</a> The travel operator. Given a source of radiance in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</em></div>
+</center><br />
 
 This operator shears the local radiance. The equivalent operator on the covariance matrix is also a shear which parameter is the traveled distance in meters. A Matlab implementation of the operator is the following:
 
