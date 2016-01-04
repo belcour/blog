@@ -55,15 +55,15 @@ Remember that we are interested not in the resulting radiance, but to its covari
 
 <center>
 <div style="position:relative;width:600px;height:300px;">
-<canvas id="draw_cov_travel" style="position:absolute;left:335px;top:30px;width:240px;height:240px;background-color:#F0F;"></canvas>
-<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_travel.svg" width="600px" id="draw_cov_travel" style="position:absolute;top:0px;left:0px;"></object></div><br />
-<div style="width:600px;"><em><a name="figure2">Fig.2 -</a> The travel operator. Given a source of radiance in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</em></div>
+<canvas id="draw_cov_travel-gl" style="position:absolute;left:335px;top:26px;width:243px;height:243px;background-color:#F0F;border:0px"></canvas>
+<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_travel.svg" width="600px" id="draw_cov_travel-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
+<div style="width:600px;"><em><a name="figure2">Fig.2 -</a> The travel operator. Given a diffuse light source with Gaussian spread in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</em></div>
 </center><br />
 
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_travel.js" type="text/javascript">
 </script>
 
-This operator shears the local radiance. The equivalent operator on the covariance matrix is also a shear which parameter is the traveled distance in meters. A Matlab implementation of the operator is the following:
+This operator shears the local radiance by the amount of traveled distance. The equivalent operator on the covariance matrix is also a shear which parameter is the traveled distance in meters. A Matlab implementation of the operator is the following:
 
       // Express the covariance after a travel of 'd' meters
       function travel(d) {
