@@ -18,3 +18,23 @@ addLoadEvent = function(func) {
     }
   }
 }
+
+// 'initWebGL' creates a webgl context in 'canvas'
+//
+initWebGL = function(canvas) {
+
+   if(canvas == null) {
+      alert("Incorrect passed canvas.");
+   }
+
+   var gl = null;
+   try {
+      gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+   } catch(e) {}
+
+   if (!gl) {
+      alert("Could not init WebGL context.");
+   }
+
+   return gl;
+}

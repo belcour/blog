@@ -1,58 +1,3 @@
-var distToLight = 0.0;
-
-// SVG drawing code
-var tr_svg = document.getElementById('draw_cov_travel-cv');
-tr_svg.addEventListener("load", function() {
-   var svg    = tr_svg.contentDocument;
-   var cursor = svg.getElementById("cursor");
-   var ray    = svg.getElementById("ray");
-
-   var rayStart = ray.pathSegList.getItem(0);
-   var rayEnd   = ray.pathSegList.getItem(1);
-   var dirX = rayEnd.x - rayStart.x;
-   var dirY = rayEnd.y - rayStart.y;
-   var rayDirNorm = Math.sqrt(dirX*dirX + dirY*dirY);
-   dirX /= rayDirNorm;
-   dirY /= rayDirNorm;
-
-   var currentX = 0;
-   var currentY = 0;
-   var curT = cursor.pathSegList.getItem(0);
-   var isDown = false;
-
-   svg.addEventListener('mousedown', function(evt) {
-      isDown = true;
-      currentX = evt.clientX;
-      currentY = evt.clientY;
-   }, false);
-   svg.addEventListener('mouseup', function(evt) {
-      isDown = false;
-   }, false);
-   svg.addEventListener('mouseout', function(evt) {
-      isDown = false;
-   }, false);
-   svg.addEventListener('mousemove', function(evt) {
-      if(isDown) {
-         var deltaX = evt.clientX - currentX;
-         var deltaY = evt.clientY - currentY;
-         currentX = evt.clientX;
-         currentY = evt.clientY;
-
-         var rayStart = cursor.pathSegList.getItem(0);
-         var rayEnd   = cursor.pathSegList.getItem(1);
-         var dotProd  = deltaX*dirX + deltaY*dirY;
-
-         var temp = distToLight + dotProd/200;
-         if(temp > 0 && temp < 1.0) {
-            distToLight = temp;
-            rayStart.x += dotProd*dirX;
-            rayStart.y += dotProd*dirY;
-            rayEnd.x += dotProd*dirX;
-            rayEnd.y += dotProd*dirY;
-         }
-      }
-   }, false);
-}, false);
 
 loadFunction = function() {
 
@@ -62,7 +7,7 @@ loadFunction = function() {
       alert("Impossible de récupérer le canvas");
    }
 
-   initWebGL(tr_canvas);
+   var gl = initWebGL(tr_canvas);
    if (gl) {
       gl.viewport(0, 0, tr_canvas.width, tr_canvas.height);
       gl.clearColor(1.0, 1.0, 1.0, 1.0);
@@ -82,8 +27,8 @@ loadFunction = function() {
 
       // Create shaders
       var program = gl.createProgram();
-      var fshader = loadFragmentShader();
-      var vshader = loadVertexShader();
+      var fshader = loadFragmentShader(gl);
+      var vshader = loadVertexShader(gl);
 
       if(vshader == null || fshader == null) {
          alert("Shaders are not compiled");
@@ -97,6 +42,8 @@ loadFunction = function() {
          alert("Unable to initialize the shader program.");
          return;
       }
+
+      var distToLight = 0.0;
 
       draw = function() {
          gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
@@ -117,11 +64,62 @@ loadFunction = function() {
          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
 
-      setInterval('draw();', 60);
+      // SVG drawing code
+      var tr_svg = document.getElementById('draw_cov_travel-cv');
+      var svg    = tr_svg.contentDocument;
+      var cursor = svg.getElementById("cursor");
+      var ray    = svg.getElementById("ray");
+   
+      var rayStart = ray.pathSegList.getItem(0);
+      var rayEnd   = ray.pathSegList.getItem(1);
+      var dirX = rayEnd.x - rayStart.x;
+      var dirY = rayEnd.y - rayStart.y;
+      var rayDirNorm = Math.sqrt(dirX*dirX + dirY*dirY);
+      dirX /= rayDirNorm;
+      dirY /= rayDirNorm;
+   
+      var currentX = 0;
+      var currentY = 0;
+      var curT = cursor.pathSegList.getItem(0);
+      var isDown = false;
+   
+      svg.addEventListener('mousedown', function(evt) {
+         isDown = true;
+         currentX = evt.clientX;
+         currentY = evt.clientY;
+      }, false);
+      svg.addEventListener('mouseup', function(evt) {
+         isDown = false;
+      }, false);
+      svg.addEventListener('mouseout', function(evt) {
+         isDown = false;
+      }, false);
+      svg.addEventListener('mousemove', function(evt) {
+         if(isDown) {
+            var deltaX = evt.clientX - currentX;
+            var deltaY = evt.clientY - currentY;
+            currentX = evt.clientX;
+            currentY = evt.clientY;
+   
+            var rayStart = cursor.pathSegList.getItem(0);
+            var rayEnd   = cursor.pathSegList.getItem(1);
+            var dotProd  = deltaX*dirX + deltaY*dirY;
+   
+            var temp = distToLight + dotProd/200;
+            if(temp > 0 && temp < 1.0) {
+               distToLight = temp;
+               rayStart.x += dotProd*dirX;
+               rayStart.y += dotProd*dirY;
+               rayEnd.x += dotProd*dirX;
+               rayEnd.y += dotProd*dirY;
+            }
+         }
+         draw();
+      }, false);
    }
 }
 
-loadFragmentShader = function() {
+loadFragmentShader = function(gl) {
 
    // Fragment shader code
    var source = '' +
@@ -134,7 +132,7 @@ loadFragmentShader = function() {
       'void main(void) {' +
       '  vec2 xu = 2.0*vec2(gl_FragCoord.x/resX - 0.5, gl_FragCoord.y/resY - 0.5);' +
       '  vec2 XU = vec2(xu.x - (distToSource*xu.y), xu.y);' +
-      '  float light = exp(-0.5*(XU.x*XU.x)/0.01);' +
+      '  float light = exp(-0.5*(XU.x*XU.x)/0.01) + 0.1;' +
       '  gl_FragColor = vec4(light, light, light, 1.0);' +
       '}';
 
@@ -149,7 +147,7 @@ loadFragmentShader = function() {
    return shader;
 }
 
-loadVertexShader = function() {
+loadVertexShader = function(gl) {
 
    // Fragment shader code
    var source = '' +
@@ -168,17 +166,6 @@ loadVertexShader = function() {
       return null;
    }
    return shader;
-}
-
-initWebGL = function(canvas) {
-   gl = null;
-   try {
-      gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-   } catch(e) {}
-
-   if (!gl) {
-      alert("Could not init WebGL context.");
-   }
 }
 
 if(addLoadEvent) {
