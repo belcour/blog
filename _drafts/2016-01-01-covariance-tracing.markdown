@@ -51,11 +51,11 @@ Expressing the rendering equation <a href="#citations">[6]</a> or the radiative 
 
 Remember that we are interested not in the resulting radiance, but to its covariance. What we really want is <strong>how an operator affects the covariance</strong>. Fortunately, under a first order assumption (equivalent to paraxial optics), we can formulate analytically how operators modify the covariance matrix.
 
-<strong>Travel operator</strong> is the simplest of all. It describes the local radiance given that we now the local radiance from a previous position along the ray.
+<strong>The travel operator</strong> is the simplest of all. It describes the local radiance given that we now the local radiance from a previous position along the ray.
 
 <center>
 <div style="position:relative;width:600px;height:300px;">
-<canvas id="draw_cov_travel-gl" style="position:absolute;left:335px;top:26px;width:243px;height:243px;background-color:#F0F;border:0px"></canvas>
+<canvas id="draw_cov_travel-gl" style="position:absolute;left:335px;top:26px;width:243px;height:243px;background-color:#FFF;border:0px"></canvas>
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_travel.svg" width="600px" id="draw_cov_travel-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
 <div style="width:600px;"><em><a name="figure2">Fig.2 -</a> The travel operator. Given a diffuse light source with Gaussian spread in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</em></div>
 </center><br />
@@ -73,11 +73,11 @@ This operator shears the local radiance by the amount of traveled distance. The 
       }
 
 
-<strong>BRDF operator</strong> describes how the roughness reduces the bandwidth of the reflected local radiance. This is well known that the BRDF can be thought as being a blurring filter (think of pre-filtered envmaps).
+<strong>The BRDF operator</strong> describes how the roughness reduces the bandwidth of the reflected local radiance. This is well known that the BRDF can be thought as being a blurring filter (think of pre-filtered envmaps).
 
 <center>
 <div style="position:relative;width:600px;height:300px;">
-<canvas id="draw_cov_brdf-gl" style="position:absolute;left:335px;top:26px;width:243px;height:243px;background-color:#F0F;border:0px"></canvas>
+<canvas id="draw_cov_brdf-gl" style="position:absolute;left:335px;top:26px;width:243px;height:243px;background-color:#FFF;border:0px"></canvas>
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_brdf.svg" width="600px" id="draw_cov_brdf-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
 <div style="width:600px;"><em><a name="figure2">Fig.2 -</a> The BRDF operator. In this case, we use as input a tight Gaussian cone light. The light's cone is blurred by the BRDF.</em></div>
 </center><br />

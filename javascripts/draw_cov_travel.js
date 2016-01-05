@@ -63,6 +63,7 @@ loadFunction = function() {
          gl.vertexAttribPointer(vPosAttribute, 3, gl.FLOAT, false, 0, 0);
          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
+      draw();
 
       // SVG drawing code
       var tr_svg = document.getElementById('draw_cov_travel-cv');
