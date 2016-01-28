@@ -82,8 +82,9 @@ This operator shears the local radiance by the amount of traveled distance. The 
 <div style="width:600px;"><em><a name="figure3">Fig.3 -</a> The BRDF operator. In this case, we use as input a tight Gaussian cone light. The light's cone is blurred by the BRDF.</em></div>
 </center><br />
 
-<script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_brdf.js" type="text/javascript">
-</script>
+<script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_brdf.js" type="text/javascript"></script>
+<script id="raytracer2d-fs"  type="x-shader/x-fragment">{% include shaders/raytracer2d.fs %}</script>
+<script id="raytracer2d-vs"  type="x-shader/x-vertex">{% include shaders/raytracer2d.vs %}</script>
 
 #### Bibliography
 <a name="citations"></a>
