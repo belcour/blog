@@ -51,6 +51,7 @@ Expressing the rendering equation <a href="#citations">[6]</a> or the radiative 
 
 Remember that we are interested not in the resulting radiance, but to its covariance. What we really want is <strong>how an operator affects the covariance</strong>. Fortunately, under a first order assumption (equivalent to paraxial optics), we can formulate analytically how operators modify the covariance matrix.
 
+
 <strong>The travel operator</strong> is the simplest of all. It describes the local radiance given that we now the local radiance from a previous position along the ray.
 
 <center>
@@ -73,6 +74,15 @@ This operator shears the local radiance by the amount of traveled distance. The 
       }
 
 
+<strong>The projection operator</strong> enables to express the local radiance and the covariance in the tangent plane of objects.
+
+      function project(cos) {
+         op = {cos^2, 0;
+                   0, 1};
+         cov = op' * cov * op;
+      }
+
+
 <strong>The BRDF operator</strong> describes how the roughness reduces the bandwidth of the reflected local radiance. This is well known that the BRDF can be thought as being a blurring filter (think of pre-filtered envmaps).
 
 <center>
@@ -81,6 +91,16 @@ This operator shears the local radiance by the amount of traveled distance. The 
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_brdf.svg" width="600px" id="draw_cov_brdf-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
 <div style="width:600px;"><em><a name="figure3">Fig.3 -</a> The BRDF operator. In this case, we use as input a tight Gaussian cone light. The light's cone is blurred by the BRDF.</em></div>
 </center><br />
+
+
+<strong>The curvature operator</strong>. So far we have expressed how to trace the covariance of local radiance when light is reflected by planar objects. To incorporate the the local variation of the object's surface into covariance tracing, we will enable to project the local radiance from the tangent plane to a first order approximation of the surface using its curvature.
+
+      function curvature(k) {
+         op = { 1, k;
+                0, 1};
+         cov = op' * cov * op;
+      }
+
 
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_brdf.js" type="text/javascript"></script>
 <script id="raytracer2d-fs"  type="x-shader/x-fragment">{% include shaders/raytracer2d.fs %}</script>

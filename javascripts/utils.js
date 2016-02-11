@@ -38,3 +38,46 @@ initWebGL = function(canvas) {
 
    return gl;
 }
+
+// 'getShader' loads a shader from a text <script> element in the DOM
+// at using its id: 'id'. It creates a shader from it and compiles it
+// using the 'gl' context. A replacement string can be provided to
+// change some part of the shader.
+// 
+getShader = function(id, gl, replacement) {
+    // Load the DOM element containing the shader using the provided 'id'
+    var shaderDOM = document.getElementById(id);
+    if (!shaderDOM) {
+        console.log("Unable to access DOM element '" + id + "'");
+        return null;
+    }
+
+    // Load the shader source
+    var shaderSrc = '';
+    var currChild = shaderDOM.firstChild;
+    while(currChild) {
+        if(currChild.nodeType == currChild.TEXT_NODE) {
+        shaderSrc += currChild.textContent;
+        }
+        currChild = currChild.nextSibling;
+    }
+    if(replacement)
+    shaderSrc = shaderSrc.replace(/\#intersect/g, replacement);
+
+    // Create a shader using the GL context
+    var shader;
+    if (shaderDOM.type == "x-shader/x-fragment") {
+        shader = gl.createShader(gl.FRAGMENT_SHADER);
+    } else if (shaderDOM.type == "x-shader/x-vertex") {
+        shader = gl.createShader(gl.VERTEX_SHADER);
+    } else {
+        console.log("Do not handle " + shaderDOM.type + " as a shader");
+    }
+    gl.shaderSource(shader, shaderSrc);
+    gl.compileShader(shader);
+
+    if (shader && !gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.log(gl.getShaderInfoLog(shader));
+    }
+    return shader;
+}

@@ -6,41 +6,43 @@ loadFunctionBrdf = function() {
       alert("Impossible de récupérer le canvas");
    }
 
-   getShader = function(id, gl) {
-      // Load the DOM element containing the shader using the provided 'id'
-      var shaderDOM = document.getElementById(id);
-      if (!shaderDOM) {
-         console.log("Unable to access DOM element '" + id + "'");
-         return null;
-      }
+//    getShader = function(id, gl, replacement=null) {
+//       // Load the DOM element containing the shader using the provided 'id'
+//       var shaderDOM = document.getElementById(id);
+//       if (!shaderDOM) {
+//          console.log("Unable to access DOM element '" + id + "'");
+//          return null;
+//       }
 
-      // Load the shader source
-      var shaderSrc = '';
-      var currChild = shaderDOM.firstChild;
-      while(currChild) {
-         if(currChild.nodeType == currChild.TEXT_NODE) {
-            shaderSrc += currChild.textContent;
-         }
-         currChild = currChild.nextSibling;
-      }
+//       // Load the shader source
+//       var shaderSrc = '';
+//       var currChild = shaderDOM.firstChild;
+//       while(currChild) {
+//          if(currChild.nodeType == currChild.TEXT_NODE) {
+//             shaderSrc += currChild.textContent;
+//          }
+//          currChild = currChild.nextSibling;
+//       }
+//       if(replacement)
+//         shaderSrc = shaderSrc.replace(/\#intersect/g, replacement);
 
-      // Create a shader using the GL context
-      var shader;
-      if (shaderDOM.type == "x-shader/x-fragment") {
-         shader = gl.createShader(gl.FRAGMENT_SHADER);
-      } else if (shaderDOM.type == "x-shader/x-vertex") {
-         shader = gl.createShader(gl.VERTEX_SHADER);
-      } else {
-         console.log("Do not handle " + shaderDOM.type + " as a shader");
-      }
-      gl.shaderSource(shader, shaderSrc);
-      gl.compileShader(shader);
+//       // Create a shader using the GL context
+//       var shader;
+//       if (shaderDOM.type == "x-shader/x-fragment") {
+//          shader = gl.createShader(gl.FRAGMENT_SHADER);
+//       } else if (shaderDOM.type == "x-shader/x-vertex") {
+//          shader = gl.createShader(gl.VERTEX_SHADER);
+//       } else {
+//          console.log("Do not handle " + shaderDOM.type + " as a shader");
+//       }
+//       gl.shaderSource(shader, shaderSrc);
+//       gl.compileShader(shader);
 
-      if (shader && !gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-         console.log(gl.getShaderInfoLog(shader));
-      }
-      return shader;
-   }
+//       if (shader && !gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+//          console.log(gl.getShaderInfoLog(shader));
+//       }
+//       return shader;
+//    }
 
    createProgram = function(gl, vShader, fShader) {
       var program = gl.createProgram();
@@ -57,10 +59,14 @@ loadFunctionBrdf = function() {
 
    var gl = initWebGL(canvas);
    if (gl) {
+       
+      // Light and geometry
+      var intersectStr = "   float scale = 1.0E2;\n" + 
+                         "   intersectLight(vec2(2, -0.5), vec2(2, 0.5), scale, org, dir, t, n, rgb);\n";
 
       // Load the vertex and pixel shaders
       var vShader = getShader('raytracer2d-vs', gl);
-      var fShader = getShader('raytracer2d-fs', gl);
+      var fShader = getShader('raytracer2d-fs', gl, intersectStr);
       if(!vShader || !fShader) { return; }
       var program = createProgram(gl, vShader, fShader);
       if(!program) { return; }
