@@ -62,7 +62,8 @@ loadFunctionBrdf = function() {
        
       // Light and geometry
       var intersectStr = "   float scale = 1.0E2;\n" + 
-                         "   intersectLight(vec2(2, -0.5), vec2(2, 0.5), scale, org, dir, t, n, rgb);\n";
+                         "   intersectPlane(vec2(-10.0, 0.0), vec2(10.0, 0.0), o, d, t, n, p);\n" + 
+                         "   intersectLight(vec2(-1.0, 0.5), vec2(-0.5, 1.0), scale, o, d, t, n, rgb);\n";
 
       // Load the vertex and pixel shaders
       var vShader = getShader('raytracer2d-vs', gl);
@@ -99,11 +100,11 @@ loadFunctionBrdf = function() {
          gl.uniform1f(uniformResY, canvas.height);
          
          var uniformOrg = gl.getUniformLocation(program, "origin");
-         gl.uniform2f(uniformOrg, 0.0, 0.0);
+         gl.uniform2f(uniformOrg, 0.75, 0.75);
          var uniformDir = gl.getUniformLocation(program, "direction");
-         gl.uniform2f(uniformDir, 1.0, 0.0);
+         gl.uniform2f(uniformDir, -0.75, -0.75);
          var uniformUp  = gl.getUniformLocation(program, "up");
-         gl.uniform2f(uniformUp,  0.0, 1.0);
+         gl.uniform2f(uniformUp,  0.75, -0.75);
 
          var vPosAttribute = gl.getAttribLocation(program, "vertexPos");
          gl.enableVertexAttribArray(vPosAttribute);
