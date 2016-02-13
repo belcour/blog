@@ -58,7 +58,7 @@ void intersectLight(in vec2 p1, in vec2 p2, float scale, in vec2 org, in vec2 di
 // and update the boolean 'hit', the intersection distance 't', the normal
 // at the intersection position 'n' and the roughness 's'.
 //
-vec3 raytrace(in vec2 org, in vec2 dir) {
+vec3 raytrace(in vec2 org, in vec2 dir, in vec2 e) {
 
    // Resulting color and throughput
    vec3 color = vec3(0,0,0);
@@ -81,9 +81,18 @@ vec3 raytrace(in vec2 org, in vec2 dir) {
 
       // Reshoot part
       if(t <= 0.0 || t >= 1.0E8 || length(rgb) > 0.0) { break; }
-      d   = d - 2.0*dot(d, n)*n;
+      
+      // Sample diffuse
+      vec2 r = d - 2.0*dot(d, n)*n;
+    //   vec2 b = (n.x != 0.0) ? vec2(n.y, -n.x) : vec2(-n.y, n.x);
+    //   d = e.x*n + sqrt(1.0-e.x*e.x)*b; 
+    //   tr *= dot(d, n);
+      
+      // Sample pure mirror
+      d   = r;
+      //tr *= 1.0;
+      
       o   = p + 1.0E-8*d;
-      tr *= 1.0;
    }
    return color;
 }
@@ -95,6 +104,12 @@ void main(void) {
 
    vec2 org = origin + xu.x*up;
    vec2 dir = normalize(normalize(direction) + xu.y*up);
+   vec3 color = vec3(0.0,0.0,0.0);
+   const int I = 16;
 
-   gl_FragColor = vec4(raytrace(org, dir), 1.0);
+   for(int i=0; i<I; ++i) {
+     vec2 e = vec2(float(i) / float(I-1), 0.0);
+     color += raytrace(org, dir, e);
+   }
+   gl_FragColor = vec4(color / float(I),1.0);
 }
