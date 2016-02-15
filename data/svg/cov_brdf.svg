@@ -29,10 +29,10 @@
      id="namedview28"
      showgrid="false"
      inkscape:zoom="1.2741938"
-     inkscape:cx="313.11361"
+     inkscape:cx="185.97439"
      inkscape:cy="152.85504"
      inkscape:window-x="38"
-     inkscape:window-y="49"
+     inkscape:window-y="27"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1" />
   <defs
@@ -128,7 +128,7 @@
        inkscape:connector-curvature="0"
        id="path6419"
        d="M 224.37624,948.61177 176.4357,916.92438"
-       style="fill:#747474;fill-opacity:1;fill-rule:evenodd;stroke:#9f9f9f;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#ff0000;fill-opacity:1;fill-rule:evenodd;stroke:#ff0000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        style="fill:#747474;fill-opacity:1;fill-rule:evenodd;stroke:#adadad;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 46.107806,845.8373 92.221481,811.54567"

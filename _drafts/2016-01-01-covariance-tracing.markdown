@@ -42,12 +42,22 @@ In order to describe the radiance for small perturbation of a given ray, we need
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_twoplanes.js" type="text/javascript">
 </script>
 
-Now that we have this parametrization, we can express the radiance in that space: $$L(x + \delta x, u + \delta u)$$. The next step is to express radiance transport equations in this space.
+Now that we have this parametrization, we can express the radiance in that space: $$L(x + \delta x, u + \delta u)$$. But instead of looking at the radiance, we will be interested by its [Fourier transform](http://en.wikipedia.org/wiki/Fourier_transform). While local radiance is parametrized in 2D by the couple $$(\delta{x},\delta{y})$$, it is parametrized by the couple $$(\Omega_x,\Omega_u)$$.
+
+The next step is to express radiance transport equations in this space and to express the frequency equivalent of those equations.
 
 
 #### Radiance Operators in Local Space
 
-Expressing the rendering equation <a href="#citations">[6]</a> or the radiative transfer equation <a href="#citations">[7]</a> in local coordinates is not possible since they rely on global coordinates. Instead, we look at solutions of those equations for simple cases (operators) that correspond to transport evaluated during path tracing. We will need to describe several transport operators such as <em>travel in free space, reflection, refraction, ...</em>
+Expressing the rendering equation <a href="#citations">[6]</a> or the radiative transfer equation <a href="#citations">[7]</a> in local coordinates is not possible since they rely on global coordinates. Instead, we look at solutions of those equations for simple cases (operators) that correspond to transport evaluated during path tracing. We will need to describe several transport operators such as <em>travel in free space, reflection, refraction, etc.</em> (see <a href="#figure2">Fig.2</a>).
+
+<center>
+<div style="position:relative;width:600px;height:300px;">
+<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_path.svg" width="600px" id="draw_cov_path-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
+<div style="width:600px;"><em><a name="figure2">Fig.2 -</a> Frequency analysis of light transport builds from light to sensor (left to right) by concatenating atomic operators. 
+Those atomic operators correspond to specific elements of light transport such as transport \(T_d\), scattering \(B_\rho\), etc. For our implementation, we are interested on the 
+effect those operators have on the covariance matrix \(\Sigma\).</em></div>
+</center><br />
 
 Remember that we are interested not in the resulting radiance, but to its covariance. What we really want is <strong>how an operator affects the covariance</strong>. Fortunately, under a first order assumption (equivalent to paraxial optics), we can formulate analytically how operators modify the covariance matrix.
 
@@ -58,7 +68,7 @@ Remember that we are interested not in the resulting radiance, but to its covari
 <div style="position:relative;width:600px;height:300px;">
 <canvas id="draw_cov_travel-gl" style="position:absolute;left:335px;top:26px;width:243px;height:243px;background-color:#FFF;border:0px"></canvas>
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_travel.svg" width="600px" id="draw_cov_travel-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
-<div style="width:600px;"><em><a name="figure2">Fig.2 -</a> The travel operator. Given a diffuse light source with Gaussian spread in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</em></div>
+<div style="width:600px;"><em><a name="figure3">Fig.3 -</a> The travel operator. Given a diffuse light source with Gaussian spread in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</em></div>
 </center><br />
 
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_travel.js" type="text/javascript">
@@ -89,8 +99,8 @@ This operator shears the local radiance by the amount of traveled distance. The 
 <div style="position:relative;width:600px;height:300px;">
 <canvas id="draw_cov_brdf-gl" style="position:absolute;left:335px;top:26px;width:243px;height:243px;background-color:#FFF;border:0px"></canvas>
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_brdf.svg" width="600px" id="draw_cov_brdf-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
-<div>BRDF exponent: 100 <input type="range" min="100" max="1000" value="1000" step="5" onchange="drawBRDF(this.value)" /> 1000</div>
-<div style="width:600px;"><em><a name="figure3">Fig.3 -</a> The BRDF operator. In this case, we use as input a tight Gaussian cone light. The light's cone is blurred by the BRDF.</em></div>
+<div>BRDF exponent: 100 <input style="vertical-align: middle;" type="range" min="100" max="1000" value="1000" step="5" onchange="drawBRDF(this.value)" /> 1000</div>
+<div style="width:600px;"><em><a name="figure4">Fig.4 -</a> The BRDF operator. In this case, we use as input a tight Gaussian cone light. The light's cone is blurred by the BRDF.</em></div>
 </center><br />
 
 
