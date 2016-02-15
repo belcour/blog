@@ -84,11 +84,11 @@ This operator shears the local radiance by the amount of traveled distance. The 
       }
 
 
-<strong>The projection operator</strong> enables to express the local radiance and the covariance in the tangent plane of objects.
+<strong>The projection operator</strong> enables to express the local radiance and the covariance in the tangent plane of objects. This is necessary to express the reflection or refraction of light on a planar surface. When the surface is non-planar, the <strong>curvature operator</strong> has to be applied after this operator.
 
       function project(cos) {
-         op = {cos^2, 0;
-                   0, 1};
+         op = {cos, 0;
+                 0, 1};
          cov = op' * cov * op;
       }
 
@@ -103,6 +103,16 @@ This operator shears the local radiance by the amount of traveled distance. The 
 <div style="width:600px;"><em><a name="figure4">Fig.4 -</a> The BRDF operator. In this case, we use as input a tight Gaussian cone light. The light's cone is blurred by the BRDF. Using the cursor, you can vary the phong exponent from 100 to 1000 and see the blurring effect.</em></div>
 </center><br />
 
+The BRDF operator is not easy to define using the covariance matrix. Intuitively, we want to express the covariance of the product of two signals using their respective covariance matrices. If we have no knowledge of the type of signals we are multiplying, then this product is undefined. However, in the case of Gaussians spectra the product is defined as the inverse of the sum of the inverse covariance matrices.
+
+      function BRDF(B) {
+         cov = inverse(inverse(cov) + B);
+      }
+
+where `B` describe the angular blur of the BRDF. For a Phong BRDF with exponnent `e`, the matrix is defined as:
+
+     B = { 0, 0;
+           0, 4*pi^2/e};
 
 <strong>The curvature operator</strong>. So far we have expressed how to trace the covariance of local radiance when light is reflected by planar objects. To incorporate the the local variation of the object's surface into covariance tracing, we will enable to project the local radiance from the tangent plane to a first order approximation of the surface using its curvature.
 
