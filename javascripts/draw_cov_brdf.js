@@ -1,3 +1,5 @@
+var drawBRDF;
+
 loadFunctionBrdf = function() {
 
    // WebGL code
@@ -90,9 +92,12 @@ loadFunctionBrdf = function() {
       gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-      drawBRDF = function() {
+      drawBRDF = function(roughness) {
          gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
          gl.useProgram(program);
+
+         var uniformRough = gl.getUniformLocation(program, "exponent");
+         gl.uniform1f(uniformRough, roughness);
 
          var uniformResX = gl.getUniformLocation(program, "resX");
          gl.uniform1f(uniformResX, canvas.width);
@@ -113,7 +118,7 @@ loadFunctionBrdf = function() {
          gl.vertexAttribPointer(vPosAttribute, 3, gl.FLOAT, false, 0, 0);
          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
-      drawBRDF();
+      drawBRDF(1000.0);
    } else {
       console.log("Unable to init WebGL context");
    }
