@@ -62,10 +62,11 @@ Those atomic operators correspond to specific elements of light transport such a
 effect those operators have on the covariance matrix \(\Sigma\).</em></div>
 </center><br />
 
-Remember that we are interested not in the resulting radiance, but to its covariance. What we really want is <strong>how an operator affects the covariance</strong>. Fortunately, under a first order assumption (equivalent to paraxial optics), we can formulate analytically how operators modify the covariance matrix.
+Remember that we are not interested in the resulting radiance, but to its covariance. What we really want is <strong>how an operator affects the covariance</strong>. Fortunately, under a first order assumption (equivalent to paraxial optics), we can formulate analytically how operators modify the covariance matrix.
 
 
-<strong>The travel operator</strong> is the simplest of all. It describes the local radiance given that we now the local radiance from a previous position along the ray.
+<h4>The travel operator</h4>
+<strong>The travel operator</strong> is the simplest of all. It describes the local radiance given that we now the local radiance from a previous position along the ray. Using the tangent plane formulation described earlier, we can update the local position of a ray after a travel of length `d`. Only the spatial component of the ray will be updated since the ray's direction remains fixed.
 
 <center>
 <div style="position:relative;width:600px;height:300px;">
@@ -77,7 +78,9 @@ Remember that we are interested not in the resulting radiance, but to its covari
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_travel.js" type="text/javascript">
 </script>
 
-This operator shears the local radiance by the amount of traveled distance. The equivalent operator on the covariance matrix is also a shear which parameter is the traveled distance in meters. A Matlab implementation of the operator is the following:
+This operator shears the local radiance by the amount of traveled distance. The equivalent operator on the covariance matrix is also a shear which parameter is the traveled distance in meters. However, in the Fourier domain, the shear transfers spatial content to the angular domain. This is the opposite behaviour for radiance. It can be understood in the limit case where the travel distance is infinite. There, locally around the central direction of the ray, only radiance along the same direction remains. Thus the angular content is locally a dirac (a single direction) and the spatial content is locally a constant (same radiance for neighboring positions). 
+
+A Matlab implementation of the operator is the following:
 
       // Express the covariance after a travel of 'd' meters
       function travel(d) {
@@ -87,15 +90,19 @@ This operator shears the local radiance by the amount of traveled distance. The 
       }
 
 
-<strong>The projection operator</strong> enables to express the local radiance and the covariance in the tangent plane of objects. This is necessary to express the reflection or refraction of light on a planar surface. When the surface is non-planar, the <strong>curvature operator</strong> has to be applied after this operator.
+<h4>The projection operator</h4>
+<strong>The projection operator</strong> enables to express the local radiance and the covariance in the tangent plane of objects. This is necessary to express the reflection or refraction of light on a planar surface. When the surface is non-planar, the <strong>curvature operator</strong> is applied after this operator.
 
       function project(cos) {
          op = {cos, 0;
                  0, 1};
          cov = op' * cov * op;
       }
+      
+ Intuitively, this operator scales the spatial frequency content to match the new frame. Imagine that the incoming radiance is unidirectional and which a structured pattern. If you account for the difference of travel with respect to the tangent plane, some ray will have to travel further than other. Thus the distance with respect to the central position will scale with respect to the angular difference between the incident local plane and the tangent plane and the structured pattern will be dilated. Dilatation of space reduces frequency in the Fourier domain, this is why we have a cosine scaling in the operator.
 
 
+<h4>The BRDF operator</h4>
 <strong>The BRDF operator</strong> describes how the roughness reduces the bandwidth of the reflected local radiance. This is well known that the BRDF can be thought as being a blurring filter (think of pre-filtered envmaps).
 
 <center>
@@ -112,12 +119,14 @@ The BRDF operator is not easy to define using the covariance matrix. Intuitively
          cov = inverse(inverse(cov) + B);
       }
 
-where `B` describe the angular blur of the BRDF. It is defined using the absolute value of the BRDF's Hessian in the tangent plane of the reflected ray. For a Phong BRDF with exponnent `e`, the matrix is defined as:
+where `B` describe the angular blur of the BRDF. It is defined using the inverse of the absolute value of the BRDF's Hessian in the tangent plane of the reflected ray. For a Phong BRDF with exponent `e` with a reflected ray in the pure mirror direction, the matrix is defined as:
 
      B = { 0, 0;
            0, 4*pi^2/e};
 
-<strong>The curvature operator</strong>. So far we have expressed how to trace the covariance of local radiance when light is reflected by planar objects. To incorporate the the local variation of the object's surface into covariance tracing, we will enable to project the local radiance from the tangent plane to a first order approximation of the surface using its curvature.
+
+<h4>The curvature operator</h4>
+So far we have expressed how to trace the covariance of local radiance when light is reflected by planar objects. To incorporate the local variation of the object's surface into covariance tracing, we will enable to project the local radiance from the tangent plane to a first order approximation of the surface using its curvature.
 
       function curvature(k) {
          op = { 1, k;
@@ -125,9 +134,11 @@ where `B` describe the angular blur of the BRDF. It is defined using the absolut
          cov = op' * cov * op;
       }
 
-<strong>The visibility operator</strong>. Since we are studying local radiance, we need to account for the fact that part light might be occluded or that part of the light will not interact with an object. We account for those two effects by reducing the local window used for our frequency analysis until there is no more near-hit or near-miss rays. Applying a window to a signal means that we will convolve its Fourier spectrum by the window Fourier spectrum. In terms of covariance, this boils down to summing the covariance matrices.
 
-We usualy assumes that occluders are planar. In such case, we can perform the windowing on the spatial component only. If an occluder has non negligeable depth, then we can slice it along its depth and apply multiple times the occlusion operator.
+<h4>The visibility operator</h4>
+Since we are studying local radiance, we need to account for the fact that part light might be occluded or that part of the light will not interact with an object. We account for those two effects by reducing the local window used for our frequency analysis until there is no more *near-hit* or *near-miss* rays. Applying a window to a signal means that we will convolve its Fourier spectrum by the window Fourier spectrum. In terms of covariance, this boils down to summing the covariance matrices.
+
+We usually assumes that occluders are planar. In such case, we can perform the windowing on the spatial component only. If an occluder has non negligible depth, then we can slice it along its depth and apply multiple times the occlusion operator.
 
       function occlusion(w) {
          occ = {w, 0;
