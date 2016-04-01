@@ -3,9 +3,9 @@ var drawBRDF;
 loadFunctionBrdf = function() {
 
    // WebGL code
-   var canvas = document.getElementById("draw_cov_brdf-gl");
-   if(!canvas) {
-      alert("Impossible de récupérer le canvas");
+   var canvas_cov_brdf = document.getElementById("draw_cov_brdf-gl");
+   if(!canvas_cov_brdf) {
+      alert("Impossible de récupérer le canvas 'draw_cov_brdf-gl'");
    }
 
 //    getShader = function(id, gl, replacement=null) {
@@ -59,7 +59,7 @@ loadFunctionBrdf = function() {
       return program;
    }
 
-   var gl = initWebGL(canvas);
+   var gl = initWebGL(canvas_cov_brdf);
    if (gl) {
        
       // Light and geometry
@@ -75,7 +75,7 @@ loadFunctionBrdf = function() {
       if(!program) { return; }
       gl.useProgram(program);
 
-      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.viewport(0, 0, canvas_cov_brdf.width, canvas_cov_brdf.height);
       gl.clearColor(1.0, 1.0, 1.0, 1.0);
       gl.enable(gl.DEPTH_TEST);
       gl.depthFunc(gl.LEQUAL);
@@ -100,9 +100,9 @@ loadFunctionBrdf = function() {
          gl.uniform1f(uniformRough, roughness);
 
          var uniformResX = gl.getUniformLocation(program, "resX");
-         gl.uniform1f(uniformResX, canvas.width);
+         gl.uniform1f(uniformResX, canvas_cov_brdf.width);
          var uniformResY = gl.getUniformLocation(program, "resY");
-         gl.uniform1f(uniformResY, canvas.height);
+         gl.uniform1f(uniformResY, canvas_cov_brdf.height);
          
          var uniformOrg = gl.getUniformLocation(program, "origin");
          gl.uniform2f(uniformOrg, 0.75, 0.75);

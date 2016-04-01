@@ -1,7 +1,9 @@
-var canvas = document.getElementById('draw_cov_twoplanes');
+var two_planes_canvas = document.getElementById('draw_cov_twoplanes');
 
-canvas.addEventListener("load", function(){
-   var svg    = canvas.contentDocument;
+two_planes_canvas.addEventListener("load", function(){
+   var svg    = two_planes_canvas.contentDocument;
+   if(!svg){ alert("Unable to access SVG element from 'draw_cov_twoplanes'"); }
+   
    var cursor = svg.getElementById("cursor");
    var rect   = svg.getElementById("rectangle");
    var ray    = svg.getElementById("ray");
@@ -42,5 +44,3 @@ canvas.addEventListener("load", function(){
       }
    }, false);
 }, false);
-
-//updateDrawing(canvas, {x:0, y:0});
