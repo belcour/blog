@@ -173,7 +173,7 @@
 }
 
 .page-heading {
-    font-size: 20px;
+    font-size: $subtitle-font-size;
 }
 
 .post-list {
@@ -205,39 +205,23 @@
 }
 
 .post-title {
-    font-size: 42px;
+    font-size: $title-font-size;
     letter-spacing: -1px;
     line-height: 1;
-
-    @include media-query($on-laptop) {
-        font-size: 36px;
-    }
 }
 
 .post-content {
     margin-bottom: $spacing-unit;
 
     h2 {
-        font-size: 32px;
-
-        @include media-query($on-laptop) {
-            font-size: 28px;
-        }
+        font-size: $title-font-size;
     }
 
     h3 {
-        font-size: 26px;
-
-        @include media-query($on-laptop) {
-            font-size: 22px;
-        }
+        font-size: $subtitle-font-size;
     }
 
     h4 {
-        font-size: 20px;
-
-        @include media-query($on-laptop) {
-            font-size: 18px;
-        }
+        font-size: $subtitle-font-size;
     }
 }

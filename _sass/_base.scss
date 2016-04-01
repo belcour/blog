@@ -116,7 +116,7 @@ blockquote {
     color: $grey-color;
     border-left: 4px solid $grey-color-light;
     padding-left: $spacing-unit / 2;
-    font-size: 18px;
+    font-size: $small-font-size;
     letter-spacing: -1px;
     font-style: italic;
 
@@ -133,7 +133,7 @@ blockquote {
 pre,
 code {
     font-family: $code-font-family;
-    font-size: 11px;
+    font-size: $small-font-size;
     border: 1px solid $grey-color-light;
     border-radius: 3px;
     background-color: #eee;
@@ -210,11 +210,11 @@ pre {
 }
 
 span.h3 {
-   font-size: 14pt;
+   font-size: $title-font-size;
 }
 
 span.h4 {
-   font-size: 12pt;
+   font-size: $subtitle-font-size;
 }
 
 ul.iconlist {

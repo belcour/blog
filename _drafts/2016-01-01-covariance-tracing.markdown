@@ -8,6 +8,9 @@ javascripts:
   - utils
 ---
 
+<center style="color:#EE0000;">This webpage does not correctly render on Chrome yet. It has been fully tested on Firefox and Safari.
+</center><br />
+
 <strong>Covariance Tracing</strong> is a method to evaluate the bandwidth of the <em>local radiance</em> around a given light path. Knowing the bandwidth of the radiance enable a wide variety of applications (see <a href="#citations">[1-3]</a>). This document present the idea of covariance tracing and frequency analysis in a progressive manner.
 
 For simplicity, we will illustrate the different concepts using 2D light transport.
@@ -109,7 +112,7 @@ The BRDF operator is not easy to define using the covariance matrix. Intuitively
          cov = inverse(inverse(cov) + B);
       }
 
-where `B` describe the angular blur of the BRDF. For a Phong BRDF with exponnent `e`, the matrix is defined as:
+where `B` describe the angular blur of the BRDF. It is defined using the absolute value of the BRDF's Hessian in the tangent plane of the reflected ray. For a Phong BRDF with exponnent `e`, the matrix is defined as:
 
      B = { 0, 0;
            0, 4*pi^2/e};
@@ -122,6 +125,15 @@ where `B` describe the angular blur of the BRDF. For a Phong BRDF with exponnent
          cov = op' * cov * op;
       }
 
+<strong>The visibility operator</strong>. Since we are studying local radiance, we need to account for the fact that part light might be occluded or that part of the light will not interact with an object. We account for those two effects by reducing the local window used for our frequency analysis until there is no more near-hit or near-miss rays. Applying a window to a signal means that we will convolve its Fourier spectrum by the window Fourier spectrum. In terms of covariance, this boils down to summing the covariance matrices.
+
+We usualy assumes that occluders are planar. In such case, we can perform the windowing on the spatial component only. If an occluder has non negligeable depth, then we can slice it along its depth and apply multiple times the occlusion operator.
+
+      function occlusion(w) {
+         occ = {w, 0;
+                0, 0};
+         cov = cov + occ;
+      }
 
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_brdf.js" type="text/javascript"></script>
 <script id="raytracer2d-fs"  type="x-shader/x-fragment">{% include shaders/raytracer2d.fs %}</script>
