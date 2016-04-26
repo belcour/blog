@@ -9,7 +9,7 @@ javascripts:
 
 Below is a thematic list of my publications. For a complete list of paper I
 have [co]-authored, please refer to my [google scholar
-page](https://scholar.google.fr/citations?user=W0RoUdYAAAAJ&hl=fr&oi=sra).
+page](https://scholar.google.fr/citations?hl=fr&user=W0RoUdYAAAAJ&view_op=list_works&sortby=pubdate).
 
 
 ### Frequency Analysis of Light Transport
