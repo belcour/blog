@@ -26,7 +26,7 @@ simulation or to adapt the sampling budget locally.
   <td style="vertical-align:top;"><b><a style="color:black;" href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">Antialiasing Complex Global Illumination Effects in Path-space</a></b> <br />
       Laurent Belcour, Ling-Qi Yan, Ravi Ramamoorthi, and Derek Nowrouzezahrai <br />
       University of Montréal Technical Report #1375
-      <a href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">project</a> <a href="https://hal.inria.fr/hal-01200710v1/document">paper</a> <a href="https://hal.inria.fr/hal-01200710v1/bibtex">bib</a> <a href="https://www.youtube.com/watch?v=lgldxBcuIj0">video</a>
+      <a href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">project</a> <a href="https://hal.inria.fr/hal-01200710/document">paper</a> <a href="https://hal.inria.fr/hal-01200710/bibtex">bib</a> <a href="https://www.youtube.com/watch?v=lgldxBcuIj0">video</a>
   </td>
 </tr>
 <tr>
