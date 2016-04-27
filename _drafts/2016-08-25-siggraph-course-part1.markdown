@@ -1,15 +1,18 @@
 ---
 layout: post
-title:  "Introduction to Covariance Tracing"
-date:   2016-01-01
-categories: research
+title:  "SIGGRAPH 2016 Course: Part 1"
+date:   2016-08-25
+categories: course
 published: true
 javascripts:
   - utils
 ---
 
-<center style="color:#EE0000;">This webpage does not correctly render on Chrome yet. It has been fully tested on Firefox and Safari.
+<div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-2016-course.html">&larr; Intro</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
+
+<center style="color:#EE0000;"><span>This webpage does not correctly render on Chrome yet. It has been tested on Firefox and Safari.</span><br /><span> If you have trouble with it, please send me a note!</span>
 </center><br />
+This course note is the first part of the [2016 SIGGRAPH course][course-main] on Frequency Analysis of Light Transport.
 
 <strong>Covariance Tracing</strong> is a method to evaluate the bandwidth of the <em>local radiance</em> around a given light path. Knowing the bandwidth of the radiance enable a wide variety of applications (see <a href="#citations">[1-3]</a>). This document present the idea of covariance tracing and frequency analysis in a progressive manner.
 
@@ -113,6 +116,7 @@ A Matlab implementation of the operator is the following:
 <div style="width:600px;"><em><a name="figure4">Fig.4 -</a> The BRDF operator. In this case, we use as input a tight Gaussian cone light. The light's cone is blurred by the BRDF. Using the cursor, you can vary the phong exponent from 100 to 1000 and see the blurring effect.</em></div>
 </center><br />
 
+
 The BRDF operator is not easy to define using the covariance matrix. Intuitively, we want to express the covariance of the product of two signals using their respective covariance matrices. If we have no knowledge of the type of signals we are multiplying, then this product is undefined. However, in the case of Gaussians spectra the product is defined as the inverse of the sum of the inverse covariance matrices.
 
       function BRDF(B) {
@@ -146,9 +150,10 @@ We usually assumes that occluders are planar. In such case, we can perform the w
          cov = cov + occ;
       }
 
-<script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_brdf.js" type="text/javascript"></script>
-<script id="raytracer2d-fs"  type="x-shader/x-fragment">{% include shaders/raytracer2d.fs %}</script>
-<script id="raytracer2d-vs"  type="x-shader/x-vertex">{% include shaders/raytracer2d.vs %}</script>
+In the [next section][course-part2], we will see how to pratically use the knowledge of the Fourer spectrum extents.
+<br />
+
+<div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-course.html">&larr; Intro</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course//2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
 
 #### Bibliography
 <a name="citations"></a>
@@ -160,3 +165,13 @@ We usually assumes that occluders are planar. In such case, we can perform the w
   5. A Frequency Analysis of Monte-Carlo and other Numerical Integration Schemes. Durand 2011. Tech Report.
   6. The Rendering Equation. Kajiya 1986. ACM SIGGRAPH.
   7. Wave Propagation and Scattering in Random Media. Ishimaru 1999. John Wiley & Sons.
+
+
+[course-main]:  {{ site.url | append: site.baseurl }}/siggraph-2016-course.html
+[course-part1]: {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part1.html
+[course-part2]: {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html
+
+<script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_brdf.js" type="text/javascript"></script>
+<script id="raytracer2d-fs"  type="x-shader/x-fragment">{% include shaders/raytracer2d.fs %}</script>
+<script id="raytracer2d-vs"  type="x-shader/x-vertex">{% include shaders/raytracer2d.vs %}</script>
+
