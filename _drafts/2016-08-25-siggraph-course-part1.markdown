@@ -6,6 +6,8 @@ categories: course
 published: true
 javascripts:
   - utils
+  - raytracer
+  - fft
 ---
 
 <div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-2016-course.html">&larr; Intro</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
@@ -73,8 +75,10 @@ Remember that we are not interested in the resulting radiance, but to its covari
 
 <center>
 <div style="position:relative;width:600px;height:300px;">
-<canvas id="draw_cov_travel-gl" style="position:absolute;left:335px;top:26px;width:243px;height:243px;background-color:#FFF;border:0px"></canvas>
-<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_travel.svg" width="600px" id="draw_cov_travel-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
+<canvas id="draw_cov_travel-gl" style="position:absolute;left:335px;top:28px;width:241px;height:241px;background-color:#FFF;border:0px"></canvas>
+<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_travel.svg" width="600px" id="draw_cov_travel-cv" style="position:absolute;top:0px;left:0px;"></object>
+<button id="draw_cov_travel_bt" type="button" style="position:absolute;left:400px;top:290px;">Fourier Transform!</button>
+</div><br />
 <div style="width:600px;"><em><a name="figure3">Fig.3 -</a> The travel operator. Given a diffuse light source with Gaussian spread in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</em></div>
 </center><br />
 
