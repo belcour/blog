@@ -8,22 +8,140 @@ javascripts:
   - utils
   - raytracer
   - fft
+  - snap.svg
 ---
 
 <div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-2016-course.html">&larr; Intro</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
 
 <center style="color:#EE0000;"><span>This webpage does not correctly render on Chrome yet. It has been tested on Firefox and Safari.</span><br /><span> If you have trouble with it, please send me a note!</span>
 </center><br />
-This course note is the first part of the [2016 SIGGRAPH course][course-main] on Frequency Analysis of Light Transport.
+This course note is the first part of the [2016 SIGGRAPH course][course-main] on Frequency Analysis of Light Transport. Additional material such as slides and source code are available in the [main page][course-main].
 
-<strong>Covariance Tracing</strong> is a method to evaluate the bandwidth of the <em>local radiance</em> around a given light path. Knowing the bandwidth of the radiance enable a wide variety of applications (see <a href="#citations">[1-3]</a>). This document present the idea of covariance tracing and frequency analysis in a progressive manner.
 
-For simplicity, we will illustrate the different concepts using 2D light transport.
+#### Introduction
 
+The idea of Frequency Analysis of Light Transport as sketched by [Durand and colleagues [2005]][durand2005] is that many tools used in rendering are better understood using a **signal processing** approach. Not only can we explain phenomena such as soft shadows and glossy reflections, but we can also improve existing algorithms.
+
+**Signal processing** uses an alternative representation of a signal which: its **Fourier transform**. A Fourier transform describes a signal in terms of amplitude with respect to frequency instead of the traditional view (we call *the primal*) that describes a signal in terms of amplitude with respect to coordinates.
+
+<center>
+<div style="position:relative;width:600px;height:300px;">
+<canvas id="fourier-transform-01-fft" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:1;"></canvas>
+<canvas id="fourier-transform-01-img" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:1;"></canvas>
+<canvas id="fourier-transform-01-rec" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:0;"></canvas>
+<svg id="fourier-transform-01-svg" width="600px" height="300px" style="position:relative;z-index:3;"></svg>
+</div><br />
+<div style="width:600px;"><em>The Fourier transform of a signal describes its content with respect to variations and not positions. A fourier spectrum restricted to the center of the Fourier domain smooth. As we incorporate more elements far away from the center, the image becomes sharper. Click on areas to remove frequency content above a level.</em></div>
+</center>
+<script type="text/javascript">
+var s = Snap('#fourier-transform-01-svg');
+Snap.load("{{ site.url | append: site.baseurl }}/data/svg/course-fourier01.svg", function (f) {
+      s.append(f);
+      
+      // Position of the input image
+      var bbox    = Snap("#image").getBBox();
+      var img_cnv = document.getElementById("fourier-transform-01-img");
+      var img_ctx = img_cnv.getContext('2d');
+      img_cnv.style.width  = bbox.width + "px";
+      img_cnv.style.height = bbox.height + "px";
+      img_cnv.style.left   = bbox.x + "px";
+      img_cnv.style.top    = bbox.y + "px";
+      img_cnv.style.backgroundColor = "#F0F";
+      
+      // Reconstructed image
+      var rec_cnv = document.getElementById("fourier-transform-01-rec");
+      var rec_ctx = rec_cnv.getContext('2d');
+      rec_cnv.style.width  = bbox.width + "px";
+      rec_cnv.style.height = bbox.height + "px";
+      rec_cnv.style.left   = bbox.x + "px";
+      rec_cnv.style.top    = bbox.y + "px";
+      rec_cnv.style.backgroundColor = "#F0F";
+      rec_ctx.fillStyle = '#ffffff';
+      rec_ctx.fillRect(0, 0, rec_ctx.canvas.width, rec_ctx.canvas.height);
+      
+      // Position of the fourier spectrum
+      var bbox    = Snap("#fourier").getBBox();
+      var fft_cnv = document.getElementById("fourier-transform-01-fft");
+      var fft_ctx = fft_cnv.getContext('2d');
+      fft_cnv.style.width  = bbox.width + "px";
+      fft_cnv.style.height = bbox.height + "px";
+      fft_cnv.style.left   = bbox.x + "px";
+      fft_cnv.style.top    = bbox.y + "px";
+      fft_cnv.style.backgroundColor = "#FFF";
+      fft_ctx.fillStyle = '#ffffff';
+      fft_ctx.fillRect(0, 0, fft_ctx.canvas.width, fft_ctx.canvas.height);
+      
+      // Load the image and display it
+      const h = 128, w = 128;
+      var image   = new Image(w, h);
+      image.src = "{{ site.url | append: site.baseurl }}/data/images/lena.jpg";
+      image.addEventListener('load', function() {
+            img_ctx.drawImage(image, 0, 0, w, h);
+            
+            var updateFilter = function(radius) {
+                  // Compute the FFT of the image
+                  FFT.init(w);
+                  FrequencyFilter.init(w);
+                  SpectrumViewer.init(fft_ctx);
+                  var src = img_ctx.getImageData(0, 0, w, h);
+                  var dat = src.data;
+                  var re = [], im = [];
+                  for(var y=0; y<h; y++) {
+                        var i = y*w;
+                        for(var x=0; x<w; x++) {
+                        var L = dat[(i << 2) + (x << 2) + 0] 
+                              + dat[(i << 2) + (x << 2) + 1]
+                              + dat[(i << 2) + (x << 2) + 2];
+                        re[i + x] = L / 3.0;
+                        im[i + x] = 0.0;
+                        }
+                  }
+                  FFT.fft2d(re, im);
+                  FrequencyFilter.swap(re, im);
+                  
+                  // Draw spectrum
+                  SpectrumViewer.render(re, im, true);
+
+                  FrequencyFilter.LPF(re, im, radius);
+                  FrequencyFilter.swap(re, im);
+                  FFT.ifft2d(re, im);
+                  for(var y=0; y<h; y++) {
+                        var i = y*w;
+                        for(var x=0; x<w; x++) {
+                              var val = re[i + x];
+                              val = val > 255 ? 255 : val < 0 ? 0 : val;
+                              var p   = (i << 2) + (x << 2);
+                              dat[p] = dat[p + 1] = dat[p + 2] = val;
+                        }
+                  }
+                  rec_ctx.putImageData(src, 0, 0);
+                  rec_cnv.style.zIndex = "2"; 
+            }
+            
+            updateFilter(200);
+            
+            Snap("#zone0").node.onclick = function() { 
+                  updateFilter(4);
+            };
+            Snap("#zone1").node.onclick = function() { 
+                  updateFilter(40);
+            };
+            Snap("#zone2").node.onclick = function() { 
+                  updateFilter(128);
+            };
+      });
+      
+
+});
+</script>
 
 #### Local Bandwidth
 
-The bandwidth of a signal provides information on the necessary sampling pattern to either reconstruct it <a href="#citations">[4]</a> or integrate it <a href="#citations">[5]</a>. Intuitively, it tells us how far apart two samples should be. This is however assuming that the bandwidth is finite (or distance between samples would be zero). Mathematically, the bandwidth is the minimum support of the Fourier transform of the signal we are considering.
+The **bandwidth** of a signal is its Fourier transform's extent. Mathematically, the bandwidth is the minimum support of the signal's Fourier transform. It provides information on the necessary sampling pattern to either [reconstruct it][shannon1949] or to [integrate it][durand2011]. Intuitively, it tells the maximum amount of variation a signal has and this is enough to predict the maximum distance between samples for perfect sampling. This is however assuming that the bandwidth is finite (or distance between samples would be zero). 
+
+**Covariance Tracing** is a method to evaluate the bandwidth of the *local radiance* around a given light path. Knowing the bandwidth of the radiance enable a lot of applications (see <a href="#citations">[1-3]</a>). This document present the idea of covariance tracing and frequency analysis in a progressive way.
+
+For simplicity, we will illustrate the different concepts using 2D light transport.
 
 
 #### What is covariance?
@@ -169,7 +287,10 @@ In the [next section][course-part2], we will see how to pratically use the knowl
   5. A Frequency Analysis of Monte-Carlo and other Numerical Integration Schemes. Durand 2011. Tech Report.
   6. The Rendering Equation. Kajiya 1986. ACM SIGGRAPH.
   7. Wave Propagation and Scattering in Random Media. Ishimaru 1999. John Wiley & Sons.
-
+  
+[shannon1949]: https://en.wikipedia.org/wiki/Nyquist–Shannon_sampling_theorem
+[durand2005]: http://portal.acm.org/citation.cfm?id=1186822.1073320
+[durand2011]: http://dspace.mit.edu/handle/1721.1/67677
 
 [course-main]:  {{ site.url | append: site.baseurl }}/siggraph-2016-course.html
 [course-part1]: {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part1.html
