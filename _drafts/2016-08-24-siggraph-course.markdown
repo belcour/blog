@@ -33,7 +33,7 @@ Source code available on github [here][source-code].
 
 
 [notes-part1]:  {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part1.html
-[notes-part2]:  {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-2016-part2.html
+[notes-part2]:  {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html
 [slides-part1]: {{ site.url | append: site.baseurl }}/slides/siggraph-2016-part1.html
 [slides-part2]: {{ site.url | append: site.baseurl }}/slides/siggraph-2016-part2.html
 [source-code]:  https://github.com/belcour/CovarianceTracing

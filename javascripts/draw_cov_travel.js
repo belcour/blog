@@ -11,13 +11,7 @@ loadFunctionTravel = function() {
    tr_canvas.width  = w;
    tr_canvas.height = h;
 
-   scene = createScene();
-   addObject(scene, {p1 : {x: 1.0, y: -0.5}, p2 : {x: 1.0, y: 0.5}, L : 1.0});
-   addCamera(scene, {o: {x: -0.5, y: 0.0}, d: {x: 1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
-
-   var distToLight = 0.0;
-   scene.camera.o.x = -distToLight;
-
+   var fourier_bt_press = false;
    function render_fourier() {
       FFT.init(w);
       FrequencyFilter.init(w);
@@ -42,20 +36,28 @@ loadFunctionTravel = function() {
       SpectrumViewer.init(tr_spectrum);
       SpectrumViewer.render(re, im);
    }
-   
-   var fourier_bt_press = false;
+ //*     
+   scene = createScene();
+   addObject(scene, {p1 : {x: 1.0, y: -0.5}, p2 : {x: 1.0, y: 0.5}, L : 1.0});
+   addCamera(scene, {o: {x: -0.5, y: 0.0}, d: {x: 1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
+
+   var distToLight = 0.0;
+   scene.camera.o.x = -distToLight;
 
    render(tr_canvas, scene, 0);
    if(fourier_bt_press) {
       render_fourier();
    }
-   
+ 
    var button = document.getElementById("draw_cov_travel_bt");
    button.onclick = function() {
       fourier_bt_press = !fourier_bt_press;
       render(tr_canvas, scene, 0);
       if(fourier_bt_press) {
+            button.textContent = "inverse Fourier Transform";
             render_fourier();
+      } else {
+            button.textContent = "Fourier Transform";
       }
    };
 
@@ -115,7 +117,7 @@ loadFunctionTravel = function() {
             render_fourier();
          }
       }, false);
-/*
+/*/
    var gl = initWebGL(tr_canvas);
    if (gl) {
       gl.viewport(0, 0, tr_canvas.width, tr_canvas.height);
@@ -183,6 +185,18 @@ loadFunctionTravel = function() {
          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
       drawTravel();
+      if(fourier_bt_press) {
+            render_fourier();
+      }
+      
+      var button = document.getElementById("draw_cov_travel_bt");
+      button.onclick = function() {
+            fourier_bt_press = !fourier_bt_press;
+            drawTravel();
+            if(fourier_bt_press) {
+                  render_fourier();
+            }
+      };
 
       // SVG drawing code
       var tr_svg = document.getElementById('draw_cov_travel-cv');
@@ -236,7 +250,7 @@ loadFunctionTravel = function() {
          drawTravel();
       }, false);
    }
-*/
+//*/
 }
 
 addLoadEvent(loadFunctionTravel);

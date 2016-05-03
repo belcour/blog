@@ -13,14 +13,17 @@ javascripts:
 
 <div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-2016-course.html">&larr; Intro</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
 
+<!--
 <center style="color:#EE0000;"><span>This webpage does not correctly render on Chrome yet. It has been tested on Firefox and Safari.</span><br /><span> If you have trouble with it, please send me a note!</span>
 </center><br />
-This course note is the first part of the [2016 SIGGRAPH course][course-main] on Frequency Analysis of Light Transport. Additional material such as slides and source code are available in the [main page][course-main].
+-->
+
+This course note is the first part of the [2016 SIGGRAPH course][course-main] on Frequency Analysis of Light Transport. Additional material such as slides and source code are available in the [main page][course-main]. **Note:** most of the diagrams and figure are *interactive* (but not all of them). Please feel unashamed to click on them!
 
 
 #### Introduction
 
-The idea of Frequency Analysis of Light Transport as sketched by [Durand and colleagues [2005]][durand2005] is that many tools used in rendering are better understood using a **signal processing** approach. Not only can we explain phenomena such as soft shadows and glossy reflections, but we can also improve existing algorithms.
+The idea of Frequency Analysis of Light Transport as sketched by [Durand and colleagues [2005]][durand2005] is that many tools used in rendering are better understood using a **signal processing** approach. Not only can we explain phenomena such as soft shadows and glossy reflections, but we can also improve existing algorithms. For example, Frequency Analysis enables to improve denoising  and adaptive sampling algorithms, density estimation or antialiasing.
 
 **Signal processing** uses an alternative representation of a signal which: its **Fourier transform**. A Fourier transform describes a signal in terms of amplitude with respect to frequency instead of the traditional view (we call *the primal*) that describes a signal in terms of amplitude with respect to coordinates.
 
@@ -33,7 +36,7 @@ The idea of Frequency Analysis of Light Transport as sketched by [Durand and col
 </div><br />
 <div style="width:600px;"><em>The Fourier transform of a signal describes its content with respect to variations and not positions. A fourier spectrum restricted to the center of the Fourier domain smooth. As we incorporate more elements far away from the center, the image becomes sharper. Click on areas to remove frequency content above a level.</em></div>
 </center>
-<script type="text/javascript">
+<script type="text/javascript" >
 var s = Snap('#fourier-transform-01-svg');
 Snap.load("{{ site.url | append: site.baseurl }}/data/svg/course-fourier01.svg", function (f) {
       s.append(f);
@@ -115,7 +118,7 @@ Snap.load("{{ site.url | append: site.baseurl }}/data/svg/course-fourier01.svg",
                         }
                   }
                   rec_ctx.putImageData(src, 0, 0);
-                  rec_cnv.style.zIndex = "2"; 
+                  rec_cnv.style.zIndex = "2";
             }
             
             updateFilter(200);
@@ -130,23 +133,48 @@ Snap.load("{{ site.url | append: site.baseurl }}/data/svg/course-fourier01.svg",
                   updateFilter(128);
             };
       });
-      
-
 });
-</script>
+</script><br />
 
-#### Local Bandwidth
+Mathematically, the Fourier transform of a signal $$f(\mathbf{x})$$ where $$\mathbf{x} = [x_1, \cdots, x_N] \in \mathbb{R}^N$$ is:
 
-The **bandwidth** of a signal is its Fourier transform's extent. Mathematically, the bandwidth is the minimum support of the signal's Fourier transform. It provides information on the necessary sampling pattern to either [reconstruct it][shannon1949] or to [integrate it][durand2011]. Intuitively, it tells the maximum amount of variation a signal has and this is enough to predict the maximum distance between samples for perfect sampling. This is however assuming that the bandwidth is finite (or distance between samples would be zero). 
+$$ \mathcal{F}\left[ f \right](\mathbf{\Omega}) = \int_{\mathbb{R}^N} f(\mathbf{x}) e^{i 2 \pi \mathbf{\Omega}^T \mathbf{x}} \mbox{d}\mathbf{x}.$$
+
+Here, variable $$\mathbf{\Omega} = [\Omega_1, \cdots, \Omega_N] \in \mathbb{R}^N$$ describes the frequency domain coordinates.
+
+The Fourier transform has many interesting properties that we will uncover as we need them. For more information about it, you can go to its [wikipedia page][wiki-fourier]. The next step is to specify how the Fourier transform is applied in rendering.
+
+
+### Fourier Transform of Radiance
+
+    TODO:
+     + Freq. Analysis in pixel space is not interesting
+     + Need to go back to how a pixel's value is computed: Radiance 
+     + Freq. Analysis of the [Rendering Equation][kajiya1986].
+     + Need schematic with dragon scene here.
+
+
+#### Bandwidth
+
+The **bandwidth** of a signal is its Fourier transform's extent. Mathematically, the bandwidth is the minimum support of the signal's Fourier transform. It provides information on the necessary sampling pattern to either [reconstruct it][shannon1949] or to [integrate it][durand2011]. Intuitively, it gives the maximum amount of relative variation a signal has. This is enough to predict the maximum distance between samples for perfect sampling. This is however assuming that the bandwidth is finite (or distance between samples would be zero). 
 
 **Covariance Tracing** is a method to evaluate the bandwidth of the *local radiance* around a given light path. Knowing the bandwidth of the radiance enable a lot of applications (see <a href="#citations">[1-3]</a>). This document present the idea of covariance tracing and frequency analysis in a progressive way.
 
 For simplicity, we will illustrate the different concepts using 2D light transport.
 
 
+### Local Fourier Transform
+
+      + Localisation needed to have a fine analysis
+      + Need windowing W
+      + Redefine a local Fourier Transform
+
+
 #### What is covariance?
 
 In the following, we will talk about covariance referring to the covariance of the Fourier transform of the radiance function. The covariance is a matrix describing the orientation and spread of a signal. Covariance gives us an indication on the bandwidth of the signal and enable to work with signals having infinite bandwidth.
+
+$$\Sigma_{i,j} = \int_{\mathbb{R}^N} \Omega_i \, \Omega_j \; \mathcal{F_l}[f](\mathbf{\Omega}) \; \mbox{d}\mathbf{\Omega}$$
 
 Since we are interested by 2D light transport, we will use a 2D matrix. The complete formulation of covariance tracing involves a 5D matrix (2D in space, 2D in angles and  1D in time).
 
@@ -158,7 +186,7 @@ where `sxx` and `syy` are the variance (or squared standard deviation) of the si
 
 #### Ray Local Space
 
-In order to describe the radiance for small perturbation of a given ray, we need a parametrization of this local space. We will use the tangential space defined by the ray. This space can be defined using a two plane parametrization (see <a href="#figure1">Fig.1</a>).
+In order to describe the radiance for small perturbation of a given ray, we need a parametrization of this local space. We will use the tangential space defined by the ray. This space can be defined using a two plane parametrization.
 
 <center>
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_twoplanes.svg" width="604px" id="draw_cov_twoplanes"></object><br />
@@ -168,14 +196,20 @@ In order to describe the radiance for small perturbation of a given ray, we need
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_twoplanes.js" type="text/javascript">
 </script>
 
-Now that we have this parametrization, we can express the radiance in that space: $$L(x + \delta x, u + \delta u)$$. But instead of looking at the radiance, we will be interested by its [Fourier transform](http://en.wikipedia.org/wiki/Fourier_transform). While local radiance is parametrized in 2D by the couple $$(\delta{x},\delta{y})$$, it is parametrized by the couple $$(\Omega_x,\Omega_u)$$.
+Mathematically, we express positions and directions as perturbations of the main position (resp. direction) along the tangent plane of the ray:
 
-The next step is to express radiance transport equations in this space and to express the frequency equivalent of those equations.
+$$\mathbf{x} = \mathbf{x}_0 + \delta \mathbf{x}$$
+
+$$\pmb{\omega} = \frac{\pmb{\omega}_0 + \delta \mathbf{u}}{|| \pmb{\omega}_0 + \delta \mathbf{u} ||}$$
+
+Now that we have this parametrization, we can express the radiance in that space: $$L(\mathbf{x}_0 + \delta \mathbf{x}, \pmb{\omega}_0 + \delta \mathbf{u} )$$. But remember that we are interested by its Fourier transform. While local radiance is parametrized in 2D by the couple $$(\delta{x},\delta{y})$$, it is parametrized by the couple $$(\Omega_x,\Omega_u)$$ in the Fourier domain.
+
+The next step is to express radiance transport equations in this space and to convert them using the Fourier transform.
 
 
 #### Radiance Operators in Local Space
 
-Expressing the rendering equation <a href="#citations">[6]</a> or the radiative transfer equation <a href="#citations">[7]</a> in local coordinates is not possible since they rely on global coordinates. Instead, we look at solutions of those equations for simple cases (operators) that correspond to transport evaluated during path tracing. We will need to describe several transport operators such as <em>travel in free space, reflection, refraction, etc.</em> (see <a href="#figure2">Fig.2</a>).
+Expressing the [rendering equation][kajiya1986] or the [radiative transfer equation][ishimaru19XX] in local coordinates is not possible since they rely on global coordinates. Instead, we look at solutions of those equations for simple cases (operators) that correspond to transport evaluated during path tracing. We will need to describe several transport operators such as *travel in free space, reflection, refraction, etc.*.
 
 <center>
 <div style="position:relative;width:600px;height:300px;">
@@ -185,11 +219,12 @@ Those atomic operators correspond to specific elements of light transport such a
 effect those operators have on the covariance matrix \(\Sigma\).</em></div>
 </center><br />
 
-Remember that we are not interested in the resulting radiance, but to its covariance. What we really want is <strong>how an operator affects the covariance</strong>. Fortunately, under a first order assumption (equivalent to paraxial optics), we can formulate analytically how operators modify the covariance matrix.
+Remember that we are not interested in the resulting radiance, but to its Fourier transform. What we really want is **how an operator affects the Fourier spectrum**. Fortunately, under a first order assumption (equivalent to paraxial optics), we can formulate analytically how operators modify it. Furthermore, we will have the same analytical formulation for the covariance matrix.
 
 
-<h4>The travel operator</h4>
-<strong>The travel operator</strong> is the simplest of all. It describes the local radiance given that we now the local radiance from a previous position along the ray. Using the tangent plane formulation described earlier, we can update the local position of a ray after a travel of length `d`. Only the spatial component of the ray will be updated since the ray's direction remains fixed.
+### The travel operator
+
+**The travel operator** is the simplest of all. It describes the local radiance given that we now the local radiance from a previous position along the ray. Using the tangent plane formulation described earlier, we can update the local position of a ray after a travel of length `d`. Only the spatial component of the ray will be updated since the ray's direction remains fixed.
 
 <center>
 <div style="position:relative;width:600px;height:300px;">
@@ -197,7 +232,7 @@ Remember that we are not interested in the resulting radiance, but to its covari
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_travel.svg" width="600px" id="draw_cov_travel-cv" style="position:absolute;top:0px;left:0px;"></object>
 <button id="draw_cov_travel_bt" type="button" style="position:absolute;left:400px;top:290px;">Fourier Transform!</button>
 </div><br />
-<div style="width:600px;"><em><a name="figure3">Fig.3 -</a> The travel operator. Given a diffuse light source with Gaussian spread in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</em></div>
+<div style="width:600px;"><em><a name="figure3">Fig.3 -</a> The travel operator. Given a diffuse light source with in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</em></div>
 </center><br />
 
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_travel.js" type="text/javascript">
@@ -264,6 +299,9 @@ So far we have expressed how to trace the covariance of local radiance when ligh
 <h4>The visibility operator</h4>
 Since we are studying local radiance, we need to account for the fact that part light might be occluded or that part of the light will not interact with an object. We account for those two effects by reducing the local window used for our frequency analysis until there is no more *near-hit* or *near-miss* rays. Applying a window to a signal means that we will convolve its Fourier spectrum by the window Fourier spectrum. In terms of covariance, this boils down to summing the covariance matrices.
 
+       TODO:
+        + Add schematic
+
 We usually assumes that occluders are planar. In such case, we can perform the windowing on the spatial component only. If an occluder has non negligible depth, then we can slice it along its depth and apply multiple times the occlusion operator.
 
       function occlusion(w) {
@@ -276,25 +314,16 @@ In the [next section][course-part2], we will see how to pratically use the knowl
 <br />
 
 <div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-course.html">&larr; Intro</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course//2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
-
-#### Bibliography
-<a name="citations"></a>
-
-  1. 5D Covariance Tracing for Efficient Defocus and Motion Blur. Belcour <em>et al.</em> 2013. ACM TOG.
-  2. Frequency Analysis of Light Scattering and Absorption. Belcour <em>et al.</em> 2014. ACM TOG.
-  3. Antialiasing Complex Global Illumination Effects in Path-space. Belcour <em>et al.</em> 2015. Tech Report.
-  4. Communication in the presence of noise. Shannon 1949. Proc. Institute of Radio Engineers.
-  5. A Frequency Analysis of Monte-Carlo and other Numerical Integration Schemes. Durand 2011. Tech Report.
-  6. The Rendering Equation. Kajiya 1986. ACM SIGGRAPH.
-  7. Wave Propagation and Scattering in Random Media. Ishimaru 1999. John Wiley & Sons.
   
 [shannon1949]: https://en.wikipedia.org/wiki/Nyquist–Shannon_sampling_theorem
+[kajiya1986]: http://dl.acm.org/citation.cfm?id=280987&CFID=609795496&CFTOKEN=98285306
 [durand2005]: http://portal.acm.org/citation.cfm?id=1186822.1073320
 [durand2011]: http://dspace.mit.edu/handle/1721.1/67677
 
 [course-main]:  {{ site.url | append: site.baseurl }}/siggraph-2016-course.html
 [course-part1]: {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part1.html
 [course-part2]: {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html
+[wiki-fourier]: https://en.wikipedia.org/wiki/Fourier_transform
 
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_brdf.js" type="text/javascript"></script>
 <script id="raytracer2d-fs"  type="x-shader/x-fragment">{% include shaders/raytracer2d.fs %}</script>

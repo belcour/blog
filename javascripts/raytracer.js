@@ -196,6 +196,8 @@ function render(target, scene, pass) {
    // Create the target image
    var  ctx = target.getContext('2d');
    var data = ctx.getImageData(0, 0, target.width, target.height);
+   
+   const spp = 4
 
    // Check for the scene validity
    if(!scene.camera || !scene.objects) {
@@ -210,14 +212,13 @@ function render(target, scene, pass) {
          index = (i + j * J) * 4;
 
          var radiance = 0;
-         const spp = 1;
 
          // Super sampling
          for (var ei=0; ei<spp; ei++) {
             for (var ej=0; ej<spp; ej++) {
 
-               var x = 2.0*((i + 0.25*(ei + 0.5)) / I - 0.5);
-               var y = 2.0*((j + 0.25*(ej + 0.5)) / J - 0.5);
+               var x = 2.0*((i + (ei + 0.5)/spp) / I - 0.5);
+               var y = 2.0*((j + (ej + 0.5)/spp) / J - 0.5);
                var ray = {
                   o: add(scene.camera.o, mul(x, scene.camera.up)),
                   d: normalize(add(scene.camera.d, mul(y, scene.camera.up)))
