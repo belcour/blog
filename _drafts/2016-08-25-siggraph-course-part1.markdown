@@ -238,7 +238,7 @@ Remember that we are not interested in the resulting radiance, but to its Fourie
 <div style="position:relative;width:600px;height:300px;">
 <canvas id="draw_cov_travel-gl" style="position:absolute;left:335px;top:28px;width:241px;height:241px;background-color:#FFF;border:0px"></canvas>
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_travel.svg" width="600px" id="draw_cov_travel-cv" style="position:absolute;top:0px;left:0px;"></object>
-<button id="draw_cov_travel_bt" type="button" style="position:absolute;left:400px;top:290px;">Fourier Transform!</button>
+<button id="draw_cov_travel_bt" type="button" style="position:absolute;left:400px;top:290px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>
 </div><br />
 <div style="width:600px;"><em><a name="figure3">Fig.3 -</a> The travel operator. Given a diffuse light source with in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</em></div>
 </center><br />
@@ -308,12 +308,12 @@ So far we have expressed how to trace the covariance of local radiance when ligh
 Since we are studying local radiance, we need to account for the fact that part light might be occluded or that part of the light will not interact with an object. We account for those two effects by reducing the local window used for our frequency analysis until there is no more *near-hit* or *near-miss* rays. Applying a window to a signal means that we will convolve its Fourier spectrum by the window Fourier spectrum. In terms of covariance, this boils down to summing the covariance matrices.
 
 <center>
-<div style="position:relative;width:600px;height:300px;">
+<div style="position:relative;width:600px;height:280px;">
 <canvas id="draw_cov_occl-gl" style="position:absolute;left:352px;top:18px;width:229px;height:229px;background-color:#FFF;border:0px"></canvas>
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_occlusion.svg" width="600px" id="draw_cov_occl-cv" style="position:absolute;top:0px;left:0px;"></object>
-<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:290px;">Fourier Transform!</button>
+<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:270px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>
 </div><br />
-<div style="width:600px;"><em>The occlusion operator.</em></div>
+<div style="width:700px;"><em>The occlusion operator. A square occluder lit by a uniform infinite light source cast a shadow that will result in a wedge shape spectrum. In the primal, we can see the two discontinuity clearly. The wedge is sheared as we move away the senor from the occluder.</em></div>
 </center><br />
 
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_occl.js" type="text/javascript">
@@ -331,7 +331,7 @@ We usually assumes that occluders are planar. In such case, we can perform the w
 In the [next section][course-part2], we will see how to pratically use the knowledge of the Fourer spectrum extents.
 <br />
 
-<div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-course.html">&larr; Intro</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course//2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
+<div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-2016-course.html">&larr; Intro</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course//2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
   
 [shannon1949]: https://en.wikipedia.org/wiki/Nyquist–Shannon_sampling_theorem
 [kajiya1986]: http://dl.acm.org/citation.cfm?id=280987&CFID=609795496&CFTOKEN=98285306

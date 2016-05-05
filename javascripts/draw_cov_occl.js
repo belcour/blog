@@ -39,10 +39,10 @@ loadFunctionOcclusion = function() {
    var scene = createScene();
    addObject(scene, {p1 : {x: 10.0, y: -1000}, p2 : {x: 10.0, y: 1000}, L : 1.0});
 
-   addObject(scene, {p1 : {x: 1.0, y: 0.5}, p2 : {x: 2.0, y: 0.5}, L : 0.0});
-   addObject(scene, {p1 : {x: 2.0, y: 0.5}, p2 : {x: 2.0, y: 2.5}, L : 0.0});
-   addObject(scene, {p1 : {x: 2.0, y: 2.5}, p2 : {x: 1.0, y: 2.5}, L : 0.0});
-   addObject(scene, {p1 : {x: 1.0, y: 2.5}, p2 : {x: 1.0, y: 0.5}, L : 0.0});
+   addObject(scene, {p1 : {x: 1.0, y: 0.0}, p2 : {x: 2.0, y: 0.0}, L : 0.0});
+   addObject(scene, {p1 : {x: 2.0, y: 0.0}, p2 : {x: 2.0, y: 2.0}, L : 0.0});
+   addObject(scene, {p1 : {x: 2.0, y: 2.0}, p2 : {x: 1.0, y: 2.0}, L : 0.0});
+   addObject(scene, {p1 : {x: 1.0, y: 2.0}, p2 : {x: 1.0, y: 0.0}, L : 0.0});
 
    addCamera(scene, {o: {x: -0.5, y: 0.0}, d: {x: 1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
 

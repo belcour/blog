@@ -61,6 +61,8 @@ Lethinen et al. [[2012][lethinen2012]] applied splatting to reconstruct defocus 
 
 Density estimation is a reconstruction method notoriously used in [Photon Mapping][jensen1995] and [Progressive Photon Mapping][hachisuka2009] to estimate approximately a density from a discrete set of samples. Traditionnaly, density estimation is done using a nearest neighbor search. Starting from a query point, all samples falling into a disk of radius $$r$$ around the query point are used to estimate the reflected radiance.
 
+    TODO: Add schema
+
 <!--
 $$E[S_N \star k] = f \star k$$
 -->
@@ -71,7 +73,7 @@ $$r_{\mbox{opt}} = \sqrt{ \frac{2 \epsilon}{\alpha \nabla^2(L)} },$$
 
 where $$\alpha$$ is a characteristic of the density estimation kernel and the Hessian of the radiance can be retreived from the Fourier transform.
 
-This idea of adapting reconstruction kernels has been applied by Belcour et al. for surface based density [[2011][belcour2011]] and volumetric density estimation [[2014][belcour2014]].
+This idea of adapting reconstruction kernels has been applied by Belcour et al. for surface based density [[2011][belcour2011]] and volumetric density estimation [[2014][belcour2014]]. Similarly, Kaplanyan and Dachsbacher [[2013][kaplanyan2013]] also used the Hessian of the radiance to adapt the gathering radius. However, they used a fixed kernel density estimation to approximate the Hessian in the first place.
 
 [jensen1995]: http://photonmapping.org
 [hachisuka2009]: http://todo.fr
@@ -79,6 +81,8 @@ This idea of adapting reconstruction kernels has been applied by Belcour et al. 
 ### Antialiasing
 
 In some case, when we are rendering high frequency elements such as texture or envmaps and we have to average to get the resulting appearance, it is possible to use an antialiasing (or prefiltering) model to avoid super sampling. This problem has a vast history in graphics.
+
+    Add schema
 
  + Looking at the work of [Heckbert 1986][heckbert1986]
  + Looking at the work of [Krivanek and Colbert][krivanek2008]
@@ -104,6 +108,7 @@ In some case, when we are rendering high frequency elements such as texture or e
 [lethinen2012]: http://hal.inria.fr/todo
 [mehta2012]:    http://graphics.berkeley.edu/papers/UdayMehta-AAF-2012-12/index.html
 [belcour2013]:  http://hal.inria.fr/todo
+[kaplanyan2013]:http://cg.ivd.kit.edu/english/APPM.php
 [metha2013]:    http://graphics.berkeley.edu/papers/Udaymehta-IPB-2013-07/index.html
 [metha2014]:    http://dl.acm.org/citation.cfm?id=2601113&CFID=610675972&CFTOKEN=79354783
 [belcour2014]:  http://hal.inria.fr/todo
