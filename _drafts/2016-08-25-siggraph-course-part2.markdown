@@ -61,7 +61,9 @@ Lethinen et al. [[2012][lethinen2012]] applied splatting to reconstruct defocus 
 
 Density estimation is a reconstruction method notoriously used in [Photon Mapping][jensen1995] and [Progressive Photon Mapping][hachisuka2009] to estimate approximately a density from a discrete set of samples. Traditionnaly, density estimation is done using a nearest neighbor search. Starting from a query point, all samples falling into a disk of radius $$r$$ around the query point are used to estimate the reflected radiance.
 
-However, using a fixed radius 
+<!--
+$$E[S_N \star k] = f \star k$$
+-->
 
 Using Frequency Analysis, the radius using to gather samples can be adapted depending on the frequency content of samples aggregated. The optimal radius, for a threshold error $$\epsilon$$, is defined by:
 

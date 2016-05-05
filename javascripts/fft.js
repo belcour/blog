@@ -381,7 +381,7 @@
       _data = _img.data;
     },
     // renders FFT power spectrum on the canvas
-    render : function(re, im, islog) {
+    render : function(re, im, islog, scale) {
       var val = 0,
           i = 0,
           p = 0,
@@ -402,6 +402,7 @@
         }
       }
       imax = 1/max;
+      if(scale) { imax *= scale };
       for(var j=0; j<n2; j++) {
         spectrum[j] = spectrum[j]*255*imax;
       }
@@ -449,7 +450,7 @@
       _data = _img.data;
     },
     // render FFT power spectrum on the Canvas
-    render : function(re, im, islog) {
+    render : function(re, im, islog, scale) {
       var val = 0,
           i = 0,
           p = 0,
@@ -468,6 +469,7 @@
         }
       }
       imax = 1/max;
+      if(scale) { imax *= scale; }
       for(var j=0; j<n2; j++) {
         spectrum[j] = spectrum[j]*255*imax;
       }

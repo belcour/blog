@@ -165,10 +165,18 @@ For simplicity, we will illustrate the different concepts using 2D light transpo
 
 ### Local Fourier Transform
 
-      + Localisation needed to have a fine analysis
-      + Need windowing W
-      + Redefine a local Fourier Transform
+However, using the Fourier transform defined previously, it would be hard to develop a fine analysis. For example, if we look for the bandwidth of the rendering image of the dragon above, we will find that the bandwidth if infinite due to the hard edges. Instead, we will use a local frequency analysis defined with respect to a central point.
 
+<center>
+<img src="{{ site.url | append: site.baseurl }}/data/images/cover_course_2016.jpg" height="300px" ><br />
+<div style="width:80%"><em>Using a local windowed Fourier transform, we can perform a finer analysis and differentiate between low frequency regions (green inset) and high frequency regions (red inset). It requires a different formulation of the Fourier transform.</em></div>
+</center><br />
+
+Mathematically, we will incorporate this notion of windowing into the definition of the Fourier transform:
+
+$$\mathcal{F}_l[f] = \mathcal{F}[f \times W_l] = \int_{\mathbb{R}^N} f(\mathbf{x}) W_l(\mathbf{x}_0 - \mathbf{x}) e^{i 2 \pi \mathbf{\Omega}^T \mathbf{x}} \mbox{d}\mathbf{x},$$
+
+where $$W_l(\mathbf{x}_0 - \mathbf{x})$$ is a windowing function of size $$l$$ around point $$\mathbf{x}_0$$.
 
 #### What is covariance?
 
@@ -299,8 +307,18 @@ So far we have expressed how to trace the covariance of local radiance when ligh
 <h4>The visibility operator</h4>
 Since we are studying local radiance, we need to account for the fact that part light might be occluded or that part of the light will not interact with an object. We account for those two effects by reducing the local window used for our frequency analysis until there is no more *near-hit* or *near-miss* rays. Applying a window to a signal means that we will convolve its Fourier spectrum by the window Fourier spectrum. In terms of covariance, this boils down to summing the covariance matrices.
 
-       TODO:
-        + Add schematic
+<center>
+<div style="position:relative;width:600px;height:300px;">
+<canvas id="draw_cov_occl-gl" style="position:absolute;left:352px;top:18px;width:229px;height:229px;background-color:#FFF;border:0px"></canvas>
+<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_occlusion.svg" width="600px" id="draw_cov_occl-cv" style="position:absolute;top:0px;left:0px;"></object>
+<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:290px;">Fourier Transform!</button>
+</div><br />
+<div style="width:600px;"><em>The occlusion operator.</em></div>
+</center><br />
+
+<script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_occl.js" type="text/javascript">
+</script>
+
 
 We usually assumes that occluders are planar. In such case, we can perform the windowing on the spatial component only. If an occluder has non negligible depth, then we can slice it along its depth and apply multiple times the occlusion operator.
 
