@@ -93,7 +93,12 @@ This idea of adapting reconstruction kernels has been applied by Belcour et al. 
 
 In some case, when we are rendering high frequency elements such as texture or envmaps and we have to average to get the resulting appearance, it is possible to use an antialiasing (or prefiltering) model to avoid super sampling. This problem has a vast history in graphics.
 
-    Add schema
+<center>
+<div style="position:relative;width:100%">
+<object width="80%" data="{{ site.url | append: site.baseurl }}/data/svg/course-applications04.svg" type="image/svg+xml"></object>
+</div>
+<div style="width:90%"><em>Antialiased surface appearance approximate the integrated surface appearance of a high frequency surface. In this example case, a scratch normal map is averaged in the footprint \(\mathcal{F}\) to approximate the BRDF and avoid using supersampling to integrate it.</em></div>
+</center><br />
 
  + Looking at the work of [Heckbert 1986][heckbert1986]
  + Looking at the work of [Krivanek and Colbert][krivanek2008]
