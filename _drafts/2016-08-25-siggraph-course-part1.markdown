@@ -40,7 +40,7 @@ The idea of Frequency Analysis of Light Transport as sketched by [Durand and col
 var s = Snap('#fourier-transform-01-svg');
 Snap.load("{{ site.url | append: site.baseurl }}/data/svg/course-fourier01.svg", function (f) {
       s.append(f);
-      
+
       // Position of the input image
       var bbox    = Snap("#image").getBBox();
       var img_cnv = document.getElementById("fourier-transform-01-img");
@@ -50,7 +50,7 @@ Snap.load("{{ site.url | append: site.baseurl }}/data/svg/course-fourier01.svg",
       img_cnv.style.left   = bbox.x + "px";
       img_cnv.style.top    = bbox.y + "px";
       img_cnv.style.backgroundColor = "#F0F";
-      
+
       // Reconstructed image
       var rec_cnv = document.getElementById("fourier-transform-01-rec");
       var rec_ctx = rec_cnv.getContext('2d');
@@ -61,7 +61,7 @@ Snap.load("{{ site.url | append: site.baseurl }}/data/svg/course-fourier01.svg",
       rec_cnv.style.backgroundColor = "#F0F";
       rec_ctx.fillStyle = '#ffffff';
       rec_ctx.fillRect(0, 0, rec_ctx.canvas.width, rec_ctx.canvas.height);
-      
+
       // Position of the fourier spectrum
       var bbox    = Snap("#fourier").getBBox();
       var fft_cnv = document.getElementById("fourier-transform-01-fft");
@@ -73,14 +73,14 @@ Snap.load("{{ site.url | append: site.baseurl }}/data/svg/course-fourier01.svg",
       fft_cnv.style.backgroundColor = "#FFF";
       fft_ctx.fillStyle = '#ffffff';
       fft_ctx.fillRect(0, 0, fft_ctx.canvas.width, fft_ctx.canvas.height);
-      
+
       // Load the image and display it
       const h = 128, w = 128;
       var image   = new Image(w, h);
       image.src = "{{ site.url | append: site.baseurl }}/data/images/lena.jpg";
       image.addEventListener('load', function() {
             img_ctx.drawImage(image, 0, 0, w, h);
-            
+
             var updateFilter = function(radius) {
                   // Compute the FFT of the image
                   FFT.init(w);
@@ -92,7 +92,7 @@ Snap.load("{{ site.url | append: site.baseurl }}/data/svg/course-fourier01.svg",
                   for(var y=0; y<h; y++) {
                         var i = y*w;
                         for(var x=0; x<w; x++) {
-                        var L = dat[(i << 2) + (x << 2) + 0] 
+                        var L = dat[(i << 2) + (x << 2) + 0]
                               + dat[(i << 2) + (x << 2) + 1]
                               + dat[(i << 2) + (x << 2) + 2];
                         re[i + x] = L / 3.0;
@@ -101,7 +101,7 @@ Snap.load("{{ site.url | append: site.baseurl }}/data/svg/course-fourier01.svg",
                   }
                   FFT.fft2d(re, im);
                   FrequencyFilter.swap(re, im);
-                  
+
                   // Draw spectrum
                   SpectrumViewer.render(re, im, true);
 
@@ -120,16 +120,16 @@ Snap.load("{{ site.url | append: site.baseurl }}/data/svg/course-fourier01.svg",
                   rec_ctx.putImageData(src, 0, 0);
                   rec_cnv.style.zIndex = "2";
             }
-            
+
             updateFilter(200);
-            
-            Snap("#zone0").node.onclick = function() { 
+
+            Snap("#zone0").node.onclick = function() {
                   updateFilter(4);
             };
-            Snap("#zone1").node.onclick = function() { 
+            Snap("#zone1").node.onclick = function() {
                   updateFilter(40);
             };
-            Snap("#zone2").node.onclick = function() { 
+            Snap("#zone2").node.onclick = function() {
                   updateFilter(128);
             };
       });
@@ -147,16 +147,17 @@ The Fourier transform has many interesting properties that we will uncover as we
 
 ### Fourier Transform of Radiance
 
-    TODO:
-     + Freq. Analysis in pixel space is not interesting
-     + Need to go back to how a pixel's value is computed: Radiance 
-     + Freq. Analysis of the [Rendering Equation][kajiya1986].
-     + Need schematic with dragon scene here.
+We need to perform our frequency analysis from first principles governing the rendering of images. In physically based rendering, this is provided by the Rendering Equation [[Kajiya 1986][kajiya1986]] that describe the conservation of radiance energy at surface boundaries:
 
+$$ L(\mathbf{x}, \pmb{\omega}) = L_e(\mathbf{x}, \pmb{\omega}) + \int_{\Omega} \rho(\pmb{\omega}, \pmb{\omega}^\prime) L(\mathbf{y}, -\pmb{\omega}^\prime) (\pmb{\omega}^\prime, \mathbf{n})^+ \mbox{d}\pmb{\omega}^\prime. $$
+
+Here $$\mathbf{y}$$ is the directly visible point from $$\mathbf{x}$$ in direction $$\pmb{\omega}^\prime$$. The surface material is represented by the bidirectional reflectance distribution function $$\rho(\pmb{\omega}, \pmb{\omega}^\prime)$$. The emission from surfaces is noted $$L_e$$. And $$(\cdot, \cdot)^{+}$$ is the clamped dot product to positive values.
+
+However, this expression is not simple to perform frequency analysis due to its recursive nature. We will see in the following how this recursion can be used to build frequency estimate.
 
 #### Bandwidth
 
-The **bandwidth** of a signal is its Fourier transform's extent. Mathematically, the bandwidth is the minimum support of the signal's Fourier transform. It provides information on the necessary sampling pattern to either [reconstruct it][shannon1949] or to [integrate it][durand2011]. Intuitively, it gives the maximum amount of relative variation a signal has. This is enough to predict the maximum distance between samples for perfect sampling. This is however assuming that the bandwidth is finite (or distance between samples would be zero). 
+The **bandwidth** of a signal is its Fourier transform's extent. Mathematically, the bandwidth is the minimum support of the signal's Fourier transform. It provides information on the necessary sampling pattern to either [reconstruct it][shannon1949] or to [integrate it][durand2011]. Intuitively, it gives the maximum amount of relative variation a signal has. This is enough to predict the maximum distance between samples for perfect sampling. This is however assuming that the bandwidth is finite (or distance between samples would be zero).
 
 **Covariance Tracing** is a method to evaluate the bandwidth of the *local radiance* around a given light path. Knowing the bandwidth of the radiance enable a lot of applications (see <a href="#citations">[1-3]</a>). This document present the idea of covariance tracing and frequency analysis in a progressive way.
 
@@ -177,6 +178,8 @@ Mathematically, we will incorporate this notion of windowing into the definition
 $$\mathcal{F}_l[f] = \mathcal{F}[f \times W_l] = \int_{\mathbb{R}^N} f(\mathbf{x}) W_l(\mathbf{x}_0 - \mathbf{x}) e^{i 2 \pi \mathbf{\Omega}^T \mathbf{x}} \mbox{d}\mathbf{x},$$
 
 where $$W_l(\mathbf{x}_0 - \mathbf{x})$$ is a windowing function of size $$l$$ around point $$\mathbf{x}_0$$.
+
+In the following, to ease notation, we will note the local Fourier transform of the radiance as $$\hat{l}(\Omega_x, \Omega_u) = \mathcal{F}_l[L](\Omega_x, \Omega_u)$$.
 
 #### What is covariance?
 
@@ -222,8 +225,8 @@ Expressing the [rendering equation][kajiya1986] or the [radiative transfer equat
 <center>
 <div style="position:relative;width:600px;height:300px;">
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_path.svg" width="600px" id="draw_cov_path-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
-<div style="width:600px;"><em><a name="figure2">Fig.2 -</a> Frequency analysis of light transport builds from light to sensor (left to right) by concatenating atomic operators. 
-Those atomic operators correspond to specific elements of light transport such as transport \(T_d\), scattering \(B_\rho\), etc. For our implementation, we are interested on the 
+<div style="width:600px;"><em><a name="figure2">Fig.2 -</a> Frequency analysis of light transport builds from light to sensor (left to right) by concatenating atomic operators.
+Those atomic operators correspond to specific elements of light transport such as transport \(T_d\), scattering \(B_\rho\), etc. For our implementation, we are interested on the
 effect those operators have on the covariance matrix \(\Sigma\).</em></div>
 </center><br />
 
@@ -246,7 +249,15 @@ Remember that we are not interested in the resulting radiance, but to its Fourie
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_travel.js" type="text/javascript">
 </script>
 
-This operator shears the local radiance by the amount of traveled distance. The equivalent operator on the covariance matrix is also a shear which parameter is the traveled distance in meters. However, in the Fourier domain, the shear transfers spatial content to the angular domain. This is the opposite behaviour for radiance. It can be understood in the limit case where the travel distance is infinite. There, locally around the central direction of the ray, only radiance along the same direction remains. Thus the angular content is locally a dirac (a single direction) and the spatial content is locally a constant (same radiance for neighboring positions). 
+This operator shears the local radiance by the amount of traveled distance. The equivalent operator on the covariance matrix is also a shear which parameter is the traveled distance in meters. However, in the Fourier domain, the shear transfers spatial content to the angular domain. This is the opposite behaviour for radiance. It can be understood in the limit case where the travel distance is infinite. There, locally around the central direction of the ray, only radiance along the same direction remains. Thus the angular content is locally a dirac (a single direction) and the spatial content is locally a constant (same radiance for neighboring positions).
+
+Mathematically, the local radiance after $$d$$ meters is expressed as:
+
+$$\mbox{T}_{d}[L](\delta x, \delta u) = L(\delta x - d\tan(\delta u), \delta u)$$
+
+Since we are interested by a first order approximation of the radiance, we can approximate $$\tan(\delta u) \simeq \delta u$$. After this approximation, the Fourier transform of the local radiance can be expressed analytically as:
+
+$$\mbox{T}_{d}[\hat{l}](\Omega_x, \Omega_u) \simeq \hat{l}(\Omega_x , \Omega_u + d \Omega_x)$$
 
 A Matlab implementation of the operator is the following:
 
@@ -261,14 +272,23 @@ A Matlab implementation of the operator is the following:
 <h4>The projection operator</h4>
 <strong>The projection operator</strong> enables to express the local radiance and the covariance in the tangent plane of objects. This is necessary to express the reflection or refraction of light on a planar surface. When the surface is non-planar, the <strong>curvature operator</strong> is applied after this operator.
 
+Intuitively, this operator scales the spatial frequency content to match the new frame. Imagine that the incoming radiance is unidirectional and which a structured pattern. If you account for the difference of travel with respect to the tangent plane, some ray will have to travel further than other. Thus the distance with respect to the central position will scale with respect to the angular difference between the incident local plane and the tangent plane and the structured pattern will be dilated. Dilatation of space reduces frequency in the Fourier domain, this is why we have a cosine scaling in the operator.
+
+Mathematically, the projected local radiance on the plane with normal $$\mathbf{n}$$ is expressed as:
+
+$$\mbox{P}_{\mathbf{n}}[L](\delta x, \delta u) = L\biggr({\delta x \over |(\pmb{\omega}_0 \cdot \mathbf{n})|}, \delta u\biggr)$$
+
+This translate into the Fourier domain as:
+
+$$\mbox{P}_{\mathbf{n}}[\hat{l}](\Omega_x, \Omega_u) = \hat{l}(|(\pmb{\omega}_0 \cdot \mathbf{n})| \Omega_x, \Omega_u)$$
+
+A Matlab implementation of the operator is the following:
+
       function project(cos) {
          op = {cos, 0;
                  0, 1};
          cov = op' * cov * op;
       }
-      
- Intuitively, this operator scales the spatial frequency content to match the new frame. Imagine that the incoming radiance is unidirectional and which a structured pattern. If you account for the difference of travel with respect to the tangent plane, some ray will have to travel further than other. Thus the distance with respect to the central position will scale with respect to the angular difference between the incident local plane and the tangent plane and the structured pattern will be dilated. Dilatation of space reduces frequency in the Fourier domain, this is why we have a cosine scaling in the operator.
-
 
 <h4>The BRDF operator</h4>
 <strong>The BRDF operator</strong> describes how the roughness reduces the bandwidth of the reflected local radiance. This is well known that the BRDF can be thought as being a blurring filter (think of pre-filtered envmaps).
@@ -280,6 +300,14 @@ A Matlab implementation of the operator is the following:
 <div>BRDF exponent: 100 <input style="vertical-align: middle;" type="range" min="100" max="1000" value="1000" step="5" onchange="drawBRDF(this.value)" /> 1000</div>
 <div style="width:600px;"><em><a name="figure4">Fig.4 -</a> The BRDF operator. In this case, we use as input a tight Gaussian cone light. The light's cone is blurred by the BRDF. Using the cursor, you can vary the phong exponent from 100 to 1000 and see the blurring effect.</em></div>
 </center><br />
+
+This operator describes the integral product of the incoming local radiance with the BRDF. For an isotropic BRDF model, it is possible to express the outgoing radiance using a convolutive form:
+
+$$\mbox{B}_{\rho}[L](\delta x, \delta u) = \int L(\delta x, \delta u) \rho(\delta u - \delta v) \mbox{d} \delta v$$
+
+This translate into a product in the Fourier domain:
+
+$$\mbox{B}_{\rho}[\hat{l}](\Omega_x, \Omega_u) = \hat{l}(\Omega_x, \Omega_u) \times \hat{\rho}(\Omega_u)$$
 
 
 The BRDF operator is not easy to define using the covariance matrix. Intuitively, we want to express the covariance of the product of two signals using their respective covariance matrices. If we have no knowledge of the type of signals we are multiplying, then this product is undefined. However, in the case of Gaussians spectra the product is defined as the inverse of the sum of the inverse covariance matrices.
@@ -297,6 +325,16 @@ where `B` describe the angular blur of the BRDF. It is defined using the inverse
 <h4>The curvature operator</h4>
 So far we have expressed how to trace the covariance of local radiance when light is reflected by planar objects. To incorporate the local variation of the object's surface into covariance tracing, we will enable to project the local radiance from the tangent plane to a first order approximation of the surface using its curvature.
 
+Mathematically, the first order approximation of the projected local radiance on a sphere of curvature $$k$$ is expressed as:
+
+$$\mbox{C}_{k}[L](\delta x, \delta u) \simeq L(\delta x, \delta u + k \delta x)$$
+
+The Fourier transform of the local radiance can be expressed analytically as:
+
+$$\mbox{C}_{k}[\hat{l}](\Omega_x, \Omega_u) \simeq \hat{l}(\Omega_x - k \Omega_u, \Omega_u)$$
+
+In terms of covariance, the operator is expressed similarly to the travel operator:
+
       function curvature(k) {
          op = { 1, k;
                 0, 1};
@@ -305,7 +343,13 @@ So far we have expressed how to trace the covariance of local radiance when ligh
 
 
 <h4>The visibility operator</h4>
-Since we are studying local radiance, we need to account for the fact that part light might be occluded or that part of the light will not interact with an object. We account for those two effects by reducing the local window used for our frequency analysis until there is no more *near-hit* or *near-miss* rays. Applying a window to a signal means that we will convolve its Fourier spectrum by the window Fourier spectrum. In terms of covariance, this boils down to summing the covariance matrices.
+Since we are studying local radiance, we need to account for the fact that part light might be occluded or that part of the light will not interact with an object. We account for those two effects by reducing the local window used for our frequency analysis until there is no more *near-hit* or *near-miss* rays. Applying a window to a signal means that we will convolve its Fourier spectrum by the window Fourier spectrum:
+
+$$\mbox{V}[L](\delta x, \delta u) = L(\delta x, \delta u) \times V(\delta x, \delta u)$$
+
+This translate into a convolution in the Fourier domain:
+
+$$\mbox{V}[\hat{l}](\Omega_x, \Omega_u) = \hat{l}(\Omega_x, \Omega_u) \star \hat{V}(\Omega_x, \Omega_u)$$
 
 <center>
 <div style="position:relative;width:600px;height:280px;">
@@ -319,8 +363,7 @@ Since we are studying local radiance, we need to account for the fact that part 
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_occl.js" type="text/javascript">
 </script>
 
-
-We usually assumes that occluders are planar. In such case, we can perform the windowing on the spatial component only. If an occluder has non negligible depth, then we can slice it along its depth and apply multiple times the occlusion operator.
+We usually assumes that occluders are planar. In such case, we can perform the windowing on the spatial component only. If an occluder has non negligible depth, then we can slice it along its depth and apply multiple times the occlusion operator. In terms of covariance, this boils down to summing the covariance matrices.
 
       function occlusion(w) {
          occ = {w, 0;
@@ -332,7 +375,7 @@ In the [next section][course-part2], we will see how to pratically use the knowl
 <br />
 
 <div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-2016-course.html">&larr; Intro</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course//2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
-  
+
 [shannon1949]: https://en.wikipedia.org/wiki/Nyquist–Shannon_sampling_theorem
 [kajiya1986]: http://dl.acm.org/citation.cfm?id=280987&CFID=609795496&CFTOKEN=98285306
 [durand2005]: http://portal.acm.org/citation.cfm?id=1186822.1073320

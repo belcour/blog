@@ -62,7 +62,7 @@ Up-sampling is a particular case of adaptive sampling and reconstruction where s
 
 This technique corresponds to splating pixel samples on the screen relative their frequency content. Using a pixel hierarchy ensures that no pixel will be left unshaded.
 
-Lethinen et al. [[2012][lethinen2012]] applied splatting to reconstruct defocus and motion blur from a small set of samples in screen space. In terms of frequency analysis, this work assumes that the samples are emitted by diffuse surfaces and reproject them along the sheared line defined by motion and lens. Here, instead of splatting on a pixel quad, samples are splatted along planes in the combined domain of image space, time and lens (called *XYUVT*).
+Lehtinen et al. [[2011][lehtinen2011]] applied splatting to reconstruct defocus and motion blur from a small set of samples in screen space. In terms of frequency analysis, this work assumes that the samples are emitted by diffuse surfaces and reproject them along the sheared line defined by motion and lens. Here, instead of splatting on a pixel quad, samples are splatted along planes in the combined domain of image space, time and lens (called *XYUVT*).
 
 ### Density Estimation
 
@@ -86,12 +86,14 @@ where $$\alpha$$ is a characteristic of the density estimation kernel and the He
 
 This idea of adapting reconstruction kernels has been applied by Belcour et al. for surface based density [[2011][belcour2011]] and volumetric density estimation [[2014][belcour2014]]. Similarly, Kaplanyan and Dachsbacher [[2013][kaplanyan2013]] also used the Hessian of the radiance to adapt the gathering radius. However, they used a fixed kernel density estimation to approximate the Hessian in the first place.
 
-[jensen1995]: http://photonmapping.org
-[hachisuka2009]: http://todo.fr
+[jensen1995]:    http://graphics.ucsd.edu/%7Ehenrik/papers/book/
+[hachisuka2009]: http://www.ci.i.u-tokyo.ac.jp/~hachisuka/ppm.pdf
 
 ### Antialiasing
 
-In some case, when we are rendering high frequency elements such as texture or envmaps and we have to average to get the resulting appearance, it is possible to use an antialiasing (or prefiltering) model to avoid super sampling. This problem has a vast history in graphics.
+In some case, when we are rendering high frequency elements such as texture or envmaps and we have to average to get the resulting appearance, it is possible to use an antialiasing (or prefiltering) model to avoid super sampling. This problem has a vast history in graphics. For example, Greene and Heckbert [[1986][greene1986]] introduced elliptical filter to account for the pixel's projection in texture space.
+
+An antialiasing reflectance model works as follow: given a kernel defined over a surface footprint (here $$ \mathcal{F} $$) we need to evaluate or approximate the integral of a spatially varying BSDF model over the spatially varying geometry (for example using a normal-map or a height-map). To do so, an antialiased BRDF model has an extra variable: the surface footprint.
 
 <center>
 <div style="position:relative;width:100%">
@@ -100,34 +102,36 @@ In some case, when we are rendering high frequency elements such as texture or e
 <div style="width:90%"><em>Antialiased surface appearance approximate the integrated surface appearance of a high frequency surface. In this example case, a scratch normal map is averaged in the footprint \(\mathcal{F}\) to approximate the BRDF and avoid using supersampling to integrate it.</em></div>
 </center><br />
 
- + Looking at the work of [Heckbert 1986][heckbert1986]
- + Looking at the work of [Krivanek and Colbert][krivanek2008]
- + Looking at the work of [Belcour et al. 2016][belcour2016]
+In terms of Fourier analysis, evaluating the antialiased BRDF is equivalent to do a low-pass filter to the finest scale BRDF. Concretly, in the Fourier domain, we are removing high frequency part of the finest scale BRDF. The limit at which frequency are cut off is given by the kernel. It is said that **the kernel bandlimits the frequency content** of the BRDF.
 
+It is possible to bandlimit other signals than the BRDF. For example, Krivanek and Colbert [[2008][krivanek2008]] showed that it was possible to bandlimit the envmap signal when doing importance sampling. They showed that the size of the kernel was directly linked to the importance function.
+
+<!--
 ### Deconvolution
 
  + Looking at the work of [Zubiaga et al. 2015][zubiaga2015]
+-->
 
 [course-main]:  {{ site.url | append: site.baseurl }}/siggraph-2016-course.html
 [course-part1]: {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part1.html
 [course-part2]: {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html
 
-[heckbert1986]: http://tood.fr
-[durand2005]:   http://hal.inria.fr/todo
-[soler2009]:    http://hal.inria.fr/todo
+[greene1986]:   https://www.cs.cmu.edu/~ph/omni.ps.gz
+[durand2005]:   http://people.csail.mit.edu/fredo/PUBLI/Fourier/
+[soler2009]:    https://hal.inria.fr/inria-00345902
 [egan2009]:     http://www.cs.columbia.edu/cg/mb/
 [egan2011a]:    http://graphics.berkeley.edu/papers/Egan-PFF-2011-12/index.html
 [egan2011b]:    http://graphics.berkeley.edu/papers/Egan-FAS-2011-04/index.html
-[krivanek2008]: http://todo.com/
-[belcour2011]:  http://hal.inria.fr/todo
-[bagher2011]:   http://hal.inria.fr/todo
-[lethinen2012]: http://hal.inria.fr/todo
+[krivanek2008]: http://cgg.mff.cuni.cz/~jaroslav/papers/2008-egsr-fis/2008-egsr-fis-final-embedded.pdf
+[belcour2011]:  https://hal.inria.fr/inria-00633940
+[bagher2011]:   https://hal.inria.fr/hal-00652066
+[lehtinen2011]: http://groups.csail.mit.edu/graphics/tlfr/
 [mehta2012]:    http://graphics.berkeley.edu/papers/UdayMehta-AAF-2012-12/index.html
-[belcour2013]:  http://hal.inria.fr/todo
+[belcour2013]:  https://hal.inria.fr/hal-00814164
 [kaplanyan2013]:http://cg.ivd.kit.edu/english/APPM.php
 [metha2013]:    http://graphics.berkeley.edu/papers/Udaymehta-IPB-2013-07/index.html
 [metha2014]:    http://dl.acm.org/citation.cfm?id=2601113&CFID=610675972&CFTOKEN=79354783
-[belcour2014]:  http://hal.inria.fr/todo
+[belcour2014]:  https://hal.inria.fr/hal-00957242
 [yan2015]:      http://dl.acm.org/citation.cfm?id=2816814&CFID=610675972&CFTOKEN=79354783
-[zubiaga2015]:  http://hal.inria.fr/todo
-[belcour2016]:  http://hal.inria.fr/todo
+[zubiaga2015]:  https://hal.inria.fr/hal-01164590
+[belcour2016]:  https://hal.inria.fr/hal-01200710
