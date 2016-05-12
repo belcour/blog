@@ -220,7 +220,7 @@ The next step is to express radiance transport equations in this space and to co
 
 #### Radiance Operators in Local Space
 
-Expressing the [rendering equation][kajiya1986] or the [radiative transfer equation][ishimaru19XX] in local coordinates is not possible since they rely on global coordinates. Instead, we look at solutions of those equations for simple cases (operators) that correspond to transport evaluated during path tracing. We will need to describe several transport operators such as *travel in free space, reflection, refraction, etc.*.
+Expressing the [rendering equation][kajiya1986] or the [radiative transfer equation][ishimaru1997] in local coordinates is not possible since they rely on global coordinates. Instead, we look at solutions of those equations for simple cases (operators) that correspond to transport evaluated during path tracing. We will need to describe several transport operators such as *travel in free space, reflection, refraction, etc.*.
 
 <center>
 <div style="position:relative;width:600px;height:300px;">
@@ -376,10 +376,12 @@ In the [next section][course-part2], we will see how to pratically use the knowl
 
 <div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-2016-course.html">&larr; Intro</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course//2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
 
-[shannon1949]: https://en.wikipedia.org/wiki/Nyquist–Shannon_sampling_theorem
-[kajiya1986]: http://dl.acm.org/citation.cfm?id=280987&CFID=609795496&CFTOKEN=98285306
-[durand2005]: http://portal.acm.org/citation.cfm?id=1186822.1073320
-[durand2011]: http://dspace.mit.edu/handle/1721.1/67677
+[shannon1949]:  https://en.wikipedia.org/wiki/Nyquist–Shannon_sampling_theorem
+[kajiya1986]:   http://dl.acm.org/citation.cfm?id=280987&CFID=609795496&CFTOKEN=98285306
+[ishimaru1997]: https://books.google.fr/books?id=wAZnuHdEKL0C
+[durand2005]:   http://portal.acm.org/citation.cfm?id=1186822.1073320
+[durand2011]:   http://dspace.mit.edu/handle/1721.1/67677
+
 
 [course-main]:  {{ site.url | append: site.baseurl }}/siggraph-2016-course.html
 [course-part1]: {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part1.html
