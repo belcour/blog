@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+   <head>
+      <meta charset="utf-8">
+
+      <title>SIGGRAPH 2016 Course - Intro</title>
+
+      <meta name="description" content="Frequency Analysis Course - Intro">
+      <meta name="author" content="Laurent Belcour">
+
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+      <link rel="stylesheet" href="../css/reveal.css">
+      <link rel="stylesheet" href="../css/theme/beige.css" id="theme">
+
+      <script src="../js/snap.svg.js"></script>
+      <script src="../js/reveal.js"></script>
+      <script src="../js/mathjax.js"></script>
+      <script src="../../javascripts/fft.js"></script>
+   </head>
+   <body>
+      <div class="reveal">
+         <!-- Any section element inside of this container is displayed as a slide -->
+         <div class="slides">
+
+            <!-- Title screen -->
+            <section class="title"> <!-- data-background="./png/background.png" -->
+            <h3>A Practical Introduction to Frequency Analysis of Light Transport</h3>
+            <p><small>
+               <a href="http://belcour.github.io/blog">Laurent Belcour - Unity Technologies</a>
+            </small></p>
+            </section>
+
+            <!-- Introduction on Fourier Transforms -->
+            <section>
+            <h4>The Fourier Transform</h4>
+<center>
+<div style="position:relative;width:600px;height:300px;margin-top:100px;">
+<canvas id="fourier-transform-01-fft" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:1;"></canvas>
+<canvas id="fourier-transform-01-img" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:1;"></canvas>
+<canvas id="fourier-transform-01-rec" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:0;"></canvas>
+<svg id="fourier-transform-01-svg" width="600px" height="300px" style="position:relative;z-index:3;"></svg>
+</div><br />
+</center>
+<script type="text/javascript" >
+Snap.load("../../data/svg/course-fourier01.svg", function (f) {
+
+      var s = Snap('#fourier-transform-01-svg');
+      s.append(f);
+
+      // Position of the input image
+      var bbox    = s.select("#image").getBBox();
+      var img_cnv = document.getElementById("fourier-transform-01-img");
+      var img_ctx = img_cnv.getContext('2d');
+      img_cnv.style.width  = bbox.width + "px";
+      img_cnv.style.height = bbox.height + "px";
+      img_cnv.style.left   = bbox.x + "px";
+      img_cnv.style.top    = bbox.y + "px";
+      img_cnv.style.backgroundColor = "#F0F";
+
+      // Reconstructed image
+      var rec_cnv = document.getElementById("fourier-transform-01-rec");
+      var rec_ctx = rec_cnv.getContext('2d');
+      rec_cnv.style.width  = bbox.width + "px";
+      rec_cnv.style.height = bbox.height + "px";
+      rec_cnv.style.left   = bbox.x + "px";
+      rec_cnv.style.top    = bbox.y + "px";
+      rec_cnv.style.backgroundColor = "#F0F";
+      rec_ctx.fillStyle = '#ffffff';
+      rec_ctx.fillRect(0, 0, rec_ctx.canvas.width, rec_ctx.canvas.height);
+
+      // Position of the fourier spectrum
+      var bbox    = s.select("#fourier").getBBox();
+      var fft_cnv = document.getElementById("fourier-transform-01-fft");
+      var fft_ctx = fft_cnv.getContext('2d');
+      fft_cnv.style.width  = bbox.width + "px";
+      fft_cnv.style.height = bbox.height + "px";
+      fft_cnv.style.left   = bbox.x + "px";
+      fft_cnv.style.top    = bbox.y + "px";
+      fft_cnv.style.backgroundColor = "#FFF";
+      fft_ctx.fillStyle = '#ffffff';
+      fft_ctx.fillRect(0, 0, fft_ctx.canvas.width, fft_ctx.canvas.height);
+
+      // Load the image and display it
+      const h = 128, w = 128;
+      var image   = new Image(w, h);
+      image.src = "../../data/images/lena.jpg";
+      image.addEventListener('load', function() {
+            img_ctx.drawImage(image, 0, 0, w, h);
+
+            var updateFilter = function(radius) {
+                  // Compute the FFT of the image
+                  FFT.init(w);
+                  FrequencyFilter.init(w);
+                  SpectrumViewer.init(fft_ctx);
+                  var src = img_ctx.getImageData(0, 0, w, h);
+                  var dat = src.data;
+                  var re = [], im = [];
+                  for(var y=0; y<h; y++) {
+                        var i = y*w;
+                        for(var x=0; x<w; x++) {
+                        var L = dat[(i << 2) + (x << 2) + 0]
+                              + dat[(i << 2) + (x << 2) + 1]
+                              + dat[(i << 2) + (x << 2) + 2];
+                        re[i + x] = L / 3.0;
+                        im[i + x] = 0.0;
+                        }
+                  }
+                  FFT.fft2d(re, im);
+                  FrequencyFilter.swap(re, im);
+
+                  // Draw spectrum
+                  SpectrumViewer.render(re, im, true);
+
+                  FrequencyFilter.LPF(re, im, radius);
+                  FrequencyFilter.swap(re, im);
+                  FFT.ifft2d(re, im);
+                  for(var y=0; y<h; y++) {
+                        var i = y*w;
+                        for(var x=0; x<w; x++) {
+                              var val = re[i + x];
+                              val = val > 255 ? 255 : val < 0 ? 0 : val;
+                              var p   = (i << 2) + (x << 2);
+                              dat[p] = dat[p + 1] = dat[p + 2] = val;
+                        }
+                  }
+                  rec_ctx.putImageData(src, 0, 0);
+                  rec_cnv.style.zIndex = "2";
+            }
+
+            updateFilter(200);
+
+            s.select("#zone0").node.onclick = function() {
+               updateFilter(4);
+            };
+            s.select("#zone1").node.onclick = function() {
+                  updateFilter(40);
+            };
+            s.select("#zone2").node.onclick = function() {
+                  updateFilter(128);
+            };
+      });
+});
+</script>
+            </section>
+         <div>
+      </div>
+
+
+      <script>
+         // More info https://github.com/hakimel/reveal.js#configuration
+         Reveal.initialize({
+            controls: false,
+            progress: true,
+            history: true,
+            center: false,
+            slideNumber: true,
+            transition: 'fade',
+            //dependencies: [{ src: 'js/mathjax.js', async: true }]
+         });
+
+         // Reveal.addEventListener( 'fragmentshown', intro01anim01fw);
+         // Reveal.addEventListener( 'fragmenthidden', intro01anim01bw);
+
+
+         // Reveal.addEventListener( 'helloshown', function() { alert("Hello"); } );
+         // Reveal.addEventListener( 'hellohidden', intro01anim01bw);
+      </script>
+   </body>
+</html>
