@@ -30,6 +30,22 @@ Lastly, we can represent the spectrum using second order statistics such as the 
 I all those case, two methods are possible to determine the spectrum during rendering: either we can use a **closed form** method, or a **tracing** method. We will use a closed form method when the transport operators are known before hand (to study the last bounce with a BRDF assuming a directional light source for example). There, we determine the resulting spectrum by concatenating the operator and expressing them as a single expression. On the other hand, we will use the tracing method when the transport operators sequence is unknown (such as multiple bounces). There, we update the representation using the atomic operators as we perform rendering.
 
 
+**Sheared filters -** It is to note that the wedge form produces the same filters as the covariance representation. Indeed, the resulting filter is the product of Gaussians along the various dimensions. But those Gaussian are correlated and can be expressed as a single Gaussian that would be resulting from the covariance analysis (see below).
+
+Mathematically, the filter $$ h(\delta x, \delta y) $$ is expressed as [[Yan et al. 2015][yan2015]]:
+
+$$
+   h(x, y) = e^{- k_x (x - x_0)^2} e^{- k_y (y - y_0(x, x_0))^2},
+$$
+
+where \(y_0 = \eta (x - x_0)\) is the sheared center of the second Gaussian. By expressing the product of those Gaussian, we can regroup the terms and express the filter using the following form:
+
+$$
+   h(x, y) = e^{- [x - x_0, y] \, \Sigma^{-1} \, [x - x_0, y]^T}, \; \mbox{where} \; \Sigma^{-1} = \left[\begin{array}{cc} k_x + k_y & \eta k_y \\ \eta k_y & k_y \end{array}\right].
+$$
+
+This form is a Gaussian that can be extracted using the covariance formulation. All the optimization procedure described by Yan et al. [[2015][yan2015]] to improve the efficiency of reconstruction can thus be applied to most of the anisotropic methods (Gaussian, Covariance).
+
 
 ### Adaptive Sampling & Reconstruction
 

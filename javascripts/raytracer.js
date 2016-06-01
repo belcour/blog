@@ -196,7 +196,7 @@ function render(target, scene, pass) {
    // Create the target image
    var  ctx = target.getContext('2d');
    var data = ctx.getImageData(0, 0, target.width, target.height);
-   
+
    const spp = 4;
 
    // Check for the scene validity
