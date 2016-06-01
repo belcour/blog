@@ -38,7 +38,7 @@ $$
    h(x, y) = e^{- k_x (x - x_0)^2} e^{- k_y (y - y_0(x, x_0))^2},
 $$
 
-where \(y_0 = \eta (x - x_0)\) is the sheared center of the second Gaussian. By expressing the product of those Gaussian, we can regroup the terms and express the filter using the following form:
+where $$y_0 = \eta (x - x_0)$$ is the sheared center of the second Gaussian. By expressing the product of those Gaussian, we can regroup the terms and express the filter using the following form:
 
 $$
    h(x, y) = e^{- [x - x_0, y] \, \Sigma^{-1} \, [x - x_0, y]^T}, \; \mbox{where} \; \Sigma^{-1} = \left[\begin{array}{cc} k_x + k_y & \eta k_y \\ \eta k_y & k_y \end{array}\right].
@@ -64,6 +64,9 @@ The sampling rate in image space is directly extracted from the bandwidth of the
 $$ B_i = \frac{\tan(f_H)}{H} B_u, $$
 
 where $$f_H$$ is the angular field of view in either width or height and $$H$$ is either the screen width of height in pixels.
+
+
+**Image space vs XYUVT space reconstruction** - There exist two kind of reconstruction methods in the litterature: the one that perform a pixel filter on pixels (or the projected samples positions) [[Durand et al. 2005][durand2005], [Belcour et al. 2013][belcour2013]]; or the one that perform the reconstruction from the more global space of integration (we refer as *XYUVT* -for image, lens and time- here though it can cover some other integration domains) [[Egan et al. 2009][egan2009], [Egan et al. 2011][egan2011a], and others]. Because the later work on a high dimensional domain, the reconstruction cost has to be accounted. It can be reduced using the method of Yan et al. [[2015][yan2015]] that decompose the reconstruction into a set of 1D convolutions.
 
 ### Up-Sampling
 
