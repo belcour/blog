@@ -7,6 +7,7 @@ published: true
 javascripts:
   - utils
   - snap.svg
+  - course2016-part2
 ---
 
 <div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part1.html">&larr; Part 1</a></div><br />
@@ -30,26 +31,9 @@ Lastly, we can represent the spectrum using second order statistics such as the 
 I all those case, two methods are possible to determine the spectrum during rendering: either we can use a **closed form** method, or a **tracing** method. We will use a closed form method when the transport operators are known before hand (to study the last bounce with a BRDF assuming a directional light source for example). There, we determine the resulting spectrum by concatenating the operator and expressing them as a single expression. On the other hand, we will use the tracing method when the transport operators sequence is unknown (such as multiple bounces). There, we update the representation using the atomic operators as we perform rendering.
 
 
-**Sheared filters -** It is to note that the wedge form produces the same filters as the covariance representation. Indeed, the resulting filter is the product of Gaussians along the various dimensions. But those Gaussian are correlated and can be expressed as a single Gaussian that would be resulting from the covariance analysis (see below).
-
-Mathematically, the filter $$ h(\delta x, \delta y) $$ is expressed as [[Yan et al. 2015][yan2015]]:
-
-$$
-   h(x, y) = e^{- k_x (x - x_0)^2} e^{- k_y (y - y_0(x, x_0))^2},
-$$
-
-where $$y_0 = \eta (x - x_0)$$ is the sheared center of the second Gaussian. By expressing the product of those Gaussian, we can regroup the terms and express the filter using the following form:
-
-$$
-   h(x, y) = e^{- [x - x_0, y] \, \Sigma^{-1} \, [x - x_0, y]^T}, \; \mbox{where} \; \Sigma^{-1} = \left[\begin{array}{cc} k_x + k_y & \eta k_y \\ \eta k_y & k_y \end{array}\right].
-$$
-
-This form is a Gaussian that can be extracted using the covariance formulation. All the optimization procedure described by Yan et al. [[2015][yan2015]] to improve the efficiency of reconstruction can thus be applied to most of the anisotropic methods (Gaussian, Covariance).
-
-
 ### Adaptive Sampling & Reconstruction
 
-Adaptive sampling & reconstruction use the Nyquist-Shannong sampling theorem to predict from the Fourier analysis a required sampling rate per pixel and an associated pixel filter (for example in Durand et al. [[2005][durand2005]], Soler et al. [[2009][soler2009]]). In some other cases, we adapt the required sampling rate for integration (to integrate motion for example, see Egan et al. [[2009][egan2009]] or Belcour et al. [[2013][belcour2013]]).
+Adaptive sampling & reconstruction algorithms adapt the Nyquist-Shannong sampling theorem to predict, from the Fourier analysis, a per pixel sampling rate and an associated reconstruction filter (for example in Durand et al. [[2005][durand2005]], Soler et al. [[2009][soler2009]]). In some other cases, we adapt the required sampling rate for integration (to integrate motion for example, see Egan et al. [[2009][egan2009]] or Belcour et al. [[2013][belcour2013]]).
 
 <center>
 <div style="position:relative;width:100%">
@@ -65,8 +49,60 @@ $$ B_i = \frac{\tan(f_H)}{H} B_u, $$
 
 where $$f_H$$ is the angular field of view in either width or height and $$H$$ is either the screen width of height in pixels.
 
+<!-- <center>
+<table>
+   <tr style="font-weight:bold;">
+      <td>Method</td>
+      <td>Reconstruction kernel</td>
+      <td>Integration</td>
+   </tr>
+   <tr>
+      <td>Durand et al. [2005]</td>
+      <td>Isotropic 2D Gaussian</td>
+      <td>Pre-integrated</td>
+   </tr>
+   
+| Soler et al. [[2009][soler2009]]     | Isotropic 2D Gaussian    | Adaptive density in UV |
+| Egan et al. [[2009][egan2009]]       | Sheared 3D Gaussian      | |
+| Belcour et al: [[2013][belcour2013]] | Anisotropic 2D Gaussian  | Adaptive density in UVT |
+
+ </table>
+</center> -->
+
+**Example: Adaptive Lens Integration** - In this example, we will see how we can render and image with defocus with a minimal number of samples. This example is similar to the method of Soler et al. [[2009][soler2009]]. Using this example, we will show the different technique available to generate the picture. Indeed, there are multiple ways to use the frequency analysis to adapt the samples' count and reconstruct the final image.
+
+First, our setup is the following (and shown in the figure below), we have a sensor combining an array of pixels and a lens. This sensor looks at a scene illuminated by a light source. To generate a picture from this setup, we need to integrate every ray of light passing throught the lens and hitting a pixel. We can model this integration using the *XU* domain. Here for every point, the abscissa correspond to the sub-pixel position and the ordinate to the position on the lens.
+
+<center>
+<svg id="example01-svg" width="800px" height="235px"></svg>
+</center>
+<script type="text/javascript" >
+var uri  = "{{ site.url | append: site.baseurl }}/data/svg/course-integration01.svg";
+var elem = "#example01-svg";
+loadSVG(uri, elem, createExample01);
+</script>
+
+Since the lens and the pixel array are plane parallel, we can look at the frequency content at the pixel array location. The direction componnent of the Fourier domain will correspond to the lens position.
+
+
 
 **Image space vs XYUVT space reconstruction** - There exist two kind of reconstruction methods in the litterature: the one that perform a pixel filter on pixels (or the projected samples positions) [[Durand et al. 2005][durand2005], [Belcour et al. 2013][belcour2013]]; or the one that perform the reconstruction from the more global space of integration (we refer as *XYUVT* -for image, lens and time- here though it can cover some other integration domains) [[Egan et al. 2009][egan2009], [Egan et al. 2011][egan2011a], and others]. Because the later work on a high dimensional domain, the reconstruction cost has to be accounted. It can be reduced using the method of Yan et al. [[2015][yan2015]] that decompose the reconstruction into a set of 1D convolutions.
+
+**Sheared filters -** It is to note that the wedge form produces the same filters as the covariance representation. Indeed, the resulting filter is the product of Gaussians along the various dimensions. But those Gaussian are correlated and can be expressed as a single Gaussian that would be resulting from the covariance analysis (see below and in Vaidyanathan et al. [[2015][vaidyanathan2015]]).
+
+Mathematically, the filter $$ h(\delta x, \delta y) $$ is expressed as [[Yan et al. 2015][yan2015]]:
+
+$$
+   h(x, y) = e^{- k_x (x - x_0)^2} e^{- k_y (y - y_0(x, x_0))^2},
+$$
+
+where $$y_0 = \eta (x - x_0)$$ is the sheared center of the second Gaussian. By expressing the product of those Gaussian, we can regroup the terms and express the filter using the following form:
+
+$$
+   h(x, y) = e^{- [x - x_0, y] \, \Sigma^{-1} \, [x - x_0, y]^T}, \; \mbox{where} \; \Sigma^{-1} = \left[\begin{array}{cc} k_x + k_y & \eta k_y \\ \eta k_y & k_y \end{array}\right].
+$$
+
+This form is a Gaussian that can be extracted using the covariance formulation. All the optimization procedure described by Yan et al. [[2015][yan2015]] to improve the efficiency of reconstruction can thus be applied to most of the anisotropic methods (Gaussian, Covariance).
 
 ### Up-Sampling
 
@@ -153,4 +189,5 @@ It is possible to bandlimit other signals than the BRDF. For example, Krivanek a
 [belcour2014]:  https://hal.inria.fr/hal-00957242
 [yan2015]:      http://dl.acm.org/citation.cfm?id=2816814&CFID=610675972&CFTOKEN=79354783
 [zubiaga2015]:  https://hal.inria.fr/hal-01164590
+[vaidyanathan2015]: https://software.intel.com/en-us/articles/layered-light-field-reconstruction-for-defocus-blur
 [belcour2016]:  https://hal.inria.fr/hal-01200710

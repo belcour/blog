@@ -149,11 +149,11 @@ The Fourier transform has many interesting properties that we will uncover as we
 
 We need to perform our frequency analysis from first principles governing the rendering of images. In physically based rendering, this is provided by the Rendering Equation [[Kajiya 1986][kajiya1986]] that describe the conservation of radiance energy at surface boundaries:
 
-$$ L(\mathbf{x}, \pmb{\omega}) = L_e(\mathbf{x}, \pmb{\omega}) + \int_{\Omega} \rho(\pmb{\omega}, \pmb{\omega}^\prime) L(\mathbf{y}, -\pmb{\omega}^\prime) (\pmb{\omega}^\prime, \mathbf{n})^+ \mbox{d}\pmb{\omega}^\prime. $$
+$$ L(\mathbf{x}, \boldsymbol{\omega}) = L_e(\mathbf{x}, \boldsymbol{\omega}) + \int_{\Omega} \rho(\boldsymbol{\omega}, \boldsymbol{\omega}^\prime) L(\mathbf{y}, -\boldsymbol{\omega}^\prime) (\boldsymbol{\omega}^\prime, \mathbf{n})^+ \mbox{d}\boldsymbol{\omega}^\prime. $$
 
-Here $$\mathbf{y}$$ is the directly visible point from $$\mathbf{x}$$ in direction $$\pmb{\omega}^\prime$$. The surface material is represented by the bidirectional reflectance distribution function $$\rho(\pmb{\omega}, \pmb{\omega}^\prime)$$. The emission from surfaces is noted $$L_e$$. And $$(\cdot, \cdot)^{+}$$ is the clamped dot product to positive values.
+Here $$\mathbf{y}$$ is the directly visible point from $$\mathbf{x}$$ in direction $$\boldsymbol{\omega}^\prime$$. The surface material is represented by the bidirectional reflectance distribution function $$\rho(\boldsymbol{\omega}, \boldsymbol{\omega}^\prime)$$. The emission from surfaces is noted $$L_e$$. And $$(\cdot, \cdot)^{+}$$ is the clamped dot product to positive values.
 
-However, this expression is not simple to perform frequency analysis due to its recursive nature. We will see in the following how this recursion can be used to build frequency estimate.
+However, this expression is not simple to perform frequency analysis due to its recursive nature and to the direction $$\boldsymbol{\omega}$$ (The usual Fourier transform is defined over a planar domain). We will see in the following how this recursion can be used to build frequency estimate.
 
 #### Bandwidth
 
@@ -211,9 +211,9 @@ Mathematically, we express positions and directions as perturbations of the main
 
 $$\mathbf{x} = \mathbf{x}_0 + \delta \mathbf{x}$$
 
-$$\pmb{\omega} = \frac{\pmb{\omega}_0 + \delta \mathbf{u}}{|| \pmb{\omega}_0 + \delta \mathbf{u} ||}$$
+$$\boldsymbol{\omega} = \frac{\boldsymbol{\omega}_0 + \delta \mathbf{u}}{|| \boldsymbol{\omega}_0 + \delta \mathbf{u} ||}$$
 
-Now that we have this parametrization, we can express the radiance in that space: $$L(\mathbf{x}_0 + \delta \mathbf{x}, \pmb{\omega}_0 + \delta \mathbf{u} )$$. But remember that we are interested by its Fourier transform. While local radiance is parametrized in 2D by the couple $$(\delta{x},\delta{y})$$, it is parametrized by the couple $$(\Omega_x,\Omega_u)$$ in the Fourier domain.
+Now that we have this parametrization, we can express the radiance in that space: $$L(\mathbf{x}_0 + \delta \mathbf{x}, \boldsymbol{\omega}_0 + \delta \mathbf{u} )$$. But remember that we are interested by its Fourier transform. While local radiance is parametrized in 2D by the couple $$(\delta{x},\delta{y})$$, it is parametrized by the couple $$(\Omega_x,\Omega_u)$$ in the Fourier domain.
 
 The next step is to express radiance transport equations in this space and to convert them using the Fourier transform.
 
@@ -276,11 +276,11 @@ Intuitively, this operator scales the spatial frequency content to match the new
 
 Mathematically, the projected local radiance on the plane with normal $$\mathbf{n}$$ is expressed as:
 
-$$\mbox{P}_{\mathbf{n}}[L](\delta x, \delta u) = L\biggr({\delta x \over |(\pmb{\omega}_0 \cdot \mathbf{n})|}, \delta u\biggr)$$
+$$\mbox{P}_{\mathbf{n}}[L](\delta x, \delta u) = L\biggr({\delta x \over |(\boldsymbol{\omega}_0 \cdot \mathbf{n})|}, \delta u\biggr)$$
 
 This translate into the Fourier domain as:
 
-$$\mbox{P}_{\mathbf{n}}[\hat{l}](\Omega_x, \Omega_u) = \hat{l}(|(\pmb{\omega}_0 \cdot \mathbf{n})| \Omega_x, \Omega_u)$$
+$$\mbox{P}_{\mathbf{n}}[\hat{l}](\Omega_x, \Omega_u) = \hat{l}(|(\boldsymbol{\omega}_0 \cdot \mathbf{n})| \Omega_x, \Omega_u)$$
 
 A Matlab implementation of the operator is the following:
 
