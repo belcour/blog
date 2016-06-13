@@ -17,131 +17,180 @@
       <script src="../js/reveal.js"></script>
       <script src="../js/mathjax.js"></script>
       <script src="../../javascripts/fft.js"></script>
+      <script src="../../javascripts/course2016-part1.js"></script>
    </head>
    <body>
+   <script type="text/javascript">
+      setData("general", "baseurl", "../../");
+   </script>
+
       <div class="reveal">
          <!-- Any section element inside of this container is displayed as a slide -->
          <div class="slides">
 
             <!-- Title screen -->
             <section class="title"> <!-- data-background="./png/background.png" -->
-            <h3>A Practical Introduction to Frequency Analysis of Light Transport</h3>
+            <h3>A Practical Introduction to<br /> Frequency Analysis of Light Transport</h3>
             <p><small>
                <a href="http://belcour.github.io/blog">Laurent Belcour - Unity Technologies</a>
             </small></p>
             </section>
 
+            <!-- Introduction: What it is about? -->
+            <section>
+               <h4>Welcome</h4><br />
+               <ul>
+                  <li class="fragment">Introduction to Freq. Analysis of Light Transport
+                  <ul class="fragment" style="font-size:0.8em;padding-top:0.5em;">
+                        <li>Application of Signal Processing in Graphics</li>
+                        <li>Analytical study of the Fourier Transform</li>
+                  </ul></li><br/>
+                  <li class="fragment">Applications in Physically Based Rendering
+                  <ul class="fragment" style="font-size:0.8em;padding-top:0.5em;">
+                        <li>Adaptive rendering</li>
+                        <li>Denoising</li>
+                        <li>Antialiasing</li>
+                  </ul></li>
+               </ul>
+            </section>
+            <section>
+               <h4>Applications</h4><br />
+               Examples of today's lecture's applications.<br /><br />
+
+               <ul>
+                  <li>Adaptive sampling</li>
+                  <li>Density estimation</li>
+                  <li>Anti-aliasing</li>
+               </ul>
+            </section>
+
+            <!-- Signal processing, what are its uses -->
+            <section>
+               <h4>Signal Processing</h4><br />
+               <ul>
+                  <li>Study of signals and operations on those signals</li><br />
+               </ul>
+            </section>
+            <section>
+               <h4>Example: Nyquist Rate</h4><br />
+               <svg id="fourier-nyquist-01" width="800px", height="500px"></svg>
+               <script>
+               var snap = Snap("#fourier-nyquist-01");
+               createNyquist01(snap);
+               </script>
+            </section>
+
             <!-- Introduction on Fourier Transforms -->
             <section>
-            <h4>The Fourier Transform</h4>
-<center>
-<div style="position:relative;width:600px;height:300px;margin-top:100px;">
-<canvas id="fourier-transform-01-fft" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:1;"></canvas>
-<canvas id="fourier-transform-01-img" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:1;"></canvas>
-<canvas id="fourier-transform-01-rec" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:0;"></canvas>
-<svg id="fourier-transform-01-svg" width="600px" height="300px" style="position:relative;z-index:3;"></svg>
-</div><br />
-</center>
-<script type="text/javascript" >
-Snap.load("../../data/svg/course-fourier01.svg", function (f) {
+               <h4>The Fourier Transform</h4>
+               <center style="transform:scale(1.5);padding-top:0.1em;">
+               <div style="position:relative;width:600px;height:300px;margin-top:100px;">
+               <canvas id="fourier-transform-01-fft" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:1;"></canvas>
+               <canvas id="fourier-transform-01-img" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:1;"></canvas>
+               <canvas id="fourier-transform-01-rec" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:0;"></canvas>
+               <svg id="fourier-transform-01-svg" width="600px" height="300px" style="position:relative;z-index:3;"></svg>
+               </div><br />
+               </center>
+               <script type="text/javascript" class="fragment" data-call="showZonesFourierTransform01">
+               setData("fft01", "img-url", "data/images/lena.jpg");
+               loadSVG('data/svg/course-fourier01.svg', '#fourier-transform-01-svg', createFourierTransform01);
+               </script>
+            </section>
 
-      var s = Snap('#fourier-transform-01-svg');
-      s.append(f);
 
-      // Position of the input image
-      var bbox    = s.select("#image").getBBox();
-      var img_cnv = document.getElementById("fourier-transform-01-img");
-      var img_ctx = img_cnv.getContext('2d');
-      img_cnv.style.width  = bbox.width + "px";
-      img_cnv.style.height = bbox.height + "px";
-      img_cnv.style.left   = bbox.x + "px";
-      img_cnv.style.top    = bbox.y + "px";
-      img_cnv.style.backgroundColor = "#F0F";
+            <!-- Back to Physically Based Rendering -->
+            <section data-transition="fade-in slide-out">
+               <h4>How to Apply it in Rendering?</h4>
+               <img src="../../data/images/dragon-01.png" width="512px" style="border-width: 1px;"/>
+            </section>
+            <section data-transition="slide-in fade-out">
+               <h4>Physically Based Rendering</h4>
 
-      // Reconstructed image
-      var rec_cnv = document.getElementById("fourier-transform-01-rec");
-      var rec_ctx = rec_cnv.getContext('2d');
-      rec_cnv.style.width  = bbox.width + "px";
-      rec_cnv.style.height = bbox.height + "px";
-      rec_cnv.style.left   = bbox.x + "px";
-      rec_cnv.style.top    = bbox.y + "px";
-      rec_cnv.style.backgroundColor = "#F0F";
-      rec_ctx.fillStyle = '#ffffff';
-      rec_ctx.fillRect(0, 0, rec_ctx.canvas.width, rec_ctx.canvas.height);
+               <svg style="position:absolute;top:0;left:0;z-index:-1;" width="1280px" height="720px" id="rendering-equation-00"></svg>
 
-      // Position of the fourier spectrum
-      var bbox    = s.select("#fourier").getBBox();
-      var fft_cnv = document.getElementById("fourier-transform-01-fft");
-      var fft_ctx = fft_cnv.getContext('2d');
-      fft_cnv.style.width  = bbox.width + "px";
-      fft_cnv.style.height = bbox.height + "px";
-      fft_cnv.style.left   = bbox.x + "px";
-      fft_cnv.style.top    = bbox.y + "px";
-      fft_cnv.style.backgroundColor = "#FFF";
-      fft_ctx.fillStyle = '#ffffff';
-      fft_ctx.fillRect(0, 0, fft_ctx.canvas.width, fft_ctx.canvas.height);
+               <script type="text/javascript">
+                  loadSVG("data/svg/course-pbr01.svg", "#rendering-equation-00", renderingEquation01Step00);
+               </script>
+            </section>
+            <section>
+               <h4>Physically Based Rendering</h4>
 
-      // Load the image and display it
-      const h = 128, w = 128;
-      var image   = new Image(w, h);
-      image.src = "../../data/images/lena.jpg";
-      image.addEventListener('load', function() {
-            img_ctx.drawImage(image, 0, 0, w, h);
+               <svg style="position:absolute;top:0;left:0;z-index:-1;" width="1280px" height="720px" id="rendering-equation-01"></svg>
 
-            var updateFilter = function(radius) {
-                  // Compute the FFT of the image
-                  FFT.init(w);
-                  FrequencyFilter.init(w);
-                  SpectrumViewer.init(fft_ctx);
-                  var src = img_ctx.getImageData(0, 0, w, h);
-                  var dat = src.data;
-                  var re = [], im = [];
-                  for(var y=0; y<h; y++) {
-                        var i = y*w;
-                        for(var x=0; x<w; x++) {
-                        var L = dat[(i << 2) + (x << 2) + 0]
-                              + dat[(i << 2) + (x << 2) + 1]
-                              + dat[(i << 2) + (x << 2) + 2];
-                        re[i + x] = L / 3.0;
-                        im[i + x] = 0.0;
-                        }
-                  }
-                  FFT.fft2d(re, im);
-                  FrequencyFilter.swap(re, im);
+               <script type="text/javascript">
+                  loadSVG("data/svg/course-pbr01.svg", "#rendering-equation-01", renderingEquation01Step01);
+               </script>
+               <p class="fragment" data-call="renderingEquation01Step02"></p>
+               <p class="fragment" data-call="renderingEquation01Step03"></p>
+               <p class="fragment" data-call="renderingEquation01Step04"></p>
+               <p class="fragment" data-call="renderingEquation01Step05"></p>
+            </section>
+            <section>
+               <h4>Fourier Transform of Radiance?</h4><br />
+               <svg width="800px" height="500px" id="rendering-apply-01"></svg>
+               <script type="text/javascript">
+                  var snap = Snap("#rendering-apply-01");
+                  var path = snap.path("m 120.74838,189.8229 c -11.67208,0 -144.278872,3.95905 -148.888519,-179.280271 -3.448933,-137.099489 92.96321,-165.402069 113.984864,-171.034809 l -0.09225,-15.759 34.45677,31.33809 -34.059428,42.66547 -0.370011,-18.24525 C 64.453299,-114.77845 -26.773106,-95.787872 -28.160431,10.232912 -29.696981,127.65749 91.026663,155.96416 120.21597,155.96416 Z");
+                  path.transform(Snap.matrix().translate(100, 200));
+                  path = path.clone();
+                  path.transform(Snap.matrix().translate(700, 230).add(Snap.matrix().rotate(180)));
+                  snap.text(400,  70, "Rendered image").attr({textAnchor: "middle"});
+                  snap.text(400, 390, "Fourier transform").attr({textAnchor: "middle"});
+                  snap.text( 50, 220, "need to optimize").attr({textAnchor: "end", fontSize: "0.7em"});
+                  snap.text(750, 220, "need to compute").attr({textAnchor: "start", fontSize: "0.7em"});
+               </script>
+            </section>
+            <section>
+               <h4>Local Analysis</h4>
+               <center>
+               <div style="position:relative;width:512px;height:512px;margin:0;">
+               <img id="local-analysis-01-img" src="../../data/images/dragon-01.png" width="512" height="512" style="border-width:0px;position:absolute;z-index:-1;margin:0px;top:0;left:0;" />
+               <svg viewBox="0 0 512 512" style="width:512px;height:512px;position:absolute;z-index:1;top:0;left:0;" id="local-analysis-01"></svg>
+               <canvas id="local-analysis-01-fft1" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+               <canvas id="local-analysis-01-fft2" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+               </div>
+               </center>
 
-                  // Draw spectrum
-                  SpectrumViewer.render(re, im, true);
+               <script type="text/javascript">
+                  var inset1 = {size:32, x:150, y:200, color: "#aa0000", canvas: "local-analysis-01-fft1"};
+                  var inset2 = {size:32, x:240, y:320, color: "#00aa00", canvas: "local-analysis-01-fft2"};
+                  var windw1 = {size: 200, x:-300, y:-10};
+                  var windw2 = {size: 200, x: 350, y:350};
 
-                  FrequencyFilter.LPF(re, im, radius);
-                  FrequencyFilter.swap(re, im);
-                  FFT.ifft2d(re, im);
-                  for(var y=0; y<h; y++) {
-                        var i = y*w;
-                        for(var x=0; x<w; x++) {
-                              var val = re[i + x];
-                              val = val > 255 ? 255 : val < 0 ? 0 : val;
-                              var p   = (i << 2) + (x << 2);
-                              dat[p] = dat[p + 1] = dat[p + 2] = val;
-                        }
-                  }
-                  rec_ctx.putImageData(src, 0, 0);
-                  rec_cnv.style.zIndex = "2";
-            }
+                  localAnalysis01CreateInset("local-analysis-01-img", inset1, windw1);
+                  localAnalysis01CreateInset("local-analysis-01-img", inset2, windw2);
+               </script>
+            </section>
 
-            updateFilter(200);
+            <!-- The overview of the presentation -->
+            <section>
+               <h4>Overview</h4><br />
 
-            s.select("#zone0").node.onclick = function() {
-               updateFilter(4);
-            };
-            s.select("#zone1").node.onclick = function() {
-                  updateFilter(40);
-            };
-            s.select("#zone2").node.onclick = function() {
-                  updateFilter(128);
-            };
-      });
-});
-</script>
+               <ol style="text-align:left;display:block;padding-left:3em;">
+                  <li style="color:#aaaaaa;padding-bottom:0.5em;">Introduction</li>
+                  <li style="padding-bottom:0.5em;">Frequency Operators
+                     <ul style="font-size:0.6em;">
+                        <li>Travel & Occlusion</li>
+                        <li>Reflection & Refraction</li>
+                        <li>Scattering & Absorption</li>
+                     </ul>
+                  </li>
+                  <li style="padding-bottom:0.5em;">Applications
+                     <ul style="font-size:0.6em;">
+                        <li>Adaptive sampling & denoising</li>
+                        <li>Upsampling</li>
+                        <li>Density estimation</li>
+                        <li>Antialiasing</li>
+                     </ul>
+                  </li>
+                  <li style="padding-bottom:0.5em;">Conclusion</li>
+               </ol>
+            </section>
+
+            <!-- Break before part1: operators -->
+            <section class="title">
+               <h4>Break: Questions?</h4><br />
+               <a style="font-size:0.7em;float:right;padding-top:8em;" href="part1.html">> next part</a>
             </section>
          <div>
       </div>
@@ -156,6 +205,8 @@ Snap.load("../../data/svg/course-fourier01.svg", function (f) {
             center: false,
             slideNumber: true,
             transition: 'fade',
+            width: 1280,
+            height: 720,
             //dependencies: [{ src: 'js/mathjax.js', async: true }]
          });
 

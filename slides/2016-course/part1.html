@@ -16,6 +16,8 @@
       <script src="../js/snap.svg.js"></script>
       <script src="../js/reveal.js"></script>
       <script src="../js/mathjax.js"></script>
+      <script src="../../javascripts/fft.js"></script>
+      <script src="../../javascripts/course2016-part1.js"></script>
    </head>
    <body>
       <div class="reveal">
@@ -24,10 +26,76 @@
 
             <!-- Title screen -->
             <section class="title"> <!-- data-background="./png/background.png" -->
-            <h3>A Practical Introduction to Frequency Analysis of Light Transport</h3>
-            <p><small>
-               <a href="http://belcour.github.io/blog">Laurent Belcour - Unity Technologies</a>
-            </small></p>
+            <h3>Part II: Frequency Operators</h3>
+            </section>
+
+            <section>
+               <h4>Frequency Analysis of Light Transport</h4>
+               <center>
+               <div style="width:1024px;height:512px;">
+               <div style="float:left;position:relative;width:512px;height:512px;margin:0;">
+               <img id="local-analysis-01-img" src="../../data/images/dragon-01.png" width="512" height="512" style="border-width:0px;position:absolute;z-index:-1;margin:0px;top:0;left:0;" />
+               <svg viewBox="0 0 512 512" style="width:512px;height:512px;position:absolute;z-index:1;top:0;left:0;" id="local-analysis-01"></svg>
+               <canvas id="local-analysis-01-fft1" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+               <canvas id="local-analysis-01-fft2" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+               </div>
+               <div style="float:right;position:relative;width:512px;height:512px;margin:0;">
+                  <img src="../../data/images/dragon-01.png" width="512px" style="border-width: 1px;margin: 0"/>
+               </div>
+               </div>
+               </center>
+
+               <script type="text/javascript">
+                  var inset1 = {size:32, x:150, y:200, color: "#aa0000", canvas: "local-analysis-01-fft1"};
+                  var inset2 = {size:32, x:240, y:320, color: "#00aa00", canvas: "local-analysis-01-fft2"};
+                  var windw1 = {size: 150, x:-150, y:-10};
+                  var windw2 = {size: 150, x: 250, y:400};
+
+                  localAnalysis01CreateInset("local-analysis-01-img", inset1, windw1);
+                  localAnalysis01CreateInset("local-analysis-01-img", inset2, windw2);
+               </script>
+            </section>
+
+            <section> <!-- We can do a clean formulation of the FT of L using
+                           a two plane parametrization that maps directions
+                           to a plane. -->
+               <h4>Local Ray Space</h4>
+               <center  style="transform:scale(1.5);padding-top:3em;">
+               <object type="image/svg+xml" data="../../data/svg/cov_twoplanes.svg" width="604px" id="draw_cov_twoplanes"></object><br />
+               <script src="../../javascripts/draw_cov_twoplanes.js" type="text/javascript">
+               </script>
+               </center>
+            </section>
+            <section> <!-- Here we show how the local FT in that space is made
+                           suffiently small to be well defined. -->
+               <h4>Local Ray Space</h4>
+               $$
+                  \mathcal{F}_l[L] = \int_{\delta\mathbf{x} \in \mathbb{R}^N} L(\delta\mathbf{x}) W_l(\mathbf{x}_0 - \delta\mathbf{x}) e^{i 2 \pi \, \mathbf{\Omega}^T  \delta\mathbf{x}}
+               $$
+            </section>
+            <section> <!-- Because we use local analysis, we need to look at
+                           the variations of elements in the Rendering Eq.
+                           like curvature. -->
+               <h4>Local Rendering Equation</h4>
+            </section>
+            <section> <!-- We need to break down the local rendering equation
+                           into a set of different operators for which the
+                           local FT will have closed forms. -->
+               <h4>Rendering Operators</h4>
+            </section>
+
+
+            <section>
+               <h4>Summary: Frequency Operators</h4>
+            </section>
+            <section>
+               <h4>Summary: A Unified Theory</h4>
+            </section>
+
+            <!-- Break before part2: applications -->
+            <section class="title">
+               <h4>Break: Questions?</h4><br />
+               <a style="font-size:0.7em;float:right;padding-top:8em;" href="part2.html">> next part</a>
             </section>
          <div>
       </div>
@@ -42,6 +110,8 @@
             center: false,
             slideNumber: true,
             transition: 'fade',
+            width: 1280,
+            height: 720,
             //dependencies: [{ src: 'js/mathjax.js', async: true }]
          });
 

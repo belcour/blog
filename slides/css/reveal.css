@@ -33,7 +33,10 @@ html, body, .reveal div, .reveal span, .reveal applet, .reveal object, .reveal i
   display: block; }
 
 .reveal .slides .title {
-  margin-top: 22%; 
+  margin-top: 7em; 
+}
+svg {
+   overflow: visible !important;
 }
 
 /*********************************************
