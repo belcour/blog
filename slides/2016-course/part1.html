@@ -18,8 +18,12 @@
       <script src="../js/mathjax.js"></script>
       <script src="../../javascripts/fft.js"></script>
       <script src="../../javascripts/course2016-part1.js"></script>
+      <script src="../../javascripts/course2016-part2.js"></script>
    </head>
    <body>
+   <script type="text/javascript">
+      setData("general", "baseurl", "../../");
+   </script>
       <div class="reveal">
          <!-- Any section element inside of this container is displayed as a slide -->
          <div class="slides">
@@ -31,28 +35,111 @@
 
             <section>
                <h4>Frequency Analysis of Light Transport</h4>
-               <center>
-               <div style="width:1024px;height:512px;">
+               <center style="margin-left:110px;">
+               <div style="height:512px;">
                <div style="float:left;position:relative;width:512px;height:512px;margin:0;">
                <img id="local-analysis-01-img" src="../../data/images/dragon-01.png" width="512" height="512" style="border-width:0px;position:absolute;z-index:-1;margin:0px;top:0;left:0;" />
                <svg viewBox="0 0 512 512" style="width:512px;height:512px;position:absolute;z-index:1;top:0;left:0;" id="local-analysis-01"></svg>
                <canvas id="local-analysis-01-fft1" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
                <canvas id="local-analysis-01-fft2" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
                </div>
-               <div style="float:right;position:relative;width:512px;height:512px;margin:0;">
-                  <img src="../../data/images/dragon-01.png" width="512px" style="border-width: 1px;margin: 0"/>
+               <div style="float:right;position:relative;width:512;height:512px;margin:0;padding-right:120px">
+                  <svg id="rendering-equation-02" width="512px" style="border-width: 0px;margin: 0;"></svg>
                </div>
                </div>
                </center>
 
                <script type="text/javascript">
+                  function renderingEquation02Step00(snap) {
+                     var layer = snap.select("#svg2")
+                     layer.attr({width: 800, height: 512})
+                     snap.select("#lens").attr({ opacity: 0 })
+                  }
+                  loadSVG("data/svg/course-pbr02.svg", "#rendering-equation-02", renderingEquation02Step00);
+
                   var inset1 = {size:32, x:150, y:200, color: "#aa0000", canvas: "local-analysis-01-fft1"};
                   var inset2 = {size:32, x:240, y:320, color: "#00aa00", canvas: "local-analysis-01-fft2"};
                   var windw1 = {size: 150, x:-150, y:-10};
                   var windw2 = {size: 150, x: 250, y:400};
 
-                  localAnalysis01CreateInset("local-analysis-01-img", inset1, windw1);
-                  localAnalysis01CreateInset("local-analysis-01-img", inset2, windw2);
+                  localAnalysisCreateInset("#local-analysis-01", "local-analysis-01-img", inset1, windw1);
+                  localAnalysisCreateInset("#local-analysis-01", "local-analysis-01-img", inset2, windw2);
+               </script>
+            </section>
+            <section>
+               <h4>Frequency Analysis of Light Transport</h4>
+               <center style="margin-left:110px;">
+               <div style="height:512px;">
+               <div style="float:left;position:relative;width:512px;height:512px;margin:0;">
+               <img id="local-analysis-02-img" src="../../data/images/dragon-02.png" width="512" height="512" style="border-width:0px;position:absolute;z-index:-1;margin:0px;top:0;left:0;" />
+               <svg viewBox="0 0 512 512" style="width:512px;height:512px;position:absolute;z-index:1;top:0;left:0;" id="local-analysis-02"></svg>
+               <canvas id="local-analysis-02-fft1" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+               <canvas id="local-analysis-02-fft2" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+               </div>
+               <div style="float:right;position:relative;width:512;height:512px;margin:0;padding-right:120px">
+                  <svg id="rendering-equation-03" width="512px" style="border-width: 0px;margin: 0;"></svg>
+               </div>
+               </div>
+               </center>
+
+               <script type="text/javascript">
+                  function renderingEquation03Step00(snap) {
+                     var layer = snap.select("#svg2")
+                     layer.attr({width: 800, height: 512})
+                  }
+                  loadSVG("data/svg/course-pbr02.svg", "#rendering-equation-03", renderingEquation03Step00);
+
+                  var inset1 = {size:32, x:150, y:200, color: "#aa0000", canvas: "local-analysis-02-fft1"};
+                  var inset2 = {size:32, x:240, y:320, color: "#00aa00", canvas: "local-analysis-02-fft2"};
+                  var windw1 = {size: 150, x:-150, y:-10};
+                  var windw2 = {size: 150, x: 250, y:400};
+
+                  localAnalysisCreateInset("#local-analysis-02", "local-analysis-02-img", inset1, windw1);
+                  localAnalysisCreateInset("#local-analysis-02", "local-analysis-02-img", inset2, windw2);
+               </script>
+            </section>
+            <section>
+               <h4>Break Paths using Operators</h4>
+               <center style="width: 100%;position:absolute;top: 20px;left: 0;">
+               <svg id="rendering-equation-04" width="1080" style="border-width: 0px;margin: 0;"></svg>
+               </center>
+
+               <script type="text/javascript">
+                  function renderingEquation04Step00(snap) {
+                     var layer = snap.select("#svg2")
+                     layer.attr({width: 1080})
+                     snap.select("#lens").attr({ opacity: 0 })
+                     snap.select("#path2-00").attr({ opacity: 0 })
+                     snap.select("#path2-01").attr({ opacity: 0 })
+
+                     var t1 = 0; // light
+                     var t2 = 335; // dragon
+                     var t3 = 1000; //sensor
+
+                     // Point at light
+                     var p = snap.select("#path1-00").getPointAtLength(t1);
+                     var c = snap.circle(p.x, p.y, 7).attr({ fill: "#ffffff", stroke: "#ff0000", strokeWidth: "4px", id: "cursor", filter: "drop-shadow( 2px 2px 2px #666 )"})
+                     snap.select("#lens").after(c);
+
+                     // Point at dragon
+                     p = snap.select("#path1-00").getPointAtLength(t2);
+                     c = snap.circle(p.x, p.y, 7).attr({ fill: "#ffffff", stroke: "#00aa00", strokeWidth: "4px", id: "cursor", filter: "drop-shadow( 2px 2px 2px #666 )"})
+                     snap.select("#lens").after(c);
+
+                     // var p1 = snap.select("#path1-00").getPointAtLength(t1);
+                     // var p2 = snap.select("#path1-00").getPointAtLength(t2);
+                     // c = CreateBacket(snap, p1, p2, 30, 10);
+                     // snap.select("#lens").after(c);
+
+                     // p1 = snap.select("#path1-00").getPointAtLength(t2);
+                     // p2 = snap.select("#path1-00").getPointAtLength(t3);
+                     // c = CreateBacket(snap, p1, p2, 30, 10);
+                     // snap.select("#lens").after(c);
+
+                     // var fourier = CreateFrame(snap, 1000, 100, 150, 150);
+                     // CreateCovariance(snap, fourier, Snap.matrix(0.9, 0, 0, 0.1, 0, 0));
+                  }
+                  loadSVG("data/svg/course-pbr02.svg", "#rendering-equation-04", renderingEquation04Step00);
                </script>
             </section>
 

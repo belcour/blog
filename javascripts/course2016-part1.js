@@ -289,29 +289,71 @@ var showZonesFourierTransform01 = function(offset) {
 
 /* Rendering Equation part */
 
+var renderingEquation00Step01 = function(offset) {
+   var snap = Snap("#rendering-equation-00");
+   if(offset > 0) {
+      snap.select("#eye").attr({  opacity: 1.0});
+      snap.select("#eyeT").attr({ opacity: 1.0});
+   } else {
+      snap.select("#eye").attr({  opacity: 0.0});
+      snap.select("#eyeT").attr({ opacity: 0.0});
+   }
+}
+var renderingEquation00Step02 = function(offset) {
+   var snap = Snap("#rendering-equation-00");
+   if(offset > 0) {
+      snap.select("#light").attr({  opacity: 1.0});
+      snap.select("#lightT").attr({ opacity: 1.0});
+   } else {
+      snap.select("#light").attr({  opacity: 0.0});
+      snap.select("#lightT").attr({ opacity: 0.0});
+   }
+}
+var renderingEquation00Step03 = function(offset) {
+   var snap = Snap("#rendering-equation-00");
+   if(offset > 0) {
+      snap.select("#geometry").attr({  opacity: 1.0});
+      snap.select("#geomT").attr({ opacity: 1.0});
+   } else {
+      snap.select("#geometry").attr({  opacity: 0.0});
+      snap.select("#geomT").attr({ opacity: 0.0});
+   }
+}
+var renderingEquation00Step04 = function(offset) {
+   var snap = Snap("#rendering-equation-00");
+   if(offset > 0) {
+      snap.select("#material").attr({  opacity: 1.0});
+      snap.select("#matT").attr({ opacity: 1.0});
+   } else {
+      snap.select("#material").attr({  opacity: 0.0});
+      snap.select("#matT").attr({ opacity: 0.0});
+   }
+}
+
 var renderingEquation01Step00 = function(snap) {
-   snap.select("feGaussianBlur").attr({ stdDeviation: 0});
+   snap.select("feGaussianBlur").attr({ id: "feGaussianBlur00", stdDeviation: 0 });
    snap.select("#equation").attr({opacity: 0});
    snap.select("#inset").attr({opacity: 0});
+
+   var eye  = snap.select("#eye").attr({opacity: 0});
+   var eyeT = snap.text(120, 450, "eye").attr({ id: "eyeT", fontWeight: "bold", textAnchor: "middle", fontSize: "0.9em" }).attr({opacity: 0});
+   //eye.insert(eyeT);
+
+   var light  = snap.select("#light").attr({opacity: 0});
+   var lightT = snap.text(850, 200, "light").attr({ id: "lightT", fontWeight: "bold", fill: "#ffd932", textAnchor: "middle", fontSize: "0.9em" }).attr({opacity: 0});
+
+   var geom  = snap.select("#geometry").attr({opacity: 0});
+   var geomT = snap.text(900, 640, "geometry").attr({ id: "geomT", fontWeight: "bold", textAnchor: "middle", fontSize: "0.9em" }).attr({opacity: 0});
+
+   var mat  = snap.select("#material").attr({opacity: 0});
+   var matT = snap.text(780, 350, "material").attr({ id: "matT", fontWeight: "bold", textAnchor: "middle", fontSize: "0.9em" }).attr({opacity: 0});
 }
 var renderingEquation01Step01 = function(snap) {
-   //snap.attr({overflow: "visible"});
-   //var snap   = Snap("#rendering-equation-01");
-   //var filter = snap.select("#svg2").filter(Snap.filter.blur(10));
-   snap.select("feGaussianBlur").attr({ stdDeviation: 10});
-   //var filter = snap.select("#re00blur");
-   //snap.select("#inset").attr({opacity: 0});
-   //Snap.animate(0, 5.0, function( value ) { filter.attr({ stdDeviation: value}) }, 1000 );
+
+   // Change the filter and opacity
+   //snap.select("filter7119").attr({ id: "fileRE01" });
+   snap.select("feGaussianBlur").attr({ stdDeviation: 10 });
    snap.select("#background").attr({ opacity: 0.1});
-   // if(offset > 0) {
-   //    Snap.animate(0, 5.0, function( value ) { filter.attr({ stdDeviation: value}) }, 1000 );
-   //    Snap.animate(1, 0.2, function( value ) { dragon.attr({ opacity: value})}, 1000);
-   //    Snap.animate(0, 1.0, function( value ) { equat.attr({ opacity: value})}, 1000);
-   // } else {
-   //    Snap.animate(5.0, 0, function( value ) { filter.attr({ stdDeviation: value}) }, 1000 );
-   //    Snap.animate(0.2, 1, function( value ) { dragon.attr({ opacity: value})}, 1000);
-   //    Snap.animate(1.0, 0, function( value ) { equat.attr({ opacity: value})}, 1000);
-   // }
 
    // Inset elements
    snap.select("#inset").attr({opacity: 0});
@@ -332,18 +374,18 @@ var renderingEquation01Step01 = function(snap) {
 
    var t4 = snap.text(615, 300, "material").attr({ fill: "#A52A2A", id: "material", fontSize: "0.6em"});
    var r4 = snap.rect(570, 325, 185, 60).attr({stroke: "#A52A2A", fillOpacity: 0, strokeWidth: "2px"});
-   snap.g(t4, r4).attr({id : "material", opacity: 0});
+   snap.g(t4, r4).attr({id : "materialInset", opacity: 0});
 }
 var renderingEquation01Step02 = function(offset) {
    var snap      = Snap("#rendering-equation-01");
    var inset     = snap.select("#inset");
    var radiance  = snap.select("#radiance");
    if(offset > 0) {
-      Snap.animate(0, 1, function( value ) { inset.attr({ opacity: value})}, 1000);
-      Snap.animate(0, 1, function( value ) { radiance.attr({ opacity: value})}, 1000);
+      Snap.animate(0, 1, function( value ) { inset.attr({ opacity: value})}, 500);
+      Snap.animate(0, 1, function( value ) { radiance.attr({ opacity: value})}, 500);
    } else {
-      Snap.animate(1, 0, function( value ) { inset.attr({ opacity: value})}, 1000);
-      Snap.animate(1, 0, function( value ) { radiance.attr({ opacity: value})}, 1000);
+      Snap.animate(1, 0, function( value ) { inset.attr({ opacity: value})}, 500);
+      Snap.animate(1, 0, function( value ) { radiance.attr({ opacity: value})}, 500);
    }
 }
 
@@ -352,11 +394,11 @@ var renderingEquation01Step03 = function(offset) {
    var label1 = snap.select("#emission");
    var label2 = snap.select("#radiance");
    if(offset > 0) {
-      Snap.animate(0, 1, function( value ) { label1.attr({ opacity: value})}, 1000);
-      Snap.animate(1, 0, function( value ) { label2.attr({ opacity: value})}, 1000);
+      Snap.animate(0, 1, function( value ) { label1.attr({ opacity: value})}, 500);
+      Snap.animate(1, 0, function( value ) { label2.attr({ opacity: value})}, 500);
    } else {
-      Snap.animate(1, 0, function( value ) { label1.attr({ opacity: value})}, 1000);
-      Snap.animate(0, 1, function( value ) { label2.attr({ opacity: value})}, 1000);
+      Snap.animate(1, 0, function( value ) { label1.attr({ opacity: value})}, 500);
+      Snap.animate(0, 1, function( value ) { label2.attr({ opacity: value})}, 500);
    }
 }
 
@@ -366,26 +408,26 @@ var renderingEquation01Step04 = function(offset) {
    var label2 = snap.select("#emission");
    var elem   = snap.select("#indirect");
    if(offset > 0) {
-      Snap.animate(0, 1, function( value ) { label1.attr({ opacity: value})}, 1000);
-      Snap.animate(0, 1, function( value ) { elem.attr({ opacity: value})}, 1000);
-      Snap.animate(1, 0, function( value ) { label2.attr({ opacity: value})}, 1000);
+      Snap.animate(0, 1, function( value ) { label1.attr({ opacity: value})}, 500);
+      Snap.animate(0, 1, function( value ) { elem.attr({ opacity: value})}, 500);
+      Snap.animate(1, 0, function( value ) { label2.attr({ opacity: value})}, 500);
    } else {
-      Snap.animate(1, 0, function( value ) { label1.attr({ opacity: value})}, 1000);
-      Snap.animate(1, 0, function( value ) { elem.attr({ opacity: value})}, 1000);
-      Snap.animate(0, 1, function( value ) { label2.attr({ opacity: value})}, 1000);
+      Snap.animate(1, 0, function( value ) { label1.attr({ opacity: value})}, 500);
+      Snap.animate(1, 0, function( value ) { elem.attr({ opacity: value})}, 500);
+      Snap.animate(0, 1, function( value ) { label2.attr({ opacity: value})}, 500);
    }
 }
 
 var renderingEquation01Step05 = function(offset) {
    var snap   = Snap("#rendering-equation-01");
-   var label1 = snap.select("#material");
+   var label1 = snap.select("#materialInset");
    var label2 = snap.select("#reflected");
    if(offset > 0) {
-      Snap.animate(0, 1, function( value ) { label1.attr({ opacity: value})}, 1000);
-      Snap.animate(1, 0, function( value ) { label2.attr({ opacity: value})}, 1000);
+      Snap.animate(0, 1, function( value ) { label1.attr({ opacity: value})}, 500);
+      Snap.animate(1, 0, function( value ) { label2.attr({ opacity: value})}, 500);
    } else {
-      Snap.animate(1, 0, function( value ) { label1.attr({ opacity: value})}, 1000);
-      Snap.animate(0, 1, function( value ) { label2.attr({ opacity: value})}, 1000);
+      Snap.animate(1, 0, function( value ) { label1.attr({ opacity: value})}, 500);
+      Snap.animate(0, 1, function( value ) { label2.attr({ opacity: value})}, 500);
    }
 }
 
@@ -396,12 +438,12 @@ var blurRenderingEquation01 = function(offset) {
    var dragon = snap.select("#dragon");
    if(offset > 0) {
       dragon.attr({filter: filter});
-      Snap.animate(0, 10, function( value ) { fchild.attributes[0].value = value + ',' + value;  }, 1000 );
-      Snap.animate(1, 0.5, function( value ) { dragon.attr({ opacity: value})}, 1000);
+      Snap.animate(0, 10, function( value ) { fchild.attributes[0].value = value + ',' + value;  }, 500 );
+      Snap.animate(1, 0.5, function( value ) { dragon.attr({ opacity: value})}, 500);
    } else {
       dragon.attr({filter: filter});
-      Snap.animate(10, 0, function( value ) { fchild.attributes[0].value = value + ',' + value;  }, 1000 );
-      Snap.animate(0.5, 1, function( value ) { dragon.attr({ opacity: value})}, 1000);
+      Snap.animate(10, 0, function( value ) { fchild.attributes[0].value = value + ',' + value;  }, 500 );
+      Snap.animate(0.5, 1, function( value ) { dragon.attr({ opacity: value})}, 500);
    }
 }
 
@@ -501,8 +543,6 @@ var localAnalysis01CreateInset = function(imgId, inset, window) {
       canvas.style.top    = y + "px";
    }
 
-   updateLocalAnalysis01(inset);
-
    function dragInset(dx, dy, x, y, event) {
       var t = getData("local-analysis", "inset-t").clone();
       var s = 1;//Reveal.getScale();
@@ -519,4 +559,111 @@ var localAnalysis01CreateInset = function(imgId, inset, window) {
    function dragEnd(x, y, event) {
    }
    imageRect.drag(dragInset, dragStart, dragEnd);
+
+   updateLocalAnalysis01(inset);
+}
+
+
+var updateLocalAnalysis = function(imgId, inset) {
+   var img     = document.getElementById(imgId);
+   var fft_img = document.getElementById(inset.canvas);
+   var fft_ctx = fft_img.getContext('2d');
+
+   var scale = img.naturalHeight / img.height;
+   var ffth  = fft_img.width;
+   var fftw  = fft_img.height;
+
+   fft_ctx.drawImage(img, scale*inset.x, scale*inset.y, scale*inset.size, scale*inset.size, 0, 0, fftw, ffth);
+
+   // Compute the FFT of the image
+   w = 128;
+   FFT.init(w);
+   FrequencyFilter.init(w);
+   SpectrumViewer.init(fft_ctx);
+   var src = fft_ctx.getImageData(0, 0, w, w);
+   var dat = src.data;
+   var re = [], im = [];
+   for(var y=0; y<w; y++) {
+         var i = y*w;
+         for(var x=0; x<w; x++) {
+            var W = 1.0;//Math.sin(Math.PI * y/(w-1)) * Math.sin(Math.PI * x/(w-1));
+            var L = dat[(i << 2) + (x << 2) + 0]
+                  + dat[(i << 2) + (x << 2) + 1]
+                  + dat[(i << 2) + (x << 2) + 2];
+            re[i + x] = W*L / 3.0;
+            im[i + x] = 0.0;
+         }
+   }
+
+   FFT.fft2d(re, im);
+   FrequencyFilter.swap(re, im);
+
+   // Draw spectrum
+   SpectrumViewer.render(re, im, false, 100);
+}
+
+var localAnalysisCreateInset = function(snapId, imgId, inset, window) {
+   var img = document.getElementById(imgId);
+
+   var snap   = Snap(snapId);
+   var size   = inset.size;
+   var scale  = window.size/size;
+   var border = 8 / scale;
+   var gloBorder   = snap.rect(-border, -border, 2*size+ 4*border, size + 2*border).attr({fill: "#ffffff", stroke: "#333333", strokeWidth: "1px", "vector-effect": "non-scaling-stroke", opacity: 0.8});
+   var text1 = snap.text(size/2, size+5, "local window").attr({textAnchor: "middle", fontSize: "0.1em", fill: "#000000"});
+   var text2 = snap.text(3*size/2+2*border, size+5 , "Fourier transform").attr({textAnchor: "middle", fontSize: "0.1em", fill: "#000000"});
+   var insetImg    = snap.image(img.src, -15, -15, img.width, img.height).attr({id: "image"});
+   var insetRect   = snap.rect(0,0, size, size).attr({fill: "#ffffff"});
+   var insetBorder = insetRect.clone().attr({fillOpacity: 0, stroke: inset.color, strokeWidth: "2px", "vector-effect": "non-scaling-stroke"});
+   var imageRect   = insetBorder.clone();
+   var fourBorder  = insetBorder.clone().transform(Snap.matrix().translate(size+2*border, 0));
+   fourBorder.attr({stroke: "#000000"});
+   //insetImg.transform(Snap.matrix(1,0,0,1,10,20));
+   insetImg.attr({clip: insetRect});
+   var t = Snap.matrix().translate(window.x, window.y);
+   t.add(Snap.matrix().scale(scale));
+   var group = snap.g(gloBorder, insetImg, insetBorder , fourBorder, text1, text2);
+   group.transform(t);
+
+   t = Snap.matrix().translate(inset.x, inset.y);
+   setData(imgId, "inset-t", t);
+   //globalT = t.clone();
+   imageRect.transform(t)
+   insetRect.transform(t);
+   insetImg.transform(t.invert());
+
+   if(inset.canvas) {
+      var canvas = document.getElementById(inset.canvas);
+      var bbox   = fourBorder.getBBox();
+      var transf = fourBorder.transform().totalMatrix;
+      //console.log(transf);console.log(fourBorder.transform());
+      var x = transf.x(bbox.x, bbox.y) - (window.size+15);
+      var y = transf.y(bbox.x, bbox.y);
+      var w = window.size;
+      var h = window.size;
+      //console.log(bbox.x + " " + bbox.y + " " + x + " " + y + " " + w + " " + h);
+      canvas.style.width  = w + "px";
+      canvas.style.height = h + "px";
+      canvas.style.left   = x + "px";
+      canvas.style.top    = y + "px";
+   }
+
+   function dragInset(dx, dy, x, y, event) {
+      var t = getData(imgId, "inset-t").clone();
+      var s = 1;//Reveal.getScale();
+      t.add(Snap.matrix().translate(dx/s, dy/s));
+      imageRect.transform(t);
+      insetRect.transform(t);
+      insetImg.transform(t.invert());
+      newinset = {x: inset.x + dx, y: inset.y + dy, size: inset.size, canvas: inset.canvas};
+      updateLocalAnalysis(imgId, newinset);
+   }
+   function dragStart(x, y, event) {
+      setData(imgId, "inset-t", imageRect.transform().localMatrix);
+   }
+   function dragEnd(x, y, event) {
+   }
+   imageRect.drag(dragInset, dragStart, dragEnd);
+
+   updateLocalAnalysis(imgId, inset);
 }

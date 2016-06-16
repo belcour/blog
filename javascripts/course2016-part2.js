@@ -16,13 +16,59 @@ function setData(ctx, id, dat) {
    data[ctx][id] = dat;
 }
 
-const loadSVG = function(uri, elem, call) {
-   Snap.load(uri, function (f) {
-      var s = Snap(elem);
-      s.append(f);
+if(!loadSVG) {
+   loadSVG = function(uri, elem, call) {
+      Snap.load(uri, function (f) {
+         var s = Snap(elem);
+         s.append(f);
 
-      if(call) { call(s); }
-   });
+         if(call) { call(s); }
+      });
+   }
+}
+
+function CreateFrame(snap, posX, posY, width, height) {
+   var arrowUp = snap.polygon([0,5, 4,5, 2,0, 0,5]).attr({fill: '#000'}).transform('r90');
+   var arrowDw = snap.polygon([0,5, 4,5, 2,0, 0,5]).attr({fill: '#000'}).transform('r-90');
+   var markerUp = arrowUp.marker(0,0, 5,5, 0,2.5);
+   var markerDw = arrowDw.marker(0,0, 5,5, 0,2.5);
+
+   var rect = snap.rect(posX, posY, width, height).attr({ fill: "#ffffff", stroke: "#000000", strokeWidth: "2px" })
+   var lin1 = snap.polyline(posX-0.05*width, posY+0.5*height, posX+1.1*width, posY+0.5*height).attr({ stroke: "#000000", strokeWidth: "2px", markerEnd: markerUp })
+   var lin2 = snap.polyline(posX+0.5*height, posY-0.1*width, posX+0.5*height, posY+1.05*width).attr({ stroke: "#000000", strokeWidth: "2px", markerStart: markerDw })
+
+   var p = 0.11*width;
+   var tex1 = snap.text(posX+1.1*width, posY+0.45*height, "x").attr({ fontSize: p+"px", textAnchor: "middle"})
+   var tex2 = snap.text(posX+0.59*width, posY-0.04*height, "u").attr({ fontSize: p+"px", textAnchor: "middle"})
+
+
+   return rect
+}
+
+function CreateBacket(snap, p1, p2, dwidth, dspacing) {
+   var dx =  0.1*(p2.y-p1.y)
+   var dy = -0.1*(p2.x-p1.x)
+   var nd = Math.sqrt(dx*dx+dy*dy)
+   var dsx = dx*dspacing/nd;
+   var dsy = dy*dspacing/nd;
+   console.log(nd)
+   dx *= dwidth/nd
+   dy *= dwidth/nd
+   var cx = 0.5*(p1.x+p2.x) + 1.5*dx
+   var cy = 0.5*(p1.y+p2.y) + 1.5*dy
+   var ax = 0.55*p1.x+0.45*p2.x + 0.5*dx
+   var ay = 0.55*p1.y+0.45*p2.y + 0.5*dy
+   var bx = 0.45*p1.x+0.55*p2.x + 0.5*dx
+   var by = 0.45*p1.y+0.55*p2.y + 0.5*dy
+
+   return snap.path("M" + (p1.x+dsy) + " " + (p1.y+dsy) + " C " +
+                     " " + (p1.x+1.4*dx) + " " + (p1.y+1.4*dy) +
+                     " " + ax + " " + ay +
+                    " " + cx + " " + cy +
+                     " " + bx + " " + by +
+                     " " + (p2.x+1.4*dx) + " " + (p2.y+1.4*dy) +
+                    " " + (p2.x+dsx) + " " + (p2.y+dsy)
+                    ).attr({ stroke: "#000000", fillOpacity: 0, strokeWidth: "2px"});
 }
 
 function CreateCovariance(snap, elem, matrix) {
