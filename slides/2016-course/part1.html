@@ -17,6 +17,7 @@
       <script src="../js/reveal.js"></script>
       <script src="../js/mathjax.js"></script>
       <script src="../../javascripts/fft.js"></script>
+      <script src="../../javascripts/raytracer.js"></script>
       <script src="../../javascripts/course2016-part1.js"></script>
       <script src="../../javascripts/course2016-part2.js"></script>
    </head>
@@ -67,7 +68,7 @@
                </script>
             </section>
             <section>
-               <h4>Frequency Analysis of Light Transport</h4>
+               <h4>Changing the Lense</h4>
                <center style="margin-left:110px;">
                <div style="height:512px;">
                <div style="float:left;position:relative;width:512px;height:512px;margin:0;">
@@ -99,48 +100,104 @@
                </script>
             </section>
             <section>
+               <h4>How to Predict Spectrum?</h4><br />
+               <ul style="width:80%;">
+                  <li>We want to predict the local Fourier Transform</li><br />
+                  <li>Constraints:
+                     <ul style="font-size:0.8em;">
+                        <li>Analytical formulation</li>
+                        <li>Extensible (can add defocus/motion blur)</li>
+                        <li>Not restricted to screen-space</li>
+                     </ul>
+                  </li><br />
+                  <li>Solution: Transport Operators</li>
+               </ul>
+            </section>
+            <section>
                <h4>Break Paths using Operators</h4>
                <center style="width: 100%;position:absolute;top: 20px;left: 0;">
                <svg id="rendering-equation-04" width="1080" style="border-width: 0px;margin: 0;"></svg>
                </center>
 
                <script type="text/javascript">
-                  function renderingEquation04Step00(snap) {
-                     var layer = snap.select("#svg2")
-                     layer.attr({width: 1080})
-                     snap.select("#lens").attr({ opacity: 0 })
-                     snap.select("#path2-00").attr({ opacity: 0 })
-                     snap.select("#path2-01").attr({ opacity: 0 })
-
-                     var t1 = 0; // light
-                     var t2 = 335; // dragon
-                     var t3 = 1000; //sensor
-
-                     // Point at light
-                     var p = snap.select("#path1-00").getPointAtLength(t1);
-                     var c = snap.circle(p.x, p.y, 7).attr({ fill: "#ffffff", stroke: "#ff0000", strokeWidth: "4px", id: "cursor", filter: "drop-shadow( 2px 2px 2px #666 )"})
-                     snap.select("#lens").after(c);
-
-                     // Point at dragon
-                     p = snap.select("#path1-00").getPointAtLength(t2);
-                     c = snap.circle(p.x, p.y, 7).attr({ fill: "#ffffff", stroke: "#00aa00", strokeWidth: "4px", id: "cursor", filter: "drop-shadow( 2px 2px 2px #666 )"})
-                     snap.select("#lens").after(c);
-
-                     // var p1 = snap.select("#path1-00").getPointAtLength(t1);
-                     // var p2 = snap.select("#path1-00").getPointAtLength(t2);
-                     // c = CreateBacket(snap, p1, p2, 30, 10);
-                     // snap.select("#lens").after(c);
-
-                     // p1 = snap.select("#path1-00").getPointAtLength(t2);
-                     // p2 = snap.select("#path1-00").getPointAtLength(t3);
-                     // c = CreateBacket(snap, p1, p2, 30, 10);
-                     // snap.select("#lens").after(c);
-
-                     // var fourier = CreateFrame(snap, 1000, 100, 150, 150);
-                     // CreateCovariance(snap, fourier, Snap.matrix(0.9, 0, 0, 0.1, 0, 0));
-                  }
                   loadSVG("data/svg/course-pbr02.svg", "#rendering-equation-04", renderingEquation04Step00);
                </script>
+            </section>
+            <section>
+               <h4>Fourier Analysis using Operators</h4><br />
+               <ul style="width:80%;">
+                  <li>Operators decompose the Rendering Equation
+                     <ul style="font-size:0.8em;">
+                        <li>Travel in free space</li>
+                        <li>Reflection and Transmission</li>
+                        <li>Projection on surfaces</li>
+                     </ul>
+                  </li><br />
+                  <li>We will use a <em>first-order expansion</em>
+                     <ul style="font-size:0.8em;">
+                        <li>Analytical forms</li>
+                        <li>Simplify the input parameters (curvature for surfaces)</li>
+                     </ul>
+                  </li><br />
+               </ul>
+
+               <span style="position:absolute;top:500px;left:10%;width:40%;">
+               <svg>
+                  <defs>
+                        <marker style="overflow:visible;" id="arrow" refX="0.0" refY="0.0" orient="auto">
+                           <path transform="scale(0.3) rotate(180) translate(10,0)" style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1;fill:#000000;fill-opacity:1" d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "/>
+                        </marker>
+
+                     </marker>
+                  </defs>
+                  <g transform="rotate(-20) translate(70, 130)">
+                     <path d="m 0 0 150 0" stroke="black" stroke-width="3" style="marker-end:url(#arrow)" />
+                     <circle cx="0" cy="0" r="5" stroke="black" stroke-width="3" fill="white" />
+
+                  </g>
+               </svg><br />
+               $$L(\mathbf{x}, \boldsymbol{\omega})$$
+               </span>
+               <span style="position:absolute;top:500px;left:50%;width:40%;">
+               <svg>
+                  <defs>
+                        <marker style="overflow:visible;" id="arrow" refX="0.0" refY="0.0" orient="auto">
+                           <path transform="scale(0.3) rotate(180) translate(10,0)" style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1;fill:#000000;fill-opacity:1" d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "/>
+                        </marker>
+
+                     </marker>
+                  </defs>
+                  <g transform="rotate(-20) translate(70, 100)">
+                     <path transform="scale(4) rotate(0) translate(-8.5,-19)"  d="m 0,0 17.548095,5.94795 -0.448587,26.35563 -17.764371,6.75922 z" stroke="black" stroke-width="1" fill-opacity="0" />
+                     <path d="m 0 0 150 0" stroke="black" stroke-width="3" style="marker-end:url(#arrow)" />
+                     <circle cx="0" cy="0" r="5" stroke="black" stroke-width="3" fill="white" />
+
+                     <g transform="scale(0.5)">
+                        <g transform="translate(30, 50) rotate(10)">
+                        <path d="m 0 0 150 0" stroke="black" stroke-width="3" style="marker-end:url(#arrow)" />
+                        <circle cx="0" cy="0" r="5" stroke="black" stroke-width="3" fill="white" />
+                        </g>
+                        <g transform="translate(10, -50) rotate(-5)">
+                        <path d="m 0 0 150 0" stroke="black" stroke-width="3" style="marker-end:url(#arrow)" />
+                        <circle cx="0" cy="0" r="5" stroke="black" stroke-width="3" fill="white" />
+                        </g>
+                        <g transform="translate(-10, 50) rotate(20)">
+                        <path d="m 0 0 150 0" stroke="black" stroke-width="3" style="marker-end:url(#arrow)" />
+                        <circle cx="0" cy="0" r="5" stroke="black" stroke-width="3" fill="white" />
+                        </g>
+                        <g transform="translate(-25, -90) rotate(-10)">
+                        <path d="m 0 0 150 0" stroke="black" stroke-width="3" style="marker-end:url(#arrow)" />
+                        <circle cx="0" cy="0" r="5" stroke="black" stroke-width="3" fill="white" />
+                        </g>
+                        <g transform="translate(-20, 90) rotate(25.6)">
+                        <path d="m 0 0 150 0" stroke="black" stroke-width="3" style="marker-end:url(#arrow)" />
+                        <circle cx="0" cy="0" r="5" stroke="black" stroke-width="3" fill="white" />
+                        </g>
+                     </g>
+                  </g>
+               </svg><br />
+               $$L(\mathbf{x} + \delta\mathbf{x}, \boldsymbol{\omega}+ \delta\boldsymbol{\omega})$$
+               </span>
             </section>
 
             <section> <!-- We can do a clean formulation of the FT of L using
@@ -156,9 +213,25 @@
             <section> <!-- Here we show how the local FT in that space is made
                            suffiently small to be well defined. -->
                <h4>Local Ray Space</h4>
+               <div style="text-align:left;padding:5%;">
+               <ul>
+                  <li>Redefine the Fourier Transform using a local window, $ W_l $:</li>
+               </ul><br /><br />
+
                $$
-                  \mathcal{F}_l[L] = \int_{\delta\mathbf{x} \in \mathbb{R}^N} L(\delta\mathbf{x}) W_l(\mathbf{x}_0 - \delta\mathbf{x}) e^{i 2 \pi \, \mathbf{\Omega}^T  \delta\mathbf{x}}
-               $$
+                  \mathcal{F}_l[L](\Omega) = \int_{\delta\mathbf{z} \in \mathbb{R}^N} L(\mathbf{z} + \delta\mathbf{z}) W_l(\delta\mathbf{z}) e^{i 2 \pi \, \mathbf{\Omega}^T  \delta\mathbf{z}}, \; \mbox{where} \; \mathbf{z} = [\mathbf{x}, \mathbf{u}]
+               $$<br />
+
+               <ul>
+                  <li>Interesting properties:
+                     <ul style="font-size:0.8em;">
+                        <li>Makes the Fourier Transform well defined (same surface).</li>
+                        <li>We can use paraxial optics to express $ L(\delta\mathbf{x}) $. </li>
+                        <li>The window increase the frequency content.</li>
+                     </ul>
+                  </li>
+               </ul>
+               </div>
             </section>
             <section> <!-- Because we use local analysis, we need to look at
                            the variations of elements in the Rendering Eq.
@@ -169,6 +242,20 @@
                            into a set of different operators for which the
                            local FT will have closed forms. -->
                <h4>Rendering Operators</h4>
+            </section>
+
+            <!-- The different operators
+              -->
+            <section>
+               <h4>Travel Operator</h4>
+               <div style="position:relative;width:95%;height:500px;left:2%;">
+               <canvas id="draw_cov_travel-gl" style="position:absolute;left:670px;top:56px;width:500px;height:500px;background-color:#FFF;border:0px"></canvas>
+               <svg id="draw_cov_travel-cv" width="800px" height="500px" style="position:absolute;top:0px;left:0px;"></svg>
+               <button id="draw_cov_travel_bt" type="button" style="position:absolute;left:750px;top:590px;margin-left:auto;margin-right:auto;font-size:1em;text-align: center;">Fourier Transform!</button>
+               </div>
+               <script type="text/javascript">
+                  loadSVG("data/svg/cov_travel.svg", "#draw_cov_travel-cv", travelOperator01Step00);
+               </script>
             </section>
 
 
