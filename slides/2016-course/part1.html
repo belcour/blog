@@ -5,17 +5,18 @@
 
       <title>SIGGRAPH 2016 Course - Intro</title>
 
-      <meta name="description" content="Frequency Analysis Course - Intro">
+      <meta name="description" content="Frequency Analysis Course - Part I">
       <meta name="author" content="Laurent Belcour">
 
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
       <link rel="stylesheet" href="../css/reveal.css">
       <link rel="stylesheet" href="../css/theme/beige.css" id="theme">
+      <link rel="stylesheet" href="../css/androidstudio.css" id="theme">
 
+      <script src="../js/head.min.js"></script>
       <script src="../js/snap.svg.js"></script>
       <script src="../js/reveal.js"></script>
-      <script src="../js/mathjax.js"></script>
       <script src="../../javascripts/fft.js"></script>
       <script src="../../javascripts/raytracer.js"></script>
       <script src="../../javascripts/course2016-part1.js"></script>
@@ -242,16 +243,36 @@
                            into a set of different operators for which the
                            local FT will have closed forms. -->
                <h4>Rendering Operators</h4>
+               <div style="width:60%">
+                <ul>
+                  <li>Input: Fourier transform</li>
+                  <li>Output: Modified Fourier transform</li>
+                </ul>
+               </div><br />
+
+               <div style="width:60%">
+                <ul>
+                  <li>Implementation example
+                    <ul>
+                      <li>Manipulation of the covariance matrix</li>
+                      <li>Using Matlab's' syntax</li>
+                    </ul>
+                  </li>
+                </ul>
+               </div>
             </section>
 
-            <!-- The different operators
+            <!--
+                                  The different operators
               -->
+
+            <!-- Travel operator -->
             <section>
                <h4>Travel Operator</h4><br/>
                <center>
-                  <div style="position:relative;width:900px;height:400px;">
+                  <div style="position:relative;width:900px;height:500px;">
                   <canvas id="draw_cov_travel-gl" style="position:absolute;"></canvas>
-                  <svg id="draw_cov_travel-cv" width="900px" height="400px" style="position:absolute;top:0px;left:0px;"></svg>
+                  <svg id="draw_cov_travel-cv" width="900px" height="500px" style="position:absolute;top:0px;left:0px;"></svg>
                   </div>
                </center>
                <script type="text/javascript">
@@ -259,16 +280,135 @@
                </script>
             </section>
             <section>
-               <h4>BRDF operator</h4><br/>
+               <h4>Travel Operator</h4><br/>
+               <div style="width:60%">
+               <ul>
+                 <li>Travel is a shear in local space</li>
+               </ul>
+               </div>
+
+               <svg id="operator-travel-02" width="400px" height="250px"></svg>
+               <script>
+                 var snap  = Snap("#operator-travel-02");
+                 var frame = CreateFrame(snap, 100, 50, 200, 200);
+                 var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, 0, 0, 0.1, 0, 0));
+                 cov.attr({id: "cov"})
+
+                 var ShearAnimation = function(start, end) {
+                  var s = Snap("#operator-travel-02");
+                  var c = s.select("#cov");
+
+                  const M = c.transform().localMatrix;
+                  Snap.animate(start, end, function(val) {
+                    c.transform(M);
+                    var temp = Snap.matrix(1, val, 0, 1, 0, 0);
+                    c.transform(c.transform().localMatrix.add(temp));
+                  }, 500);
+                }
+
+
+                Reveal.addEventListener( 'fragmentshown', function( event ) {
+                    if(event.fragment.id == "operator-travel-02-shear") {  ShearAnimation(0, 9); }
+                });
+                Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                    if(event.fragment.id == "operator-travel-02-shear") { ShearAnimation(0, -9); }
+                });
+               </script>
+               <pre class="fragment" id="operator-travel-02-shear"></pre>
+
+               <pre style="width:60%;" class="fragment">
+               <code class="matlab">
+% Travel of 'd' meters
+Tr  = [1, d; 0, 1]
+Cov = Tr' * Cov * Tr
+               </code>
+               </pre>
+            </section>
+
+            <!-- BRDF operator -->
+            <section>
+               <h4>BRDF Operator</h4><br/>
                <center>
-                  <div style="position:relative;width:900px;height:400px;">
+                  <div style="position:relative;width:900px;height:500px;">
                   <canvas id="draw_cov_brdf-gl" style="position:absolute;"></canvas>
-                  <svg id="draw_cov_brdf-cv" width="900px" height="400px" style="position:absolute;top:0px;left:0px;"></svg></div><br /><br />
-                  <div style="font-size:0.7em;">BRDF roughness: 0 <input style="vertical-align: middle;" type="range" min="0.0001" max="0.1" value="0.05" step="0.0005" id="draw_cov_brdf-slider" /> 0.1</div>
+                  <svg id="draw_cov_brdf-cv" width="900px" height="500px" style="position:absolute;top:0px;left:0px;"></svg></div>
+                  <div style="font-size:0.7em;">BRDF roughness: 0 <input style="vertical-align: middle;" type="range" min="0.0001" max="0.05" value="0.01" step="0.0005" id="draw_cov_brdf-slider" /> 0.05</div>
                </center>
                <script type="text/javascript">
                   loadSVG("data/svg/cov_brdf.svg", "#draw_cov_brdf-cv", brdfOperator01Step00);
                </script>
+            </section>
+            <section>
+               <h4>BRDF Operator</h4><br/>
+               <div style="width:60%">
+               <ul>
+                 <li>The BRDF cut the angular frequency
+                    <ul class="sublist">
+                      <li>Acts as a low-pass filter</li>
+                      <li>Cutof depends on the BRDF lobe
+                    </ul>
+                  </li>
+               </ul>
+               </div>
+
+               <svg id="operator-brdf-02" width="400px" height="250px"></svg>
+               <script>
+                 var snap  = Snap("#operator-brdf-02");
+                 var frame = CreateFrame(snap, 100, 50, 200, 200);
+                 var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, -0.9, 0, 0.1, 0, 0));
+                 snap.rect(100, 100, 200, 100).attr({fill: "#aa0000", fillOpacity: 0.3});
+               </script>
+
+               <pre style="width:60%;" class="fragment">
+               <code class="matlab">
+% BRDF with cutof of 'b'
+B   = [0, 0; 0, b]
+Cov = inverse(inverse(Cov) + B)
+               </code>
+               </pre>
+            </section>
+
+            <!-- Occlusion operator -->
+            <section>
+               <h4>Visibility Operator</h4><br/>
+               <center>
+                  <div style="position:relative;width:900px;height:500px;">
+                     <canvas id="draw_cov_occl-gl" style="position:absolute;background-color:#FFF;border:0px"></canvas>
+                     <svg width="900px" height="500px" id="draw_cov_occl-cv" style="position:absolute;top:0px;left:0px;"></svg>
+                     <!--<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:270px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>-->
+                  </div>
+               </center>
+               <script type="text/javascript">
+                  loadSVG("data/svg/cov_occlusion.svg", "#draw_cov_occl-cv", occlOperator01Step00);
+               </script>
+            </section>
+            <section>
+               <h4>Visibility Operator</h4><br/>
+               <div style="width:60%">
+               <ul>
+                 <li>Add frequencies in the spatial domain
+                    <ul>
+                       <li>Has infinite bandwidth!</li>
+                    </ul>
+                 </li>
+               </ul>
+               </div>
+
+               <svg id="operator-occl-02" width="400px" height="250px"></svg>
+               <script>
+                 var snap  = Snap("#operator-occl-02");
+                 var frame = CreateFrame(snap, 100, 50, 200, 200);
+                 var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, -0.9, 0, 0.1, 0, 0));
+                 //snap.rect(100, 100, 200, 100).attr({fill: "#aa0000", fillOpacity: 0.3});
+               </script>
+
+               <pre style="width:60%;" class="fragment">
+               <code class="matlab">
+% Visibility operation
+Occ = [o, 0; 0, 0]
+Cov = Cov + Occ
+               </code>
+               </pre>
             </section>
 
 
@@ -299,7 +439,10 @@
             transition: 'fade',
             width: 1280,
             height: 720,
-            //dependencies: [{ src: 'js/mathjax.js', async: true }]
+            dependencies: [
+              { src: '../js/mathjax.js', async: true },
+              { src: '../js/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+            ]
          });
 
          // Reveal.addEventListener( 'fragmentshown', intro01anim01fw);

@@ -30,17 +30,22 @@ if(!loadSVG) {
 function CreateFrame(snap, posX, posY, width, height) {
    var arrowUp = snap.polygon([0,5, 4,5, 2,0, 0,5]).attr({fill: '#000'}).transform('r90');
    var arrowDw = snap.polygon([0,5, 4,5, 2,0, 0,5]).attr({fill: '#000'}).transform('r-90');
-   var markerUp = arrowUp.marker(0,0, 5,5, 0,2.5);
-   var markerDw = arrowDw.marker(0,0, 5,5, 0,2.5);
+   var markerUp = arrowUp.marker(0,0, 5,5, 2.5,2.5);
+   var markerDw = arrowDw.marker(0,0, 5,5, 2.5,2.5);
 
    var rect = snap.rect(posX, posY, width, height).attr({ fill: "#ffffff", stroke: "#000000", strokeWidth: "2px" })
    var lin1 = snap.polyline(posX-0.05*width, posY+0.5*height, posX+1.1*width, posY+0.5*height).attr({ stroke: "#000000", strokeWidth: "2px", markerEnd: markerUp })
    var lin2 = snap.polyline(posX+0.5*height, posY-0.1*width, posX+0.5*height, posY+1.05*width).attr({ stroke: "#000000", strokeWidth: "2px", markerStart: markerDw })
 
    var p = 0.11*width;
-   var tex1 = snap.text(posX+1.1*width, posY+0.45*height, "x").attr({ fontSize: p+"px", textAnchor: "middle"})
-   var tex2 = snap.text(posX+0.59*width, posY-0.04*height, "u").attr({ fontSize: p+"px", textAnchor: "middle"})
+   var tex1 = snap.text(posX+1.10*width, posY+0.45*height, ["Ω", "x"]).attr({ fontFamily: "Times New Roman", fontSize: p+"px", textAnchor: "middle"})
+   var tex2 = snap.text(posX+0.61*width, posY-0.06*height, ["Ω", "u"]).attr({ fontFamily: "Times New Roman", fontSize: p+"px", textAnchor: "middle"})
 
+   var elems = [];
+   elems = tex1.selectAll("tspan");
+   elems[1].attr({baselineShift: "-10%", fontSize: "0.7em"});
+   elems = tex2.selectAll("tspan");
+   elems[1].attr({baselineShift: "-10%", fontSize: "0.7em"});
 
    return rect
 }
@@ -88,6 +93,7 @@ function CreateCovariance(snap, elem, matrix) {
              strokeDasharray: "1,4",
              strokeLinecap: "round",
              "vector-effect": "non-scaling-stroke"});
+    return cov;
 }
 
 const getFocalPointExample01 = function(x1, y1, lens) {

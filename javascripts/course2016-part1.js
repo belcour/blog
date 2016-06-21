@@ -33,6 +33,22 @@ const loadImageSVG = function(uri, elem, width, height, id) {
 }
 
 
+/* Manipulate SVG elements using snap */
+
+const CenterElement = function(snap, element) {
+   var gbox = snap.getBBox();
+   var ebox = element.getBBox();
+
+   // Calculate the shift in x and y to center the element in the snap
+   var x = gbox.width - ebox.cx;
+   var y = gbox.height - ebox.cy;
+
+   // Shift using the compound transform
+   var tr = Snap.matrix().translate(x, y);
+   element.transform(tr.add(element.transform().localMatrix));
+}
+
+
 /* Signal processing example: Nyquist rate */
 
 var filterNyquist01 = function(snap, coeffs, shifts, x0, y0, w, h, bwCut, orient, style) {
@@ -773,14 +789,14 @@ var travelOperator01Step00 = function(snap) {
 
       var tr_spectrum = document.querySelector('#draw_cov_travel-gl').getContext('2d');
       SpectrumViewer.init(tr_spectrum);
-      SpectrumViewer.render(re, im, false, 5);
+      SpectrumViewer.render(re, im, false, 15);
    }
 
    var scene = createScene();
-   addObject(scene, {p1 : {x: 1.0, y: -0.5}, p2 : {x: 1.0, y: 0.5}, L : 1.0});
-   addCamera(scene, {o: {x: -0.5, y: 0.0}, d: {x: 1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
+   addObject(scene, {p1 : {x: 0.0, y: -0.5}, p2 : {x: 0.0, y: 0.5}, L : 1.0});
+   addCamera(scene, {o: {x: 0.0, y: 0.0}, d: {x: 1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
 
-   var distToLight = 0.0;
+   var distToLight = 0.000001;
    scene.camera.o.x = -distToLight;
 
    render(tr_canvas, scene, 0);
@@ -809,7 +825,7 @@ var travelOperator01Step00 = function(snap) {
 
    // SVG drawing code
    var tr_svg = document.getElementById('draw_cov_travel-cv');
-   var svg    = tr_svg;//.contentDocument;
+   var svg    = tr_svg;
    var cursor = svg.getElementById("cursor");
    var ray    = svg.getElementById("ray");
 
@@ -848,129 +864,21 @@ var travelOperator01Step00 = function(snap) {
          var dotProd  = deltaX*dirX + deltaY*dirY;
 
          var temp = distToLight + dotProd/200;
-         if(temp > 0 && temp < 1.0) {
+         if(temp > 0.00001 && temp < 1.0) {
             distToLight = temp;
             rayStart.x += dotProd*dirX;
             rayStart.y += dotProd*dirY;
             rayEnd.x += dotProd*dirX;
             rayEnd.y += dotProd*dirY;
          }
-      }
-      scene.camera.o.x = -5*distToLight;
-      render(tr_canvas, scene, 0);
-      if(fourier_bt_press) {
-         render_fourier_travel();
+
+         scene.camera.o.x = -5*distToLight;
+         render(tr_canvas, scene, 0);
+         if(fourier_bt_press) {
+            render_fourier_travel();
+         }
       }
    }, false);
-
-   // var fourier_bt_press = false;
-   // function render_fourier_travel() {
-   //    FFT.init(w);
-   //    FrequencyFilter.init(w);
-   //    var src = tr_canvas.getContext('2d').getImageData(0, 0, w, h);
-   //    var dat = src.data;
-   //    var re = [], im = [];
-   //    for(var y=0; y<h; y++) {
-   //       var i = y*w;
-   //       for(var x=0; x<w; x++) {
-   //          var W = 0.25 * (1.0 - Math.cos(2.0*Math.PI * y/(h-1))) * (1.0-Math.cos(2.0*Math.PI * x/(w-1)));
-   //          var L = dat[(i << 2) + (x << 2) + 0]
-   //                + dat[(i << 2) + (x << 2) + 1]
-   //                + dat[(i << 2) + (x << 2) + 2];
-   //          re[i + x] = W*L;
-   //          im[i + x] = 0.0;
-   //       }
-   //    }
-   //    FFT.fft2d(re, im);
-   //    FrequencyFilter.swap(re, im);
-
-   //    var tr_spectrum = document.querySelector('#draw_cov_travel-gl').getContext('2d');
-   //    SpectrumViewer.init(tr_spectrum);
-   //    SpectrumViewer.render(re, im, false, 5);
-   // }
-
-   // // SVG drawing code
-   // var cursor   = snap.select("#cursor")
-   // var ray      = snap.select("#ray")
-   // var length   = ray.getTotalLength()
-   // var rayStart = ray.getPointAtLength(0)
-   // var rayEnd   = ray.getPointAtLength(length)
-   // var dirX     = rayEnd.x - rayStart.x
-   // var dirY     = rayEnd.y - rayStart.y
-   // dirX        /= length
-   // dirY        /= length
-
-   // var currentX = 0
-   // var currentY = 0
-   // var isDown   = false
-
-   // setData("travel-operator", "inset-t", cursor.transform().localMatrix)
-
-   // function getDistanceOnPath() {
-   //    var cursor   = snap.select("#cursor")
-   //    var ray      = snap.select("#ray")
-   //    var isects = Snap.path.intersection(ray, cursor)
-   //    return isects[0]
-   // }
-
-   // var scene = createScene();
-   // addObject(scene, {p1 : {x: 1.0, y: -0.5}, p2 : {x: 1.0, y: 0.5}, L : 1.0});
-   // addCamera(scene, {o: {x: -0.5, y: 0.0}, d: {x: 1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
-
-   // var distToLight = 0;
-   // console.log(getDistanceOnPath())
-   // scene.camera.o.x = -distToLight;
-
-   // render(tr_canvas, scene, 0);
-   // if(fourier_bt_press) {
-   //    render_fourier_travel();
-   // }
-
-   // var button = document.getElementById("draw_cov_travel_bt");
-   // button.onclick = function() {
-   //    fourier_bt_press = !fourier_bt_press;
-   //    render(tr_canvas, scene, 0);
-   //    if(fourier_bt_press) {
-   //          button.textContent = "inverse Fourier Transform";
-   //          render_fourier_travel();
-   //    } else {
-   //          button.textContent = "Fourier Transform";
-   //    }
-   // };
-
-   // function dragInset(dx, dy, x, y, event) {
-
-   //    var dotProd  = (dx*dirX + dy*dirY);
-   //    var temp = distToLight + dotProd/length;
-   //    //console.log(temp)
-   //    console.log(getDistanceOnPath())
-
-   //    if(temp > 0 && temp < 1.0) {
-   //       distToLight = temp;
-   //       rayStart.x += dotProd*dirX;
-   //       rayStart.y += dotProd*dirY;
-   //       rayEnd.x += dotProd*dirX;
-   //       rayEnd.y += dotProd*dirY;
-
-   //       scene.camera.o.x = -5*distToLight;
-   //       render(tr_canvas, scene, 0);
-   //       if(fourier_bt_press) {
-   //          render_fourier_travel();
-   //       }
-
-   //       var t = getData("travel-operator", "inset-t").clone();
-   //       var s = 1;//Reveal.getScale();
-   //       t.add(Snap.matrix().translate(dotProd*dirX, dotProd*dirY));
-   //       cursor.transform(t);
-   //    }
-   // }
-   // function dragStart(x, y, event) {
-   //    setData("travel-operator", "inset-t", cursor.transform().localMatrix);
-   // }
-   // function dragEnd(x, y, event) {
-   // }
-   // cursor.drag(dragInset, dragStart, dragEnd)
-
 }
 
 var brdfOperator01Step00 = function(snap) {
@@ -987,29 +895,110 @@ var brdfOperator01Step00 = function(snap) {
    var box = snap.select("#rect4136");
    AlignCanvasWithSVG(canvas, box, {x: 0, y: 0});
 
+   // Update the rendering resolution
    var image     = canvas.getContext('2d')
    canvas.width  = 128;
    canvas.height = 128;
-   //canvas.style.cssText = 'width:' + (image.width) + 'px;height:' + (image.height) + 'px';
+
+   // Slider
+   var slider = document.getElementById("draw_cov_brdf-slider");
 
    // Create the scene
-
-   var slider = document.getElementById("draw_cov_brdf-slider");
-   var exponent = 1.0/slider.value;
    var scene = createScene();
    var lY = 1;
+   var exponent = 1.0/slider.value;
    addObject(scene, {p1 : {x: -1.0, y: 0}, p2 : {x: 1.0, y: 0}, E : exponent});
    addObject(scene, {p1 : {x: -0.5, y: lY}, p2 : {x: 0.5, y: lY}, L : 1.0});
-   //addObject(scene, {p1 : {x: 0.5, y: -0.1}, p2 : {x: 0.5, y: 0.1}, L : 0.0});
    addCamera(scene, {o: {x: 0.0, y: 1}, d: {x: 0.0, y: -1.0}, up : {x: 1.0, y:0.0}});
 
-   // Render the image
-   for(var count=0; count<10; count++) {
-      render(canvas, scene, count);
+   // Display the Fourier transform or not?
+   var fourier_bt_press = false;
+
+   // Function to render the image and apply the Fourier transform if necessary
+   function render_scene_brdf(canvas, scene) {
+      for(var count=0; count<1; count++) {
+         render(canvas, scene, count);
+      }
+
+      if(fourier_bt_press) {
+         const w = canvas.width,
+               h = canvas.width;
+         FFT.init(w);
+         FrequencyFilter.init(w);
+         var src = canvas.getContext('2d').getImageData(0, 0, w, h);
+         var dat = src.data;
+         var re = [], im = [];
+         for(var y=0; y<h; y++) {
+            var i = y*w;
+            for(var x=0; x<w; x++) {
+               var W = 0.25 * (1.0 - Math.cos(2.0*Math.PI * y/(h-1))) * (1.0-Math.cos(2.0*Math.PI * x/(w-1)));
+               var L = dat[(i << 2) + (x << 2) + 0]
+                     + dat[(i << 2) + (x << 2) + 1]
+                     + dat[(i << 2) + (x << 2) + 2];
+               re[i + x] = W*L;
+               im[i + x] = 0.0;
+            }
+         }
+         FFT.fft2d(re, im);
+         FrequencyFilter.swap(re, im);
+
+         var tr_spectrum = document.querySelector('#draw_cov_brdf-gl').getContext('2d');
+         SpectrumViewer.init(tr_spectrum);
+         SpectrumViewer.render(re, im, false, 15);
+      }
    }
 
+   render_scene_brdf(canvas, scene);
+
+   var bbox = box.getBBox();
+   var text = snap.text(bbox.cx, bbox.y+bbox.height+40, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
+   var tbb  = text.getBBox();
+   var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5 /*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
+   var g    = snap.g(rect, text).click(function() {
+      fourier_bt_press = !fourier_bt_press;
+      render_scene_brdf(canvas, scene);
+      if(fourier_bt_press) {
+            text.attr({text: "Apply inverse Fourier Transform"});
+            var tbb  = text.getBBox();
+            rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
+      } else {
+            text.attr({text: "Apply Fourier Transform"});
+            var tbb  = text.getBBox();
+            rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
+      }
+   });
+   snap.select("#layer1").append(g);
+
+   slider.onchange = function(value) {
+      var canvas = document.getElementById("draw_cov_brdf-gl");
+      // var scene  = createScene();
+      scene.objects[0].E = 1.0/this.value;
+      render_scene_brdf(canvas, scene);
+   }
+}
+
+var occlOperator01Step00 = function(snap) {
+   // Scale the SVG
+   var svg2 = snap.select("#layer1")
+   svg2.transform(Snap.matrix().scale(1.5).add(svg2.transform().localMatrix))
+
+   // WebGL code
+   var canvas = document.getElementById("draw_cov_occl-gl");
+   if(!canvas) {
+      alert("Impossible de récupérer le canvas");
+   }
+
+   // Align the rendering canvas with the axis-rectangle
+   var box = snap.select("#rect4136");
+   AlignCanvasWithSVG(canvas, box, {x: 1, y: -1});
+
+   // Fix the resolution of the image
+   var h = 128, w = 128;
+   canvas.width  = w;
+   canvas.height = h;
+
    var fourier_bt_press = false;
-   function render_fourier_brdf() {
+   function render_fourier_occl() {
       FFT.init(w);
       FrequencyFilter.init(w);
       var src = canvas.getContext('2d').getImageData(0, 0, w, h);
@@ -1029,15 +1018,52 @@ var brdfOperator01Step00 = function(snap) {
       FFT.fft2d(re, im);
       FrequencyFilter.swap(re, im);
 
-      var tr_spectrum = document.querySelector('#draw_cov_brdf-gl').getContext('2d');
-      SpectrumViewer.init(tr_spectrum);
-      SpectrumViewer.render(re, im, false, 5);
+      var occl_spectrum = document.querySelector('#draw_cov_occl-gl').getContext('2d');
+      SpectrumViewer.init(occl_spectrum);
+      SpectrumViewer.render(re, im, false, 10);
    }
 
+   var scene = createScene();
+   addObject(scene, {p1 : {x: 10.0, y: -1000}, p2 : {x: 10.0, y: 1000}, L : 1.0});
+
+   // addObject(scene, {p1 : {x: 1.0, y: 0.0}, p2 : {x: 2.0, y: 0.0}, L : 0.0});
+   // addObject(scene, {p1 : {x: 2.0, y: 0.0}, p2 : {x: 2.0, y: 2.0}, L : 0.0});
+   // addObject(scene, {p1 : {x: 2.0, y: 2.0}, p2 : {x: 1.0, y: 2.0}, L : 0.0});
+   // addObject(scene, {p1 : {x: 1.0, y: 2.0}, p2 : {x: 1.0, y: 0.0}, L : 0.0});
+   var x = [-1.4142, 0.0, 1.4142, 0.0];
+   var y = [0.0, 1.4142, 0.0, -1.4142];
+   addObject(scene, {p1 : {x: x[0], y: y[0]}, p2 : {x: x[1], y: y[1]}, L : 0.0});
+   addObject(scene, {p1 : {x: x[1], y: y[1]}, p2 : {x: x[2], y: y[2]}, L : 0.0});
+   addObject(scene, {p1 : {x: x[2], y: y[2]}, p2 : {x: x[3], y: y[3]}, L : 0.0});
+   addObject(scene, {p1 : {x: x[3], y: y[3]}, p2 : {x: x[0], y: y[0]}, L : 0.0});
+
+   addCamera(scene, {o: {x: -0.5, y: 1.5}, d: {x: 1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
+
+   var distToLight = 1.3;
+   scene.camera.o.x = distToLight;
+
+   render(canvas, scene, 0);
+   if(fourier_bt_press) {
+      render_fourier_occl();
+   }
+
+   //  var button = document.getElementById("draw_cov_occl_bt");
+   //  button.onclick = function() {
+   //      fourier_bt_press = !fourier_bt_press;
+   //      render(canvas, scene, 0);
+   //      if(fourier_bt_press) {
+   //          button.textContent = "inverse Fourier Transform";
+   //          render_fourier_occl();
+   //      } else {
+   //          button.textContent = "Fourier Transform";
+   //      }
+   //  };
+
+   // Create the clickable button
    var bbox = box.getBBox();
    var text = snap.text(bbox.cx, bbox.y+bbox.height+40, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
    var tbb  = text.getBBox();
-   var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5 /*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
+   var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5/*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
    var g    = snap.g(rect, text).click(function() {
       fourier_bt_press = !fourier_bt_press;
       render(canvas, scene, 0);
@@ -1045,7 +1071,7 @@ var brdfOperator01Step00 = function(snap) {
             text.attr({text: "Apply inverse Fourier Transform"});
             var tbb  = text.getBBox();
             rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
-            render_fourier_brdf();
+            render_fourier_occl();
       } else {
             text.attr({text: "Apply Fourier Transform"});
             var tbb  = text.getBBox();
@@ -1054,16 +1080,63 @@ var brdfOperator01Step00 = function(snap) {
    });
    snap.select("#layer1").append(g);
 
-   slider.onchange = function(value) {
-      var canvas = document.getElementById("draw_cov_brdf-gl");
-      // var scene  = createScene();
-      scene.objects[0].E = 1.0/this.value;
-      // addObject(scene, {p1 : {x: 1.0, y: -0.5}, p2 : {x: 1.0, y: 0.5}, L : 1.0});
-      // addObject(scene, {p1 : {x: 0.0, y: -0.1}, p2 : {x: 0.0, y: 0.1}, E : 1.0/this.value});
-      // //addObject(scene, {p1 : {x: 0.5, y: -0.1}, p2 : {x: 0.5, y: 0.1}, L : 0.0});
-      // addCamera(scene, {o: {x: 1, y: 0.0}, d: {x: -1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
-      for(var count=0; count<10; count++) {
-         render(canvas, scene, count);
+   // SVG drawing code
+   var occl_svg = document.getElementById('draw_cov_occl-cv');
+   var svg    = occl_svg;
+   var cursor = svg.getElementById("cursor");
+   var ray    = svg.getElementById("ray");
+
+   var rayStart = ray.pathSegList.getItem(0);
+   var rayEnd   = ray.pathSegList.getItem(1);
+   var dirX = rayEnd.x - rayStart.x;
+   var dirY = rayEnd.y - rayStart.y;
+   var rayDirNorm = Math.sqrt(dirX*dirX + dirY*dirY);
+   dirX /= rayDirNorm;
+   dirY /= rayDirNorm;
+
+   var currentX = 0;
+   var currentY = 0;
+   var isDown = false;
+
+   svg.addEventListener('mousedown', function(evt) {
+      isDown = true;
+      currentX = evt.clientX;
+      currentY = evt.clientY;
+   }, false);
+   svg.addEventListener('mouseup', function(evt) {
+      isDown = false;
+   }, false);
+   svg.addEventListener('mouseout', function(evt) {
+      isDown = false;
+   }, false);
+   svg.addEventListener('mousemove', function(evt) {
+      if(isDown) {
+         var deltaX = evt.clientX - currentX;
+         var deltaY = evt.clientY - currentY;
+         currentX = evt.clientX;
+         currentY = evt.clientY;
+
+         var planeStart = cursor.pathSegList.getItem(0);
+         var planeEnd   = cursor.pathSegList.getItem(1);
+         var dotProd  = deltaX*dirX + deltaY*dirY;
+
+         var temp = distToLight - dotProd/50;
+         var xshift = dotProd*dirX;
+         var yshift = dotProd*dirY;
+         console.log(temp);
+         if(planeStart.x+xshift >= rayStart.x && planeStart.x+xshift <= rayEnd.x) {
+            distToLight   = temp;
+            planeStart.x += xshift;
+            planeStart.y += yshift;
+            planeEnd.x   += xshift;
+            planeEnd.y   += yshift;
+         }
+
+         scene.camera.o.x = distToLight;
+         render(canvas, scene, 0);
+         if(fourier_bt_press) {
+            render_fourier_occl();
+         }
       }
-   }
+   }, false);
 }
