@@ -709,12 +709,28 @@ function renderingEquation04Step00(snap) {
 
 /* Operators */
 
+function AlignCanvasWithSVG(canvas, svg, offset) {
+   var bbox   = svg.getBBox()
+   var split  = svg.transform().diffMatrix.split();
+   var width  = split.scalex * bbox.width;
+   var height = split.scaley * bbox.height;
+   var top    = svg.transform().diffMatrix.y(bbox.x, bbox.y);
+   var left   = svg.transform().diffMatrix.x(bbox.x, bbox.y);
+   if(offset) {
+      top  += offset.x;
+      left += offset.y;
+   }
 
+   canvas.style.top    = top    + "px";
+   canvas.style.left   = left   + "px";
+   canvas.style.width  = width  + "px";
+   canvas.style.height = height + "px";
+}
 
 var travelOperator01Step00 = function(snap) {
 
    var svg2 = snap.select("#layer1")
-   svg2.transform(Snap.matrix().scale(2).add(svg2.transform().localMatrix))
+   svg2.transform(Snap.matrix().scale(1.5).add(svg2.transform().localMatrix))
 
    // WebGL code
    var tr_canvas = document.getElementById("draw_cov_travel-gl");
@@ -723,11 +739,12 @@ var travelOperator01Step00 = function(snap) {
    }
    var box  = snap.select("#rect4136")
    var bbox = box.getBBox()
-   var size = box.transform().diffMatrix.x(bbox.width, bbox.height) + "px"
-   tr_canvas.style.top    = (box.transform().diffMatrix.y(bbox.x, bbox.y)+2) + "px"
-   tr_canvas.style.left   = (box.transform().diffMatrix.x(bbox.x, bbox.y)-2) + "px"
-   tr_canvas.style.width  = size
-   tr_canvas.style.height = size
+   // var size = box.transform().diffMatrix.x(bbox.width, bbox.height) + "px"
+   // tr_canvas.style.top    = (box.transform().diffMatrix.y(bbox.x, bbox.y)+1) + "px"
+   // tr_canvas.style.left   = (box.transform().diffMatrix.x(bbox.x, bbox.y)-1) + "px"
+   // tr_canvas.style.width  = size
+   // tr_canvas.style.height = size
+   AlignCanvasWithSVG(tr_canvas, box, {x: -1, y: 1});
 
    var h = 128, w = 128
    tr_canvas.width  = w
@@ -771,18 +788,24 @@ var travelOperator01Step00 = function(snap) {
       render_fourier_travel();
    }
 
-   var button = document.getElementById("draw_cov_travel_bt");
-   button.onclick = function() {
+   var text = snap.text(bbox.cx, bbox.y+bbox.height+40, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
+   var tbb  = text.getBBox();
+   var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5/*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
+   var g    = snap.g(rect, text).click(function() {
       fourier_bt_press = !fourier_bt_press;
       render(tr_canvas, scene, 0);
       if(fourier_bt_press) {
-            button.textContent = "inverse Fourier Transform";
+            text.attr({text: "Apply inverse Fourier Transform"});
+            var tbb  = text.getBBox();
+            rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
             render_fourier_travel();
       } else {
-            button.textContent = "Fourier Transform";
+            text.attr({text: "Apply Fourier Transform"});
+            var tbb  = text.getBBox();
+            rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
       }
-   };
-
+   });
+   snap.select("#layer1").append(g);
 
    // SVG drawing code
    var tr_svg = document.getElementById('draw_cov_travel-cv');
@@ -950,3 +973,97 @@ var travelOperator01Step00 = function(snap) {
 
 }
 
+var brdfOperator01Step00 = function(snap) {
+   var svg2 = snap.select("#layer1")
+   svg2.transform(Snap.matrix().scale(1.5).add(svg2.transform().localMatrix))
+
+   // WebGL code
+   var canvas = document.getElementById("draw_cov_brdf-gl");
+   if(!canvas) {
+      alert("Impossible de récupérer le canvas 'draw_cov_brdf-gl'");
+   }
+
+   // Align the rendering canvas with the axis-rectangle
+   var box = snap.select("#rect4136");
+   AlignCanvasWithSVG(canvas, box, {x: 0, y: 0});
+
+   var image     = canvas.getContext('2d')
+   canvas.width  = 128;
+   canvas.height = 128;
+   //canvas.style.cssText = 'width:' + (image.width) + 'px;height:' + (image.height) + 'px';
+
+   // Create the scene
+
+   var slider = document.getElementById("draw_cov_brdf-slider");
+   var exponent = 1.0/slider.value;
+   var scene = createScene();
+   var lY = 1;
+   addObject(scene, {p1 : {x: -1.0, y: 0}, p2 : {x: 1.0, y: 0}, E : exponent});
+   addObject(scene, {p1 : {x: -0.5, y: lY}, p2 : {x: 0.5, y: lY}, L : 1.0});
+   //addObject(scene, {p1 : {x: 0.5, y: -0.1}, p2 : {x: 0.5, y: 0.1}, L : 0.0});
+   addCamera(scene, {o: {x: 0.0, y: 1}, d: {x: 0.0, y: -1.0}, up : {x: 1.0, y:0.0}});
+
+   // Render the image
+   for(var count=0; count<10; count++) {
+      render(canvas, scene, count);
+   }
+
+   var fourier_bt_press = false;
+   function render_fourier_brdf() {
+      FFT.init(w);
+      FrequencyFilter.init(w);
+      var src = canvas.getContext('2d').getImageData(0, 0, w, h);
+      var dat = src.data;
+      var re = [], im = [];
+      for(var y=0; y<h; y++) {
+         var i = y*w;
+         for(var x=0; x<w; x++) {
+            var W = 0.25 * (1.0 - Math.cos(2.0*Math.PI * y/(h-1))) * (1.0-Math.cos(2.0*Math.PI * x/(w-1)));
+            var L = dat[(i << 2) + (x << 2) + 0]
+                  + dat[(i << 2) + (x << 2) + 1]
+                  + dat[(i << 2) + (x << 2) + 2];
+            re[i + x] = W*L;
+            im[i + x] = 0.0;
+         }
+      }
+      FFT.fft2d(re, im);
+      FrequencyFilter.swap(re, im);
+
+      var tr_spectrum = document.querySelector('#draw_cov_brdf-gl').getContext('2d');
+      SpectrumViewer.init(tr_spectrum);
+      SpectrumViewer.render(re, im, false, 5);
+   }
+
+   var bbox = box.getBBox();
+   var text = snap.text(bbox.cx, bbox.y+bbox.height+40, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
+   var tbb  = text.getBBox();
+   var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5 /*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
+   var g    = snap.g(rect, text).click(function() {
+      fourier_bt_press = !fourier_bt_press;
+      render(canvas, scene, 0);
+      if(fourier_bt_press) {
+            text.attr({text: "Apply inverse Fourier Transform"});
+            var tbb  = text.getBBox();
+            rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
+            render_fourier_brdf();
+      } else {
+            text.attr({text: "Apply Fourier Transform"});
+            var tbb  = text.getBBox();
+            rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
+      }
+   });
+   snap.select("#layer1").append(g);
+
+   slider.onchange = function(value) {
+      var canvas = document.getElementById("draw_cov_brdf-gl");
+      // var scene  = createScene();
+      scene.objects[0].E = 1.0/this.value;
+      // addObject(scene, {p1 : {x: 1.0, y: -0.5}, p2 : {x: 1.0, y: 0.5}, L : 1.0});
+      // addObject(scene, {p1 : {x: 0.0, y: -0.1}, p2 : {x: 0.0, y: 0.1}, E : 1.0/this.value});
+      // //addObject(scene, {p1 : {x: 0.5, y: -0.1}, p2 : {x: 0.5, y: 0.1}, L : 0.0});
+      // addCamera(scene, {o: {x: 1, y: 0.0}, d: {x: -1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
+      for(var count=0; count<10; count++) {
+         render(canvas, scene, count);
+      }
+   }
+}

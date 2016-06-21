@@ -247,14 +247,27 @@
             <!-- The different operators
               -->
             <section>
-               <h4>Travel Operator</h4>
-               <div style="position:relative;width:95%;height:500px;left:2%;">
-               <canvas id="draw_cov_travel-gl" style="position:absolute;left:670px;top:56px;width:500px;height:500px;background-color:#FFF;border:0px"></canvas>
-               <svg id="draw_cov_travel-cv" width="800px" height="500px" style="position:absolute;top:0px;left:0px;"></svg>
-               <button id="draw_cov_travel_bt" type="button" style="position:absolute;left:750px;top:590px;margin-left:auto;margin-right:auto;font-size:1em;text-align: center;">Fourier Transform!</button>
-               </div>
+               <h4>Travel Operator</h4><br/>
+               <center>
+                  <div style="position:relative;width:900px;height:400px;">
+                  <canvas id="draw_cov_travel-gl" style="position:absolute;"></canvas>
+                  <svg id="draw_cov_travel-cv" width="900px" height="400px" style="position:absolute;top:0px;left:0px;"></svg>
+                  </div>
+               </center>
                <script type="text/javascript">
                   loadSVG("data/svg/cov_travel.svg", "#draw_cov_travel-cv", travelOperator01Step00);
+               </script>
+            </section>
+            <section>
+               <h4>BRDF operator</h4><br/>
+               <center>
+                  <div style="position:relative;width:900px;height:400px;">
+                  <canvas id="draw_cov_brdf-gl" style="position:absolute;"></canvas>
+                  <svg id="draw_cov_brdf-cv" width="900px" height="400px" style="position:absolute;top:0px;left:0px;"></svg></div><br /><br />
+                  <div style="font-size:0.7em;">BRDF roughness: 0 <input style="vertical-align: middle;" type="range" min="0.0001" max="0.1" value="0.05" step="0.0005" id="draw_cov_brdf-slider" /> 0.1</div>
+               </center>
+               <script type="text/javascript">
+                  loadSVG("data/svg/cov_brdf.svg", "#draw_cov_brdf-cv", brdfOperator01Step00);
                </script>
             </section>
 
