@@ -59,13 +59,15 @@
                   }
                   loadSVG("data/svg/course-pbr02.svg", "#rendering-equation-02", renderingEquation02Step00);
 
-                  var inset1 = {size:32, x:150, y:200, color: "#aa0000", canvas: "local-analysis-01-fft1"};
-                  var inset2 = {size:32, x:240, y:320, color: "#00aa00", canvas: "local-analysis-01-fft2"};
-                  var windw1 = {size: 150, x:-150, y:-10};
-                  var windw2 = {size: 150, x: 250, y:400};
+                  document.getElementById("local-analysis-01-img").onload = function() {
+                    var inset1 = {size:32, x:150, y:200, color: "#aa0000", canvas: "local-analysis-01-fft1"};
+                    var inset2 = {size:32, x:210, y:300, color: "#00aa00", canvas: "local-analysis-01-fft2"};
+                    var windw1 = {size: 150, x:-150, y:-10};
+                    var windw2 = {size: 150, x: 250, y:400};
 
-                  localAnalysisCreateInset("#local-analysis-01", "local-analysis-01-img", inset1, windw1);
-                  localAnalysisCreateInset("#local-analysis-01", "local-analysis-01-img", inset2, windw2);
+                    localAnalysisCreateInset("#local-analysis-01", "local-analysis-01-img", inset1, windw1);
+                    localAnalysisCreateInset("#local-analysis-01", "local-analysis-01-img", inset2, windw2);
+                  }
                </script>
             </section>
             <section>
@@ -91,13 +93,15 @@
                   }
                   loadSVG("data/svg/course-pbr02.svg", "#rendering-equation-03", renderingEquation03Step00);
 
-                  var inset1 = {size:32, x:150, y:200, color: "#aa0000", canvas: "local-analysis-02-fft1"};
-                  var inset2 = {size:32, x:240, y:320, color: "#00aa00", canvas: "local-analysis-02-fft2"};
-                  var windw1 = {size: 150, x:-150, y:-10};
-                  var windw2 = {size: 150, x: 250, y:400};
+                  document.getElementById("local-analysis-02-img").onload = function() {
+                    var inset1 = {size:32, x:150, y:200, color: "#aa0000", canvas: "local-analysis-02-fft1"};
+                    var inset2 = {size:32, x:210, y:300, color: "#00aa00", canvas: "local-analysis-02-fft2"};
+                    var windw1 = {size: 150, x:-150, y:-10};
+                    var windw2 = {size: 150, x: 250, y:400};
 
-                  localAnalysisCreateInset("#local-analysis-02", "local-analysis-02-img", inset1, windw1);
-                  localAnalysisCreateInset("#local-analysis-02", "local-analysis-02-img", inset2, windw2);
+                    localAnalysisCreateInset("#local-analysis-02", "local-analysis-02-img", inset1, windw1);
+                    localAnalysisCreateInset("#local-analysis-02", "local-analysis-02-img", inset2, windw2);
+                  }
                </script>
             </section>
             <section>
@@ -237,7 +241,36 @@
             <section> <!-- Because we use local analysis, we need to look at
                            the variations of elements in the Rendering Eq.
                            like curvature. -->
-               <h4>Local Rendering Equation</h4>
+              <h4>Local Rendering Equation</h4><br /><br />
+              <svg id="local-rendering-equation-01" width="956px" height="452px"></svg>
+              <script>
+              function localRenderingEq01Step00(snap) {
+                // Scale the SVG
+                var svg2 = snap.select("#layer1");
+                svg2.transform(Snap.matrix().scale(4).add(svg2.transform().localMatrix));
+
+                // Clear elements from display
+                snap.select("#arrow01").attr({ class: "fragment", "data-fragment-index": 2 });
+                snap.select("#cov01").attr({ class: "fragment", "data-fragment-index": 2 });
+                snap.select("#cov02").attr({ class: "fragment", "data-fragment-index": 4 });
+                snap.select("#cov03").attr({ class: "fragment", "data-fragment-index": 6 });
+                snap.select("#cov04").attr({ class: "fragment", "data-fragment-index": 2 });
+                snap.select("#op01").attr({ opacity: 0 });
+                snap.select("#op02").attr({ opacity: 0 });
+                snap.select("#op03").attr({ opacity: 0 });
+                snap.select("#step01").attr({ class: "fragment", "data-fragment-index": 3 });
+                snap.select("#step02").attr({ class: "fragment", "data-fragment-index": 5 });
+                snap.select("#step03").attr({ class: "fragment", "data-fragment-index": 6});
+                snap.select("#sensor01").attr({ class: "fragment", "data-fragment-index": 1 });
+                snap.select("#sensor02").attr({ class: "fragment", "data-fragment-index": 3 });
+                snap.select("#sensor03").attr({ class: "fragment", "data-fragment-index": 5 });
+                snap.select("#sensor04").attr({ class: "fragment", "data-fragment-index": 1 });
+              }
+
+              function localRenderingEq01Step01(offset) {
+              }
+              loadSVG("data/svg/cov_path.svg", "#local-rendering-equation-01", localRenderingEq01Step00);
+              </script>
             </section>
             <section> <!-- We need to break down the local rendering equation
                            into a set of different operators for which the

@@ -558,6 +558,7 @@ var localAnalysis01CreateInset = function(imgId, inset, window) {
       canvas.style.left   = x + "px";
       canvas.style.top    = y + "px";
    }
+   updateLocalAnalysis01(inset);
 
    function dragInset(dx, dy, x, y, event) {
       var t = getData("local-analysis", "inset-t").clone();
@@ -575,8 +576,6 @@ var localAnalysis01CreateInset = function(imgId, inset, window) {
    function dragEnd(x, y, event) {
    }
    imageRect.drag(dragInset, dragStart, dragEnd);
-
-   updateLocalAnalysis01(inset);
 }
 
 
@@ -628,7 +627,7 @@ var localAnalysisCreateInset = function(snapId, imgId, inset, window) {
    var gloBorder   = snap.rect(-border, -border, 2*size+ 4*border, size + 2*border).attr({fill: "#ffffff", stroke: "#333333", strokeWidth: "1px", "vector-effect": "non-scaling-stroke", opacity: 0.8});
    var text1 = snap.text(size/2, size+5, "local window").attr({textAnchor: "middle", fontSize: "0.1em", fill: "#000000"});
    var text2 = snap.text(3*size/2+2*border, size+5 , "Fourier transform").attr({textAnchor: "middle", fontSize: "0.1em", fill: "#000000"});
-   var insetImg    = snap.image(img.src, -15, -15, img.width, img.height).attr({id: "image"});
+   var insetImg    = snap.image(img.src, 0, 0, img.width, img.height).attr({id: "image"});
    var insetRect   = snap.rect(0,0, size, size).attr({fill: "#ffffff"});
    var insetBorder = insetRect.clone().attr({fillOpacity: 0, stroke: inset.color, strokeWidth: "2px", "vector-effect": "non-scaling-stroke"});
    var imageRect   = insetBorder.clone();
@@ -1046,18 +1045,6 @@ var occlOperator01Step00 = function(snap) {
    if(fourier_bt_press) {
       render_fourier_occl();
    }
-
-   //  var button = document.getElementById("draw_cov_occl_bt");
-   //  button.onclick = function() {
-   //      fourier_bt_press = !fourier_bt_press;
-   //      render(canvas, scene, 0);
-   //      if(fourier_bt_press) {
-   //          button.textContent = "inverse Fourier Transform";
-   //          render_fourier_occl();
-   //      } else {
-   //          button.textContent = "Fourier Transform";
-   //      }
-   //  };
 
    // Create the clickable button
    var bbox = box.getBBox();
