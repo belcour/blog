@@ -25,6 +25,16 @@ const loadSVG = function(uri, elem, call) {
    });
 }
 
+const loadElementFromSVG = function(uri, svgid, elem, call) {
+   Snap.load(getData("general", "baseurl") + uri, function (f) {
+      var s = Snap(svgid);
+      s.append(f.select("defs"));
+      s.append(f.select(elem));
+
+      if(call != undefined && call != null) { call(s); }
+   });
+}
+
 const loadImageSVG = function(uri, elem, width, height, id) {
       var snap  = Snap(elem);
       var group = snap.g();

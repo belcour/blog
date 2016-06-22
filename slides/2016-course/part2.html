@@ -12,12 +12,22 @@
 
       <link rel="stylesheet" href="../css/reveal.css">
       <link rel="stylesheet" href="../css/theme/beige.css" id="theme">
+      <link rel="stylesheet" href="../css/androidstudio.css" id="theme">
 
+      <script src="../js/head.min.js"></script>
       <script src="../js/snap.svg.js"></script>
       <script src="../js/reveal.js"></script>
-      <script src="../js/mathjax.js"></script>
+      <script src="../../javascripts/fft.js"></script>
+      <script src="../../javascripts/raytracer.js"></script>
+      <script src="../../javascripts/course2016-part1.js"></script>
+      <script src="../../javascripts/course2016-part2.js"></script>
    </head>
    <body>
+      <!-- Update the relative url -->
+      <script type="text/javascript">
+         setData("general", "baseurl", "../../");
+      </script>
+
       <div class="reveal">
          <!-- Any section element inside of this container is displayed as a slide -->
          <div class="slides">
@@ -25,6 +35,154 @@
             <!-- Title screen -->
             <section class="title"> <!-- data-background="./png/background.png" -->
             <h3>Part III - Applications</h3>
+            </section>
+
+            <!-- The overview of the presentation -->
+            <section>
+               <h4>Overview</h4><br />
+               <ol style="color:#aaaaaa;text-align:left;display:block;padding-left:3em;">
+                  <li style="padding-bottom:0.5em;">Introduction</li>
+                  <li style="padding-bottom:0.5em;">Frequency Operators
+                     <ul style="font-size:0.6em;">
+                        <li>Travel & Occlusion</li>
+                        <li>Reflection & Refraction</li>
+                        <li>Scattering & Absorption</li>
+                     </ul>
+                  </li>
+                  <li style="color:#000000;padding-bottom:0.5em;">Applications
+                     <ul style="font-size:0.6em;">
+                        <li>Adaptive sampling & denoising</li>
+                        <li>Upsampling</li>
+                        <li>Density estimation</li>
+                        <li>Antialiasing</li>
+                     </ul>
+                  </li>
+                  <li style="padding-bottom:0.5em;">Conclusion</li>
+               </ol>
+            </section>
+
+            <!-- Adaptive sampling and reconstruction -->
+            <section>
+               <h4>Adaptive Sampling and Reconstruction</h4>
+            </section>
+
+            <!-- Upsampling -->
+            <section>
+               <h4>Upsampling</h4>
+            </section>
+
+            <!-- Adaptive density estimation -->
+            <section>
+               <h4>Adaptive Density Estimation</h4>
+            </section>
+
+            <!-- Antialiasing -->
+            <section>
+               <h4>Antialiasing Surface Appearance</h4>
+               <svg id="antialiasing01" width="800px" height="500px" style="margin-top:70px;"></svg>
+               <script>
+                  loadSVG("slides/2016-covariance-filtering/svg/singlescatter.svg", "#antialiasing01", antialiasingAppearance01Step00);
+               </script>
+            </section>
+            <section>
+               <h4>Antialiasing Surface Appearance</h4>
+               <svg id="antialiasing02" width="800px" height="500px" style="margin-top:70px;"></svg>
+               <script>
+                  loadSVG("slides/2016-covariance-filtering/svg/filtering01.svg", "#antialiasing02", antialiasingAppearance02Step00);
+               </script>
+            </section>
+            <section>
+               <h4>Antialiasing Surface Appearance</h4><br />
+               <center><div style="width:80%;text-align:left;"><ul>
+                  <li>Pixel filter is a kernel applied on the surface!</li>
+               </ul></div></center><br />
+               <svg class="fragment" id="antialiasing03" width="800px" height="500px" style="margin-top:-70px;"></svg>
+               <script>
+                  loadSVG("slides/2016-covariance-filtering/svg/filtering02.svg", "#antialiasing03", antialiasingAppearance03Step00);
+               </script>
+            </section>
+            <section>
+               <h4>Frequency Analysis Perspective</h4><br />
+               <center><div style="width:80%;text-align:left;"><ul>
+                  <li>This kernel is a low-pass filter on the BRDF:</li>
+               </ul></div></center><br />
+               <svg id="antialiasing04" width="800px" height="450px" style="margin-top:-50px;"></svg>
+               <script type="text/javascript">
+                  var s = Snap("#antialiasing04");
+                  createFilter(s, 0, 400, 790, 300, 400);
+               </script>
+
+               <br />
+               <strong>TODO</strong>: Need to explain why this is an integral in Fourier as well!
+            </section>
+            <section>
+               <h4>Antialiasing and Global Illumination</h4>
+               <center><div style="width:80%;text-align:left;"><ul>
+                  <li>The kernel can account for multiple bounces:</li>
+               </ul></div></center><br />
+               <svg id="antialiasing05" width="800px" height="480px" style="margin-top:-40px;"></svg>
+               <script>
+                  loadSVG("slides/2016-covariance-filtering/svg/multiscatter.svg", "#antialiasing05", null);
+               </script>
+              <center><div style="width:80%;text-align:left;"><ul>
+                  <li>How can we estimate the kernel in that case?</li>
+               </ul></div></center><br />
+            </section>
+            <section>
+               <h4>Covariance Antialiasing</h4><br />
+               <svg id="cov03" width="800px" height="600px"></svg>
+               <script type="text/javascript">
+                  loadElementFromSVG("slides/2016-covariance-filtering/svg/bidir-filter-example.svg", "#cov03", "#layer3", antialiasingAppearance06Step00);
+
+                  // Animation for the slide {forward and backward}
+                  Reveal.addEventListener( 'fragmentshown', function( event ) {
+                     if(event.fragment.id == "cov03shear01") { Cov03ShearCov(1); Cov03MoveCursor01(1); return; }
+                     if(event.fragment.id == "cov03kernel01") { Cov03DisplayKernel(1); return; }
+                  });
+                  Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                     if(event.fragment.id == "cov03shear01") { Cov03ShearCov(-1); Cov03MoveCursor01(-1); return; }
+                     if(event.fragment.id == "cov03kernel01") { Cov03DisplayKernel(-1); return; }
+                  });
+               </script>
+               <p class="fragment" id="cov03shear01"></p>
+               <p class="fragment" id="cov03kernel01"></p>
+            </section>
+
+
+            <!-- Demo of our uni-directionnal kernels -->
+            <section>
+            <h4>Comparison to Ground Truth Kernel</h4><br />
+            <svg id="demo01" width="512" height="512"></svg><br />
+            <script>
+               var s = Snap("#demo01");
+               var x = 225;
+               s.clear();
+               s.image("../2016-covariance-filtering/png/unidirectional-filter-cov.png", 0, 0, 512, 512);
+               var block = s.rect(0, x, 512, 512).attr({fill: "#ffffff", id: "block"});
+               var image = s.image("../2016-covariance-filtering/png/unidirectional-filter-ref.png", 0, 0, 512, 512);
+               var line  = s.line(0, x, 512, x).attr({id: "line", stroke: "#000", strokeWidth:2});
+               s.rect(1, 1, 510, 510).attr({fillOpacity: 0, strokeWidth: 2, stroke: "#000"});
+               var textu = s.text(500, x-15, "predicted kernel").attr({fillOpacity: 0.7, fill: "#FD5154", fontSize: "0.6em", textAnchor: "end"});
+               var textl = s.text(500, x+25, "ground truth kernel").attr({fillOpacity: 0.7, fill: "#59FE5B", fontSize: "0.6em", textAnchor: "end"});
+               var g = s.g(block, line, textu, textl).attr({id: "group"});
+               image.attr({id: "image", mask: block});
+
+               s.circle(320, 365, 5).attr({fill: "#aaaaff", stroke: "#5555ff", strokeWidth: 2});
+               s.text(330, 370, "pixel").attr({fontSize: "0.6em", fillOpacity: 0.9, fill: "#aaaaff"})
+
+               const demo01move = function(x, y, event) {
+                  var s = Snap("#demo01");
+                  var g = s.select("#group");
+                  var i = s.select("#image");
+                  var b = s.select("#block");
+                  g.transform("t0," + y);
+                  b.attr({transform: "t0," + y});
+                  i.attr({mask: s.select("block")});
+               }
+
+               s.drag(demo01move);
+            </script>
+            <small>Kernel after one bounce</small>
             </section>
 
             <!-- Break before part2: applications -->

@@ -96,6 +96,33 @@ function CreateCovariance(snap, elem, matrix) {
     return cov;
 }
 
+
+var createGaussian = function(snap, x0, y0, w, h, sigma, orient, style) {
+    var curve = "M" + x0 + " " + y0;
+    for(var i=0; i<100; ++i) {
+        var dx = i / 99;
+        if(orient == "vertical") {
+        var yi = y0 + h*dx;
+        var xi = x0 + w*(Math.exp(-0.5 * sigma * Math.pow(dx - 0.5, 2)));
+        } else {
+        var xi = x0 + w*dx;
+        var yi = y0 + h*(Math.exp(-0.5 * sigma * Math.pow(dx - 0.5, 2)));
+        }
+        curve += " " + xi + " " + yi;
+    }
+    var path = snap.path(curve).attr({fillOpacity: 0, stroke: "#ff0000", strokeWidth: 2});
+    if(style) { path.attr( style ); }
+    var absc;
+    if(orient == "vertical") {
+        absc = snap.line(x0, y0, x0, y0+h);
+    } else {
+        absc = snap.line(x0, y0, x0+w, y0);
+    }
+    absc.attr({stroke: "#000000", strokeWidth: 2, markerEnd: snap.select("#marker")});
+    var grou = snap.g(path, absc);
+    return grou;
+}
+
 const getFocalPointExample01 = function(x1, y1, lens) {
 
    const lLength = lens.getTotalLength();
@@ -258,4 +285,147 @@ const createExample01 = function(snap) {
    }
 
    setData("example01", "lastElem", undefined)
+}
+
+/* ANTIALIASING SECTION */
+
+var antialiasingAppearance01Step00 = function(s) {
+    // Add text
+    s.text(5, 285, "eye").attr({fill: 'black', fontSize: '0.8em'});
+    s.text(520, 50, "light").attr({fill: '#ffd527', fontSize: '0.8em'});
+    s.text(340, 450, "geometry").attr({fill: 'black', fontSize: '0.8em'});
+    s.text(650, 365, "material").attr({id: 'material', fill: 'black', fontSize: '0.8em'});
+
+    // Animation
+    s.select("#pixelfootprint").attr({class: "fragment", "data-fragment-index": 0});
+    s.select("#zoom").attr({class: "fragment", "data-fragment-index": 1});
+    s.select("#zoomeduv").attr({class: "fragment", "data-fragment-index": 1});
+    s.select("#zoomedpixelfootprint").attr({class: "fragment", "data-fragment-index": 1});
+    s.select("#zoomedborder").attr({class: "fragment", "data-fragment-index": 1});
+    s.select("#zoomedmicrosurface").attr({class: "fragment", "data-fragment-index": 1});
+    s.select("#material").attr({class: "fragment", "data-fragment-index": 1});
+};
+
+var antialiasingAppearance02Step00 = function(s) {
+    // Add text
+    s.text( 25, 310, "pixel").attr({opacity: 0.5, fill: 'black', fontSize: '0.8em'});
+    s.text(310, 310, "material").attr({opacity: 0.5, fill: 'black', fontSize: '0.8em'});
+    s.text(635, 310, "light").attr({opacity: 0.5, fill: 'black', fontSize: '0.8em'});
+
+    // Animation
+    s.select("#integral").attr({opacity: 1, class: "fragment", "data-fragment-index": 0});
+    s.select("#light").transform(s.select("#light").transform() + "t15,0");
+    s.select("#eq").attr({class: "fragment fade-out", "data-fragment-index": 0});
+    s.select("#simeq").attr({opacity: 1, class: "fragment", "data-fragment-index": 0});
+};
+
+var antialiasingAppearance03Step00 = function (s) {
+    // Add text
+    s.text( 25, 310, "pixel").attr({opacity: 0.5, fill: 'black', fontSize: '0.8em'});
+    s.text(300, 310, "kernel").attr({opacity: 0.5, fill: 'black', fontSize: '0.8em'});
+    s.text(460, 310, "material").attr({opacity: 0.5, fill: 'black', fontSize: '0.8em'});
+    s.text(680, 310, "light").attr({opacity: 0.5, fill: 'black', fontSize: '0.8em'});
+};
+
+var createFilter = function(snap, x0, y0, w, h, sigma, orient, style) {
+    var arrow = snap.polygon([0,5, 4,5, 2,0, 0,5]).attr({fill: '#000'}).transform('r90');
+    var marker = arrow.marker(0,0, 5,5, 0,2.5).attr({id: "marker"});
+    var curveA = "M" + x0 + " " + y0;
+    var curveB = "M" + x0 + " " + y0;
+    var curveC = "M" + x0 + " " + y0;
+    const N = 125;
+    for(var i=0; i<N; ++i) {
+        var dx  = i / (N-1);
+        var dy  = Math.random() /(1.0+10*Math.pow(dx-0.5, 2));
+        if(Math.abs(dx-0.5) < 0.001) { dy = 1; }
+        var exp = (Math.exp(-0.5 * sigma * Math.pow(dx - 0.5, 2)));
+        var xi = x0 + w*dx;
+        var yi = y0 - h*exp;
+
+        curveA += " " + xi + " " + yi;
+        curveB += " " + xi + " " + (y0-h*dy);
+        curveC += " " + xi + " " + (y0-h*exp*dy);
+    }
+    var pathA = snap.path(curveA).attr({fillOpacity: 0, stroke: "#ff0000", strokeWidth: 2});
+    var pathB = snap.path(curveB).attr({fillOpacity: 0, stroke: "#00ee00", strokeWidth: 2});
+    var pathC = snap.path(curveC).attr({fillOpacity: 0, stroke: "#0000ff", strokeWidth: 2});
+    var absc1 = snap.line(x0, y0, x0+w, y0);
+    absc1.attr({stroke: "#000000", strokeWidth: 2, markerEnd: marker});
+    var ord1 = snap.line(x0+w/2, y0, x0+w/2, y0-h-20);
+    ord1.attr({stroke: "#000000", strokeWidth: 2, markerEnd: marker});
+    var textA = snap.text(x0+w, y0-h-30, "Kernel").attr({fill: "#ff0000", textAnchor: "end", fontSize: "0.6em"});
+    var textA = snap.text(x0+w, y0-h-5, "Material").attr({fill: "#00ee00", textAnchor: "end", fontSize: "0.6em"});
+    var textA = snap.text(x0+w, y0-h+20, "Antaliased material").attr({fill: "#0000ff", textAnchor: "end", fontSize: "0.6em"});
+    var grou = snap.g(pathA, pathB, pathC, absc1, ord1);
+    return grou;
+}
+
+var antialiasingAppearance06Step00 = function(s) {
+    var layer = s.select("#layer3");
+    layer.transform(Snap.matrix(1, 0, 0, 1, 1580, 0));
+
+    // Covariance window
+    var cx = 30, cy = 350, w = 170;
+    var frame = CreateFrame(s, cx, cy, w, w);
+    CreateCovariance(s, frame, Snap.matrix(0.9, 0, 0, 0.1, 0, 0));
+    s.text(cx+w/2, cy+w+30, "Covariance").attr({fontSize: "0.6em", textAnchor: "middle"});
+    var quad = s.paper.rect(cx, cy+w/2 - 2, w, 4).attr({fillOpacity: 0.5, fill: "#ff0000"});
+
+    // Plot the kernel
+    var x0 = 255, y0 = 300, w = 300, h=100;
+    var plot = createGaussian(s, x0, y0, w, h, 100, "horizontal");
+    var text = s.paper.text(x0+w+50, y0+7, "kernel").attr({fill: "#ff0000", fontSize: "0.6em", textAnchor: "middle"});
+    s.g(plot, text, quad).attr({id: "plot", opacity: 0});
+};
+
+var Cov03MoveCursor01 = function(offset) {
+    var s = Snap("#cov03");
+    var c = s.select("#cursor-3");
+
+    const M = c.transform().localMatrix;
+    const posX = 285;
+    const posY = 165;
+    if(offset > 0) {
+        Snap.animate(0, 1, function(val) {
+        c.transform(M);
+        var temp = Snap.matrix(1, 0, 0, 1, val*posX, val*posY);
+        c.transform(c.transform().localMatrix.add(temp));
+        }, 500);
+    } else {
+        Snap.animate(0, 1, function(val) {
+        c.transform(M);
+        var temp = Snap.matrix(1, 0, 0, 1, -val*posX, -val*posY);
+        c.transform(c.transform().localMatrix.add(temp));
+        }, 500);
+    }
+}
+var Cov03ShearCov = function(offset) {
+    var s = Snap("#cov03");
+    var c = s.select("#circle");
+
+    const M = c.transform().localMatrix;
+    const o = -5;
+    if(offset > 0) {
+        Snap.animate(0, -o, function(val) {
+        c.transform(M);
+        var temp = Snap.matrix(1, val, 0, 1, 0, 0);
+        c.transform(c.transform().localMatrix.add(temp));
+        }, 500);
+    } else {
+        Snap.animate(0, o, function(val) {
+        c.transform(M);
+        var temp = Snap.matrix(1, val, 0, 1, 0, 0);
+        c.transform(c.transform().localMatrix.add(temp));
+        }, 500);
+    }
+}
+
+var Cov03DisplayKernel = function(offset) {
+    var s = Snap("#cov03");
+    var c = s.select("#plot");
+    if(offset > 0) {
+        c.animate({opacity: 1}, 500);
+    } else {
+        c.animate({opacity: 0}, 500);
+    }
 }
