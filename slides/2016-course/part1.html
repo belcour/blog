@@ -300,17 +300,13 @@
             <section> <!-- We need to break down the local rendering equation
                            into a set of different operators for which the
                            local FT will have closed forms. -->
-               <h4>Rendering Operators</h4>
+               <h4>Rendering Operators</h4><br />
                <div style="width:60%">
                 <ul>
                   <li>Input: Fourier transform</li>
-                  <li>Output: Modified Fourier transform</li>
-                </ul>
-               </div><br />
+                  <li>Output: Modified Fourier transform</li><br />
 
-               <div style="width:60%">
-                <ul>
-                  <li>Implementation example
+                  <li  class="fragment" data-fragment-index="1">Implementation example
                     <ul>
                       <li>Manipulation of the covariance matrix</li>
                       <li>Using Matlab's' syntax</li>
@@ -318,6 +314,14 @@
                   </li>
                 </ul>
                </div>
+
+               <pre style="width:60%;" class="fragment" data-fragment-index="1">
+               <code class="matlab">
+Cov = {sxx, sxu;
+       sxu, suu};
+               </code>
+               </pre>
+
             </section>
 
             <!--
@@ -383,48 +387,6 @@ Cov = Tr' * Cov * Tr
                </pre>
             </section>
 
-            <!-- BRDF operator -->
-            <section>
-               <h4>BRDF Operator</h4><br/>
-               <center>
-                  <div style="position:relative;width:900px;height:500px;">
-                  <canvas id="draw_cov_brdf-gl" style="position:absolute;"></canvas>
-                  <svg id="draw_cov_brdf-cv" width="900px" height="500px" style="position:absolute;top:0px;left:0px;"></svg></div>
-                  <div style="font-size:0.7em;">BRDF roughness: 0 <input style="vertical-align: middle;" type="range" min="0.0001" max="0.05" value="0.01" step="0.0005" id="draw_cov_brdf-slider" /> 0.05</div>
-               </center>
-               <script type="text/javascript">
-                  loadSVG("data/svg/cov_brdf.svg", "#draw_cov_brdf-cv", brdfOperator01Step00);
-               </script>
-            </section>
-            <section>
-               <h4>BRDF Operator</h4><br/>
-               <div style="width:60%">
-               <ul>
-                 <li>The BRDF cut the angular frequency
-                    <ul class="sublist">
-                      <li>Acts as a low-pass filter</li>
-                      <li>Cutof depends on the BRDF lobe
-                    </ul>
-                  </li>
-               </ul>
-               </div>
-
-               <svg id="operator-brdf-02" width="400px" height="250px"></svg>
-               <script>
-                 var snap  = Snap("#operator-brdf-02");
-                 var frame = CreateFrame(snap, 100, 50, 200, 200);
-                 var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, -0.9, 0, 0.1, 0, 0));
-                 snap.rect(100, 100, 200, 100).attr({fill: "#aa0000", fillOpacity: 0.3});
-               </script>
-
-               <pre style="width:60%;" class="fragment">
-               <code class="matlab">
-% BRDF with cutof of 'b'
-B   = [0, 0; 0, b]
-Cov = inverse(inverse(Cov) + B)
-               </code>
-               </pre>
-            </section>
 
             <!-- Occlusion operator -->
             <section>
@@ -451,15 +413,12 @@ Cov = inverse(inverse(Cov) + B)
                  </li>
                </ul>
                </div>
-
                <svg id="operator-occl-02" width="400px" height="250px"></svg>
                <script>
                  var snap  = Snap("#operator-occl-02");
                  var frame = CreateFrame(snap, 100, 50, 200, 200);
                  var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, -0.9, 0, 0.1, 0, 0));
-                 //snap.rect(100, 100, 200, 100).attr({fill: "#aa0000", fillOpacity: 0.3});
                </script>
-
                <pre style="width:60%;" class="fragment">
                <code class="matlab">
 % Visibility operation
@@ -470,17 +429,277 @@ Cov = Cov + Occ
             </section>
 
 
+            <!-- Local shading needs a further decomposition -->
             <section>
-               <h4>Summary: Frequency Operators</h4>
+               <h4>Shading Operator<strong>s</strong></h4><br/>
+               <center><div style="width:80%;text-align:left;"><ul>
+                 <li>Shading requires to decompose:
+                   <ul>
+                     <li>Final travel to the surface (projection)</li>
+                     <li>Material (Textures / BSDF)</li>
+                   </ul>
+                 </li>
+               </ul></div></center>
+            </section>
+
+
+            <!-- Curvature operator -->
+            <section>
+               <h4>Curvature Operator</h4><br/>
+               <center>
+                  <div style="position:relative;width:900px;height:500px;">
+                     <canvas id="draw_cov_curv-cv" style="position:absolute;background-color:#FFF;border:0px"></canvas>
+                     <svg width="900px" height="500px" id="draw_cov_curv-01" style="position:absolute;top:0px;left:0px;"></svg>
+                     <!--<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:270px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>-->
+                  </div>
+               </center>
+               <script type="text/javascript">
+                function curvOperator01Step00(snap) {
+                  var layer  = snap.select("#layer1");
+                  var r = 1000;
+                  var sphere = snap.circle(233, 480+r, 170+r).attr({fillOpacity: 0, stroke: "#333", strokeWidth: "4px", id: "sphere"});//snap.select("#sphere");
+                  var quad   = snap.rect(sphere.attr("cx")-150, 300, 300, 150).attr({fill: "#fff"});
+                  sphere.attr({clip: quad});
+
+                  var init   = parseFloat(sphere.attr("r"));
+                  var initcy = parseFloat(sphere.attr("cy"));
+                  function dragInset(dx, dy, x, y, event) {
+                    var dr = 10*(dx-dy);
+                    var r  = init + dr;
+                    if(r > 120) {
+                      sphere.attr({r: r, cy: initcy+dr});
+                    }
+                  }
+                  function dragStart(x, y, event) {
+                    init   = parseFloat(sphere.attr("r"));
+                    initcy = parseFloat(sphere.attr("cy"));
+                  }
+                  function dragEnd(x, y, event) {
+                  }
+                  snap.drag(dragInset, dragStart, dragEnd);
+
+                  // WebGL code
+                  var canvas = document.getElementById("draw_cov_curv-cv");
+                  if(!canvas) {
+                      alert("Impossible de récupérer le canvas");
+                  }
+
+                  // Align the rendering canvas with the axis-rectangle
+                  var box = snap.select("#rect4136");
+                  AlignCanvasWithSVG(canvas, box, {x: .5, y: -.5});
+                }
+                  loadSVG("data/svg/cov_curv.svg", "#draw_cov_curv-01", curvOperator01Step00);
+               </script>
+            </section>
+            <section>
+               <h4>Curvature Operator</h4><br/>
+               <div style="width:60%">
+               <ul>
+                 <li>The curvature shears the angular frequencies</li>
+               </ul>
+               </div>
+               <svg id="operator-curvature-02" width="400px" height="250px"></svg>
+               <script>
+                 var snap  = Snap("#operator-curvature-02");
+                 var frame = CreateFrame(snap, 100, 50, 200, 200);
+                 var cov   = CreateCovariance(snap, frame, Snap.matrix(0.1, 0, 0, 0.9, 0, 0));
+
+                 var ShearXUAnimation = function(start, end) {
+                  var s = Snap("#operator-curvature-02");
+                  var c = s.select("#circle");
+
+                  const M = c.transform().localMatrix;
+                  Snap.animate(start, end, function(val) {
+                    c.transform(M);
+                    var temp = Snap.matrix(1, 0, -val, 1, 0, 0);
+                    c.transform(c.transform().localMatrix.add(temp));
+                  }, 500);
+                }
+
+
+                Reveal.addEventListener( 'fragmentshown', function( event ) {
+                    if(event.fragment.id == "operator-curvature-02-shear") {  ShearXUAnimation(0, 9); }
+                });
+                Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                    if(event.fragment.id == "operator-curvature-02-shear") { ShearXUAnimation(0, -9); }
+                });
+               </script>
+               <pre class="fragment" id="operator-curvature-02-shear"></pre>
+               <pre style="width:60%;" class="fragment">
+               <code class="matlab">
+% Projection to a curved object of radius 'k'
+Cv  = [1, 0; k, 1]
+Cov = Cv' * Cov * Cv
+               </code>
+               </pre>
+            </section>
+
+            <!-- BRDF operator -->
+            <section>
+               <h4>Reflection Operator</h4><br/>
+               <center>
+                  <div style="position:relative;width:900px;height:500px;">
+                  <canvas id="draw_cov_brdf-gl" style="position:absolute;"></canvas>
+                  <svg id="draw_cov_brdf-cv" width="900px" height="500px" style="position:absolute;top:0px;left:0px;"></svg></div>
+                  <div style="font-size:0.7em;">BRDF roughness: 0 <input style="vertical-align: middle;" type="range" min="0.0001" max="0.05" value="0.01" step="0.0005" id="draw_cov_brdf-slider" /> 0.05</div>
+               </center>
+               <script type="text/javascript">
+                  loadSVG("data/svg/cov_brdf.svg", "#draw_cov_brdf-cv", brdfOperator01Step00);
+               </script>
+            </section>
+            <section>
+               <h4>Reflection Operator</h4><br/>
+               <div style="width:60%">
+               <ul>
+                 <li>The BRDF cut the angular frequency
+                    <ul class="sublist">
+                      <li>Acts as a low-pass filter</li>
+                      <li>Cutof depends on the BRDF lobe
+                    </ul>
+                  </li>
+               </ul>
+               </div>
+
+               <svg id="operator-brdf-02" width="400px" height="250px"></svg>
+               <script>
+                 var snap  = Snap("#operator-brdf-02");
+                 var frame = CreateFrame(snap, 100, 50, 200, 200);
+                 var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, -0.9, 0, 0.1, 0, 0));
+                 snap.rect(100, 100, 200, 100).attr({fill: "#aa0000", fillOpacity: 0.3});
+               </script>
+
+               <pre style="width:60%;" class="fragment">
+               <code class="matlab">
+% BRDF with cut at 'b'
+B   = [0, 0; 0, b]
+Cov = inverse(inverse(Cov) + B)
+               </code>
+               </pre>
+            </section>
+
+
+            <!-- Transmission operator -->
+            <section>
+               <h4>Transmission Operator</h4><br/>
+               <center>
+                  <div style="position:relative;width:900px;height:500px;">
+                  <canvas id="draw_cov_bsdf-gl" style="position:absolute;"></canvas>
+                  <svg id="draw_cov_bsdf-cv" width="900px" height="500px" style="position:absolute;top:0px;left:0px;"></svg></div>
+                  <!--<div style="font-size:0.7em;">BRDF roughness: 0 <input style="vertical-align: middle;" type="range" min="0.0001" max="0.05" value="0.01" step="0.0005" id="draw_cov_brdf-slider" /> 0.05</div>-->
+               </center>
+               <script type="text/javascript">
+                  loadSVG("data/svg/cov_bsdf.svg", "#draw_cov_bsdf-cv", null);
+               </script>
+            </section>
+            <section>
+               <h4>Transmission Operator</h4><br/>
+            </section>
+
+
+            <!-- BSSRDF operator -->
+            <!--
+            <section>
+               <h4>BSSRDF Operator</h4><br/>
+            </section>
+            <section>
+               <h4>BSSRDF Operator</h4><br/>
+            </section>
+            -->
+
+
+            <!-- Lens operator -->
+            <section>
+               <h4>Lens Operator</h4><br/>
+            </section>
+            <section>
+               <h4>Lens Operator</h4><br/>
+            </section>
+
+
+            <!-- Motion operator -->
+            <section>
+               <h4>Adding Another Dimension for Motion-Blur</h4>
+               <center>
+               <div style="width:80%;text-align:left;"  class="fragment" data-fragment-index="1">
+                <ul>
+                  <li>A new dimension: time.</li>
+                </ul>
+               </div>
+               <pre style="width:60%;" class="fragment" data-fragment-index="1">
+               <code class="matlab">
+Cov = {sxx, sxu, sxt;
+       sxu, suu, sut;
+       sxt, sut, stt};
+               </code>
+               </pre>
+
+               <div style="width:80%;text-align:left;padding-bottom:20px;"  class="fragment" data-fragment-index="2">
+                <ul>
+                  <li>Easy formulation: coordinate change.</li>
+                </ul>
+               </div>
+               <svg width="300px" height="300px" id="motion-cat-moving"  class="fragment" data-fragment-index="3"></svg>
+               <svg width="300px" height="300px" id="motion-couch-moving"  class="fragment" data-fragment-index="4"></svg>
+               <script>
+                 var s1 = Snap("#motion-cat-moving");
+                 var r1 = s1.rect(0, 0, 300, 300);
+                 loadImageSVG("/data/images/cat.png", "#motion-cat-moving", 200, 200, "cat");
+                 loadImageSVG("/data/images/couch.png", "#motion-cat-moving", 300, 200, "couch");
+                 var cat = s1.select("#cat");
+                 var couch = s1.select("#couch");
+                 var r2 = r1.clone();
+                 var r3 = r1.clone();
+                 s1.append(r2);
+                 s1.append(r3);
+                 cat.select("image").attr({x: 60, y: 10, clip: r3});
+                 couch.select("image").attr({y: 180, clip: r2});
+                 var g = snap.group(cat, couch);
+                 s1.append(g);
+                 cat.select("image").animate({y: 10}, 10000);
+
+                 var f = s1.filter(Snap.filter.blur(0, 10));
+                 cat.attr({filter: f});
+
+                 var s2 = Snap("#motion-couch-moving");
+                 s2.rect(0, 0, 300, 300);
+                 var copycat   = cat.clone();
+                 var copycouch = couch.clone();
+
+                  var f1 = s2.filter(Snap.filter.blur(0, 10));
+                  var f2 = s2.filter(Snap.filter.blur(0, 0));
+                  copycouch.attr({filter: f1});
+                  copycat.attr({filter: f2});
+
+                 s2.append(copycat);
+                 s2.append(copycouch);
+               </script>
+               </center>
+            </section>
+            <section>
+               <h4>Motion Operator</h4><br/>
+            </section>
+            <section>
+               <h4>Motion Operator</h4><br/>
+            </section>
+
+
+            <!-- Summary of all the operators -->
+            <section>
+               <h4>Summary: Frequency Operators</h4><br />
+                  <svg id="operator-summary-01" width="900px" height="400px"></svg>
+               <script type="text/javascript">
+                  loadSVG("data/svg/course-operators-summary.svg", "#operator-summary-01", null);
+               </script>
             </section>
             <section>
                <h4>Summary: A Unified Theory</h4>
             </section>
 
+
             <!-- Break before part2: applications -->
             <section class="title">
                <h4>Break: Questions?</h4><br />
-               <a style="font-size:0.7em;float:right;padding-top:8em;" href="part2.html">> next part</a>
+               <a style="font-size:0.7em;float:right;padding-top:25%" href="part2.html">> next part</a>
             </section>
          <div>
       </div>
