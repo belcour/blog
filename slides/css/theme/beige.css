@@ -20,7 +20,7 @@ body {
 
 .reveal {
   font-size: 36px;
-  font-weight: normal;
+  font-weight: lighter;
   color: #333; }
 
 ::selection {
@@ -110,7 +110,9 @@ body {
   list-style-type: disc; }
 
 .reveal ul ul {
-  font-size:0.8em;
+  color: #999;
+  font-size:0.75em;
+  list-style-position: outside;
   list-style-type: square; }
 
 .reveal ul ul ul {
