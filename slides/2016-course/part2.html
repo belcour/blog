@@ -218,6 +218,10 @@
             transition: 'fade',
             width: 1280,
             height: 720,
+            dependencies: [
+              { src: '../js/mathjax.js', async: true },
+              { src: '../js/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+            ]
             //dependencies: [{ src: 'js/mathjax.js', async: true }]
          });
 
