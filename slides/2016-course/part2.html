@@ -35,6 +35,7 @@
             <!-- Title screen -->
             <section class="title"> <!-- data-background="./png/background.png" -->
             <h3>Part III - Applications</h3>
+            <a style="font-size:0.7em;float:left;padding-top:25%" href="part1.html">< previous part</a>
             </section>
 
             <!-- The overview of the presentation -->
@@ -93,12 +94,35 @@
                 <center><div style="width:80%;text-align:left;"><ul>
                   <li>Example of lens integration
                       <ul>
-                          <li>Reconstruct in pixel space</li>
-                          <li>Integrate in lens/light/time space</li>
+                          <li>Operators: Reflection + Travel + Occlusion + Lens</li>
+                          <li>Adapt the sampling of the lens and in screen space</li>
+                      </ul>
+                  </li>
+               </ul></div></center>
+               <center style="padding-top:70px;transform:scale(1.4);">
+                   <svg id="example01-svg" width="800px" height="235px"></svg>
+               </center>
+               <script type="text/javascript" >
+                   var uri  = "/data/svg/course-integration01.svg";
+                   var elem = "#example01-svg";
+                   loadSVG(uri, elem, createExample01);
+               </script>
+            </section>
+             <section><!-- Integration sapce and reconstruction space -->
+                <h4>Alternative Methods</h4><br />
+                <center><div style="width:80%;text-align:left;"><ul>
+                  <li>Gradient adaptive sampling
+                      <ul>
+                          <li>[<a href="ramamoorthi2007">Ramamoorthi et al. 2007</a>]</li>
+                      </ul>
+                  </li><br />
+                  <li>Heuristic adaptive sampling
+                      <ul>
+                          <li>[<a href="hachisuka2009">Hachisuka et al. 2009</a>]</li>
                       </ul>
                   </li>
                </ul></div></center><br />
-                TODO: Show the integration / reconstruction space
+                TODO: images of the methods
             </section>
 
             <!-- Upsampling -->
@@ -121,13 +145,66 @@
                     <object width="100%" data="../../data/svg/course-applications02.svg" type="image/svg+xml"></object>
                 </div>
             </section>
+             <section><!-- Integration sapce and reconstruction space -->
+                <h4>Alternative Methods</h4><br />
+                <center><div style="width:80%;text-align:left;"><ul>
+                  <li>Heuristic upsampling
+                      <ul>
+                          <li>Real-time [<a href="nichols200X">Nichols et al. 200X</a>]</li>
+                          <li>Off-line & resampling [<a href="lehtinen2011">Lehtinen et al. 2011</a>, <a href="lehtinen2012">Lehtinen et al. 2012</a>]</li>
+                      </ul>
+                  </li><br />
+               </ul></div></center><br />
+                TODO: images of the methods
+            </section>
 
             <!-- Adaptive density estimation -->
             <section>
-               <h4>Adaptive Density Estimation</h4>
+               <h4>Adaptive Density Estimation</h4><br />
+               <center><div style="width:80%;text-align:left;"><ul>
+                  <li>Used for Photon Mapping
+                      <ul>
+                          <li>Balance bias and variance using prediction</li>
+                      </ul>
+                  </li><br />
+                  <li>Mathematical insight:
+                      <ul>
+                          <li>Density estimation <em>blurs</em> the ground truth</li>
+                          <li>Low variation of GT in the kernel means low bias</li>
+                          <li>Theoretically: the $ \mbox{bias} \prop  \mbox{Hessian} $</li>
+                      </ul>
+                  </li>
+               </ul></div></center><br />
+            </section>
+            <section>
+               <h4>Adaptive Density Estimation</h4><br />
+                <div style="position:relative;width:100%">
+                <object width="100%" data="../../data/svg/course-applications03.svg" type="image/svg+xml"></object>
+                </div>
+            </section>
+             <section><!-- Talk about Anton's paper APPM -->
+                <h4>Alternative Methods</h4><br />
+                <center><div style="width:80%;text-align:left;"><ul>
+                  <li>Progressive Hessian estimation
+                      <ul>
+                          <li>[<a href="kaplanyan2013">Kaplanyan et al. 2013</a>]</li>
+                      </ul>
+                  </li><br />
+               </ul></div></center><br />
+                TODO: images of the methods
             </section>
 
             <!-- Antialiasing -->
+            <section>
+               <h4>Antialiasing Surface Appearance</h4><br />
+               <center><div style="width:80%;text-align:left;"><ul>
+                  <li>Idea: bound the outgoing radiance frequencies
+                      <ul>
+                          <li>Adapt its variation to the screen resolution</li>
+                      </ul>
+                  </li>
+               </ul></div></center><br />
+            </section>
             <section>
                <h4>Antialiasing Surface Appearance</h4>
                <svg id="antialiasing01" width="800px" height="500px" style="margin-top:70px;"></svg>
@@ -234,6 +311,24 @@
                s.drag(demo01move);
             </script>
             <small>Kernel after one bounce</small>
+            </section>
+            <section><!-- Other antialiasing kernel things? -->
+                <h4>Alternative Methods</h4><br />
+                <center><div style="width:80%;text-align:left;"><ul>
+                    <li>Predict filtering footprint
+                      <ul>
+                          <li>Ray differentials [<a href="Igehy1999">Igehy 1999</a>]</li>
+                          <li>Path differentials [<a href="suykens2001">Suykens and Willems 2001</a>]</li>
+                      </ul>
+                  </li><br />
+                  <li>Antialiasing distant lighting
+                      <ul>
+                          <li>Filtered Importance Sampling [<a href="krivanek2009">Krivanek and Colbert 2009</a>]</li>
+                          <li>Rough transmission [<a href="derousiers2012">De Rousiers et al. 2012</a>]</li>
+                      </ul>
+                  </li><br />
+               </ul></div></center><br />
+                TODO: images of the methods
             </section>
 
             <!-- Break before part2: applications -->

@@ -91,7 +91,7 @@ function addCamera(scene, camera) {
  *       n: { x: [float], y: [float] }
  *    }
  */
-function intersect(ray, object) {
+function intersectPlane(ray, object) {
    var hit = {};
    hit.hit = false;
 
@@ -153,7 +153,7 @@ function raytrace(ray, scene, depth) {
 
    for(var k=0; k<scene.objects.length; k++) {
       var object = scene.objects[k];
-      var tHit = intersect(ray, object);
+      var tHit = intersectPlane(ray, object);
 
       if(tHit.hit && tHit.t < hit.t) {
          hit = tHit;

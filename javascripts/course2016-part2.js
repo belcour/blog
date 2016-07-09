@@ -209,9 +209,9 @@ const createExample01 = function(snap) {
    setData("example01", "f0", 10000);
 
    // Add labels
-   snap.text(150, 225, "Scene");
-   snap.text(440, 225, "(xu) Samples").attr({textAnchor: "middle"});
-   snap.text(670, 225, "Fourier domain at the sensor").attr({textAnchor: "middle"});
+   snap.text(170, 225, "Scene").attr({fontSize: "20px", textAnchor: "middle"});
+   snap.text(440, 225, "(xu) Samples").attr({fontSize: "20px", textAnchor: "middle"});
+   snap.text(670, 225, "Fourier transform").attr({fontSize: "20px", textAnchor: "middle"});
 
    // Add moving elements
    const pixels  = snap.select("#pixels");
