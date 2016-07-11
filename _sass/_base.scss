@@ -238,7 +238,7 @@ ul.iconlist li::before {
 }
 
 ul li.work::before {
-   content: "";
+   content: "\2616";
 }
 
 ul li.space::before {
@@ -247,5 +247,5 @@ ul li.space::before {
 }
 
 ul li.email::before {
-   content: "";
+   content: "\2709";
 }
