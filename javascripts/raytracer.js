@@ -41,8 +41,16 @@ function createScene() {
 //
 //    object:
 //    {
+//       t:  [int] // 1='sphere', 0='plane'
+//
+//       /* for planes */
 //       p1: { x: [float], y: [float] }
 //       p2: { x: [float], y: [float] }
+//
+//       /* for spheres */
+//       c:  {x: [float], y: [float]}
+//       r: [float]
+//
 //       L:  [float] // Emission [optional]
 //       E:  [float] // Exponent [optional]
 //    }
@@ -127,6 +135,29 @@ function intersectPlane(ray, object) {
    return hit;
 }
 
+/* Intersection function with a sphere. Returns a 'hit' objects
+ * containing the principal informatiopn regarding the intersection
+ * (if it exists).
+ */
+function intersectSphere(ray, object) {
+   var hit = {}
+   hit.hit = false;
+
+   // Solve the quadratic form
+   var a = Math.sqrt(dot(ray.d, ray.d));
+   var b = 2*dot(ray.d, sub(ray.o,object.c));
+   var c = dot(sub(ray.o,object.c), sub(ray.o,object.c)) - object.r*object.r;
+   var D = b*b - 4*a*c;
+   if(D >= 0.0) { // Got a hit!
+      hit.hit = true;
+      hit.t = (Math.sqrt(D)-b) / (2*a);
+      hit.p = add(ray.o, mul(hit.t,ray.d));
+      hit.n = normalize(sub(hit.p, object.c));
+   }
+
+   return hit;
+}
+
 /* Sample a 'Phong lobe from the incident direction 'wi', the normal 'n'
  * and the exponent 'exp'. This samples exactly the BRDF so there is no
  * need to multiply by it afterwards.
@@ -153,7 +184,12 @@ function raytrace(ray, scene, depth) {
 
    for(var k=0; k<scene.objects.length; k++) {
       var object = scene.objects[k];
-      var tHit = intersectPlane(ray, object);
+      var tHit;
+      if(object.t == 1) {
+         tHit = intersectSphere(ray, object);
+      } else {
+         tHit = intersectPlane(ray, object);
+      }
 
       if(tHit.hit && tHit.t < hit.t) {
          hit = tHit;
