@@ -22,10 +22,10 @@ Frequency Analysis of Light Transport expresses Physically Based Rendering (PBR)
 
 **Wednesday, 27 August 9am - 10:30am, Room 303 A-C**
 
- + ` 9:00` - Introduction
- + ` 9:10` - Concepts and Implementation ([notes][notes-part1])
- + ` 9:40` - Applications of Frequency Analysis ([notes][notes-part2])
- + `10:25` - Conclusion
+ + ` 9:00` - Introduction ([slides][slides-part0])
+ + ` 9:10` - Concepts and Implementation ([notes][notes-part1], [slides][slides-part1])
+ + ` 9:40` - Applications of Frequency Analysis ([notes][notes-part2], [slides][slides-part2])
+ + `10:25` - Conclusion ([slides][slides-part3])
 
 #### Additional materials
 
@@ -34,6 +34,8 @@ Source code available on github [here][source-code].
 
 [notes-part1]:  {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part1.html
 [notes-part2]:  {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html
-[slides-part1]: {{ site.url | append: site.baseurl }}/slides/siggraph-2016-part1.html
-[slides-part2]: {{ site.url | append: site.baseurl }}/slides/siggraph-2016-part2.html
+[slides-part0]: {{ site.url | append: site.baseurl }}/slides/2016-course/part0.html
+[slides-part1]: {{ site.url | append: site.baseurl }}/slides/2016-course/part1.html
+[slides-part2]: {{ site.url | append: site.baseurl }}/slides/2016-course/part2.html
+[slides-part3]: {{ site.url | append: site.baseurl }}/slides/2016-course/part3.html
 [source-code]:  https://github.com/belcour/CovarianceTracing

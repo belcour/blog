@@ -162,6 +162,18 @@ const samplingNyquist01 = function(snap, coeffs, shifts, x0, y0, w, h, bwCut) {
       var x  = x0+w*dx
       var dy = evalSignalNyquist01(coeffs, shifts, bwCut, dx);
       var y  = y0 - 0.5*h - 0.5*h*(1-dy)/ymax;
+
+
+      if(k == Ns/2+1) {
+         var dk  = w/Ns;
+         var dy2 = evalSignalNyquist01(coeffs, shifts, bwCut, dx+dk);
+         var y2  = y0 - 0.5*h - 0.5*h*(1-dy2)/ymax;
+         snap.polyline([x, y0, x, y0-h-10]).attr({opacity: 0.5, stroke: "#0000ff", strokeWidth: 2});
+         snap.polyline([x+dk, y0, x+dk, y0-h-10]).attr({opacity: 0.5, stroke: "#0000ff", strokeWidth: 2});
+         snap.polyline([x, y0-h, x+dk, y0-h]).attr({opacity: 0.5, stroke: "#0000ff", strokeWidth: 2});
+         snap.text(x+dk/2, y0-h-10, "d").attr({textAnchor: "middle", fontSize: "0.6em"});
+      }
+
       snap.circle(x, y, 5).attr({fill: "#ffffff", fillOpacity: 0, stroke: "#ff0000", strokeWidth: 2});
    }
 }
