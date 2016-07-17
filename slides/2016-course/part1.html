@@ -458,40 +458,6 @@ Cov = Cov + Occ
                   </div>
                </center>
                <script type="text/javascript">
-                function curvOperator01Step00(snap) {
-                  var layer  = snap.select("#layer1");
-                  var r = 1000;
-                  var sphere = snap.circle(233, 480+r, 170+r).attr({fillOpacity: 0, stroke: "#333", strokeWidth: "4px", id: "sphere"});//snap.select("#sphere");
-                  var quad   = snap.rect(sphere.attr("cx")-150, 300, 300, 150).attr({fill: "#fff"});
-                  sphere.attr({clip: quad});
-
-                  var init   = parseFloat(sphere.attr("r"));
-                  var initcy = parseFloat(sphere.attr("cy"));
-                  function dragInset(dx, dy, x, y, event) {
-                    var dr = 10*(dx-dy);
-                    var r  = init + dr;
-                    if(r > 120) {
-                      sphere.attr({r: r, cy: initcy+dr});
-                    }
-                  }
-                  function dragStart(x, y, event) {
-                    init   = parseFloat(sphere.attr("r"));
-                    initcy = parseFloat(sphere.attr("cy"));
-                  }
-                  function dragEnd(x, y, event) {
-                  }
-                  snap.drag(dragInset, dragStart, dragEnd);
-
-                  // WebGL code
-                  var canvas = document.getElementById("draw_cov_curv-cv");
-                  if(!canvas) {
-                      alert("Impossible de récupérer le canvas");
-                  }
-
-                  // Align the rendering canvas with the axis-rectangle
-                  var box = snap.select("#rect4136");
-                  AlignCanvasWithSVG(canvas, box, {x: .5, y: -.5});
-                }
                   loadSVG("data/svg/cov_curv.svg", "#draw_cov_curv-01", curvOperator01Step00);
                </script>
             </section>
@@ -589,16 +555,40 @@ Cov = inverse(inverse(Cov) + B)
                <h4>Transmission Operator</h4><br/>
                <center>
                   <div style="position:relative;width:900px;height:500px;">
-                  <canvas id="draw_cov_bsdf-gl" style="position:absolute;"></canvas>
-                  <svg id="draw_cov_bsdf-cv" width="900px" height="500px" style="position:absolute;top:0px;left:0px;"></svg></div>
-                  <!--<div style="font-size:0.7em;">BRDF roughness: 0 <input style="vertical-align: middle;" type="range" min="0.0001" max="0.05" value="0.01" step="0.0005" id="draw_cov_brdf-slider" /> 0.05</div>-->
+                  <canvas id="draw_cov_btdf-cv" style="position:absolute;"></canvas>
+                  <svg id="draw_cov_btdf-svg" width="900px" height="500px" style="position:absolute;top:0px;left:0px;"></svg></div>
                </center>
                <script type="text/javascript">
-                  loadSVG("data/svg/cov_bsdf.svg", "#draw_cov_bsdf-cv", null);
+                  loadSVG("data/svg/cov_bsdf.svg", "#draw_cov_btdf-svg", btdfOperator01Step00);
                </script>
             </section>
             <section>
                <h4>Transmission Operator</h4><br/>
+               <div style="width:80%">
+               <ul>
+                 <li>Snell laws scale the angular component
+                    <ul class="sublist">
+                      <li>Critical angle as a windowing (increase freq. near TIR)</li>
+                      <li>Rough refraction as low pass filter on top</li>
+                    </ul>
+                  </li>
+               </ul>
+               </div>
+
+               <svg id="operator-btdf-01" width="400px" height="250px"></svg>
+               <script>
+                 var snap  = Snap("#operator-btdf-01");
+                 var frame = CreateFrame(snap, 100, 50, 200, 200);
+                 var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, -0.9, 0, 0.1, 0, 0));
+               </script>
+
+               <pre style="width:60%;" class="fragment">
+               <code class="matlab">
+% Snell interface with e=n1/n2
+Tf = [1, 0; 0, e*i.z/t.z]
+Cov = Tf' * Cov * Tf
+               </code>
+               </pre>
             </section>
 
 
@@ -618,9 +608,49 @@ Cov = inverse(inverse(Cov) + B)
             <section>
               <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-10px;"><img src="../../data/images/acm.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-5px;">&nbsp;<a href="#url(durand2005)">Soler et al. 2009</a></span>
                <h4>Lens Operator</h4><br/>
+               <svg id="cov-lens-svg" width="900px" height="350px"></svg><br />
+               <script type="text/javascript">
+                  loadSVG("data/svg/cov_lens.svg", "#cov-lens-svg", null);
+               </script>
+               <div style="width:80%">
+               <ul>
+                 <li>A compound of already seen operators!
+                    <ul class="sublist">
+                      <li>Curvature and transmission in the lens</li>
+                      <li>Travel to the sensor</li>
+                    </ul>
+                  </li>
+               </ul>
+               </div>
             </section>
             <section>
                <h4>Lens Operator</h4><br/>
+               <div style="width:80%">
+               <ul>
+                 <li>For thin lenses, it simplifies to
+                    <ul class="sublist">
+                      <li>Curvature plus Travel operators</li>
+                    </ul>
+                  </li>
+               </ul>
+               </div>
+
+               <svg id="operator-lens-01" width="400px" height="250px"></svg>
+               <script>
+                 var snap  = Snap("#operator-lens-01");
+                 var frame = CreateFrame(snap, 100, 50, 200, 200);
+                 var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, -0.9, 0, 0.1, 0, 0));
+               </script>
+
+               <pre style="width:60%;" class="fragment">
+               <code class="matlab">
+% Lens with focal length f and distance to sensor d
+C   = [1, f; 0, 1]
+Tr  = [1, 0; d, 1]
+L   = C * Tr
+Cov = L' * Cov * L
+               </code>
+               </pre>
             </section>
 
 
@@ -690,6 +720,32 @@ Cov = {sxx, sxu, sxt;
             </section>
             <section>
                <h4>Motion Operator</h4><br/>
+               <div style="width:80%">
+               <ul>
+                 <li>Motion is a shear in space/angle/time
+                    <ul class="sublist">
+                      <li>Our local Fourier Transform window follows the motion</li>
+                      <li>Need to apply the operator twice (before and after interaction)</li>
+                    </ul>
+                  </li>
+               </ul>
+               </div>
+
+               <svg id="operator-motion-01" width="400px" height="250px"></svg>
+               <script>
+                 var snap  = Snap("#operator-motion-01");
+                 var frame = CreateFrame(snap, 100, 50, 200, 200);
+                 var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, -0.9, 0, 0.1, 0, 0));
+               </script>
+
+               <pre style="width:60%;" class="fragment">
+               <code class="matlab">
+% Occlusion with moving object of speed 'vx'
+M   = [1, 0, vx; 0, 1, 0; 0, 0, 1]
+O   = [o, 0, 0; 0, 0, 0; 0, 0, 0]
+Cov = M' * (M' * Cov * M + O) * M
+               </code>
+               </pre>
             </section>
 
 
@@ -708,9 +764,23 @@ Cov = {sxx, sxu, sxt;
             </section>
             <section>
                <h4>Absorption Operator</h4><br/>
+               <div style="width:80%">
+               <ul>
+                 <li>Same operator as occlusion
+                    <ul class="sublist">
+                      <li>However not an infinite bandwidth</li>
+                    </ul>
+                  </li>
+               </ul>
+               </div>
             </section>
             <section>
                <h4>Scattering Operator</h4><br/>
+               <div style="width:80%">
+               <ul>
+                 <li>Same operator as BRDF</li>
+               </ul>
+               </div>
             </section>
 
             <!-- Summary of all the operators -->

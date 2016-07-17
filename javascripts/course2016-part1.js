@@ -1149,3 +1149,89 @@ var occlOperator01Step00 = function(snap) {
       }
    }, false);
 }
+
+
+
+
+/* Curvature operators */
+function curvOperator01Step00(snap) {
+   var layer  = snap.select("#layer1");
+   var r = 1000;
+   var sphere = snap.circle(233, 480+r, 170+r).attr({fillOpacity: 0, stroke: "#333", strokeWidth: "4px", id: "sphere"});//snap.select("#sphere");
+   var quad   = snap.rect(sphere.attr("cx")-150, 300, 300, 150).attr({fill: "#fff"});
+   sphere.attr({clip: quad});
+
+   var init   = parseFloat(sphere.attr("r"));
+   var initcy = parseFloat(sphere.attr("cy"));
+
+   // Raytracing code
+   var canvas = document.getElementById("draw_cov_curv-cv");
+   if(!canvas) {
+   alert("Impossible de récupérer le canvas");
+   }
+
+   // Align the rendering canvas with the axis-rectangle
+   var box = snap.select("#rect4136");
+   AlignCanvasWithSVG(canvas, box, {x: .5, y: -.5});
+
+   // Fix the resolution of the image
+   var h = 128, w = 128;
+   canvas.width  = w;
+   canvas.height = h;
+
+   // TODO create a real curved scene
+   var scene = createScene();
+   addObject(scene, {p1 : {x: 10.0, y: -1}, p2 : {x: 10.0, y: 1}, L : 1.0});
+   addCamera(scene, {o: {x: -0.5, y: 1.5}, d: {x: 1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
+   render(canvas, scene, 0);
+
+
+   function dragInset(dx, dy, x, y, event) {
+     var dr = 10*(dx-dy);
+     var r  = init + dr;
+     if(r > 120) {
+      sphere.attr({r: r, cy: initcy+dr});
+
+      scene.objects[0].p1.x = r/1000;
+      scene.objects[0].p2.x = r/1000;
+      render(canvas, scene, 0);
+     }
+   }
+   function dragStart(x, y, event) {
+     init   = parseFloat(sphere.attr("r"));
+     initcy = parseFloat(sphere.attr("cy"));
+   }
+   function dragEnd(x, y, event) {
+   }
+   snap.drag(dragInset, dragStart, dragEnd);
+
+}
+
+
+
+
+/* Curvature operators */
+function btdfOperator01Step00(snap) {
+   var layer  = snap.select("#layer1");
+
+   // Raytracing code
+   var canvas = document.getElementById("draw_cov_btdf-cv");
+   if(!canvas) {
+   alert("Impossible de récupérer le canvas");
+   }
+
+   // Align the rendering canvas with the axis-rectangle
+   var box = snap.select("#rect4136");
+   AlignCanvasWithSVG(canvas, box, {x: .5, y: -.5});
+
+   // Fix the resolution of the image
+   var h = 128, w = 128;
+   canvas.width  = w;
+   canvas.height = h;
+
+   // TODO create a real transmitive material
+   var scene = createScene();
+   addObject(scene, {p1 : {x: 10.0, y: -1}, p2 : {x: 10.0, y: 1}, L : 1.0});
+   addCamera(scene, {o: {x: -0.5, y: 1.5}, d: {x: 1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
+   render(canvas, scene, 0);
+}
