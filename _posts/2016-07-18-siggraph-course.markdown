@@ -14,7 +14,7 @@ javascripts:
 
 <center style="font-size:2em;">
 <div style="position:relative;width:512px;height:512px;margin:0;">
-<img id="local-analysis-01-img" src="{{ site.url | append: site.baseurl }}/data/images/dragon-01.png" width="512" height="512" style="border-width:0px;position:absolute;z-index:-1;margin:0px;top:0;left:0;" />
+<img id="local-analysis-01-img" src="./data/images/dragon-01.png" width="512" height="512" style="border-width:0px;position:absolute;z-index:-1;margin:0px;top:0;left:0;" />
 <svg viewBox="0 0 512 512" style="width:512px;height:512px;position:absolute;z-index:1;top:0;left:0;overflow:visible;" id="local-analysis-01"></svg>
 <canvas id="local-analysis-01-fft1" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
 <canvas id="local-analysis-01-fft2" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
