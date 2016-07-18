@@ -64,7 +64,7 @@
 
             <!-- Adaptive sampling and reconstruction -->
             <section>
-               <h4>Adaptive Sampling and Reconstruction</h4><br />
+               <h4>Adaptive Sampling and Reconstruction</h4><br /><br />
                <center><div style="width:80%;text-align:left;"><ul>
                   <li>Direct application of Nyquist/Shannon:
                     <ul>
@@ -72,33 +72,65 @@
                         <li>Reconstruct using a kernel (usualy Gaussian)</li>
                     </ul>
                   </li><br />
-                  <li>Share samples across pixels</li><br />
-                  <li>Avoid over-sampling when not needed</li>
+                  <li class="fragment" fragment-id="1">Share samples across pixels</li><br />
+                  <li class="fragment" fragment-id="1">Avoid over-sampling when not needed</li>
                </ul></div></center><br />
             </section>
             <section><!-- Integration sapce and reconstruction space -->
-                <h4>Adaptive Sampling and Reconstruction</h4><br />
-                <center><div style="width:80%;text-align:left;"><ul>
+                <h4>Adaptive Sampling and Reconstruction</h4>
+                <center style="padding-top:20px;"><div style="width:80%;text-align:left;"><ul>
                   <li>However a specific context:
                       <ul>
                           <li>Reconstruct in pixel space</li>
                           <li>Integrate in lens/light/time space</li>
                       </ul>
                   </li>
+               </ul></div></center>
+               <center style="padding-top:10px;transform:scale(1.0);">
+                   <svg id="adaptive-sampling-01-svg" width="800px" height="235px"></svg>
+               </center>
+               <script type="text/javascript" >
+                   var uri  = "data/svg/course-integration02.svg";
+                   var elem = "#adaptive-sampling-01-svg";
+
+                   function adaptiveSampling01(snap) {
+                     snap.select("#samples").attr({class: 'fragment'});
+                   }
+
+                   loadSVG(uri, elem, adaptiveSampling01);
+               </script>
+            </section>
+            <section><!-- Integration sapce and reconstruction space -->
+                <h4>Adaptive Sampling and Reconstruction</h4>
+                <center style="padding-top:20px;"><div style="width:80%;text-align:left;"><ul>
+                  <li>Algorithm:
+                      <ol type="I">
+                          <li>Compute bandwidth per pixel</li>
+                          <li>Sample XYUVT space</li>
+                          <li>Integrate in UVT space & reconstruct in XY sapce</li>
+                      </ol>
+                  </li>
                </ul></div></center><br />
-                TODO: Show the integration / reconstruction space
+               <center style="padding-top:10px;transform:scale(1.0);">
+                   <svg id="adaptive-sampling-02-svg" width="1066px" height="235px"></svg>
+               </center>
+               <script type="text/javascript" >
+                   var uri  = "data/svg/course-applications01.svg";
+                   var elem = "#adaptive-sampling-02-svg";
+                   loadSVG(uri, elem, null);
+               </script>
             </section>
             <section><!-- Integration sapce and reconstruction space -->
                 <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-20px;"><img src="../../data/images/acm.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-5px;">&nbsp;<a href="#url(durand2005)">Soler et al. 2009</a></span>
-                <h4>Adaptive Sampling and Reconstruction</h4><br />
-                <center><div style="width:80%;text-align:left;"><ul>
+                <h4>Adaptive Sampling and Reconstruction</h4>
+                <center style="padding-top:20px;"><div style="width:80%;text-align:left;"><ul>
                   <li>Example of lens integration
                       <ul>
                           <li>Operators: Reflection + Travel + Occlusion + Lens</li>
                           <li>Adapt the sampling of the lens and in screen space</li>
                       </ul>
                   </li>
-               </ul></div></center>
+               </ul></div></center><br />
                <center style="padding-top:70px;transform:scale(1.4);">
                    <svg id="example01-svg" width="800px" height="235px"></svg>
                </center>
@@ -109,8 +141,8 @@
                </script>
             </section>
              <section><!-- Integration sapce and reconstruction space -->
-                <h4>Alternative Methods</h4><br />
-                <center><div style="width:80%;text-align:left;"><ul>
+                <h4>Alternative Methods</h4>
+                <center style="padding-top:20px;"><div style="width:80%;text-align:left;"><ul>
                   <li>Gradient adaptive sampling
                       <ul>
                           <li>[<a href="ramamoorthi2007">Ramamoorthi et al. 2007</a>]</li>
@@ -122,7 +154,18 @@
                       </ul>
                   </li>
                </ul></div></center><br />
-                TODO: images of the methods
+               <center><div style="font-size:0.5em;width:50%;">
+                  <div style="float:left;">
+                     <img src="../../data/images/course-adaptive-gradient.png" height="256px" /><br />
+                     [<a href="ramamoorthi2007">Ramamoorthi et al. 2007</a>]
+                  </div>
+                  <div style="float:right;">
+                     <img style="border:0px;box-shadow:0px 0px;" src="../../data/svg/course-adaptive-hachisuka.svg" height="258px" /><br />
+                     [<a href="hachisuka2009">Hachisuka et al. 2009</a>]
+                  </div>
+
+               </div>
+               </center>
             </section>
 
             <!-- Upsampling -->
@@ -150,7 +193,7 @@
                 <center><div style="width:80%;text-align:left;"><ul>
                   <li>Heuristic upsampling
                       <ul>
-                          <li>Real-time [<a href="nichols200X">Nichols et al. 200X</a>]</li>
+                          <li>Real-time [<a href="nichols2009">Nichols et al. 2009</a>]</li>
                           <li>Off-line & resampling [<a href="lehtinen2011">Lehtinen et al. 2011</a>, <a href="lehtinen2012">Lehtinen et al. 2012</a>]</li>
                       </ul>
                   </li><br />
