@@ -1022,6 +1022,26 @@ var occlOperator01Step00 = function(snap) {
    canvas.width  = w;
    canvas.height = h;
 
+   var scene = createScene();
+   addObject(scene, {p1 : {x: 10.0, y: -1000}, p2 : {x: 10.0, y: 1000}, L : 1.0});
+
+   // addObject(scene, {p1 : {x: 1.0, y: 0.0}, p2 : {x: 2.0, y: 0.0}, L : 0.0});
+   // addObject(scene, {p1 : {x: 2.0, y: 0.0}, p2 : {x: 2.0, y: 2.0}, L : 0.0});
+   // addObject(scene, {p1 : {x: 2.0, y: 2.0}, p2 : {x: 1.0, y: 2.0}, L : 0.0});
+   // addObject(scene, {p1 : {x: 1.0, y: 2.0}, p2 : {x: 1.0, y: 0.0}, L : 0.0});
+   var x = [-1.4142, 0.0, 1.4142, 0.0];
+   var y = [0.0, 1.4142, 0.0, -1.4142];
+   addObject(scene, {p1 : {x: x[0], y: y[0]}, p2 : {x: x[1], y: y[1]}, L : 0.0});
+   addObject(scene, {p1 : {x: x[1], y: y[1]}, p2 : {x: x[2], y: y[2]}, L : 0.0});
+   addObject(scene, {p1 : {x: x[2], y: y[2]}, p2 : {x: x[3], y: y[3]}, L : 0.0});
+   addObject(scene, {p1 : {x: x[3], y: y[3]}, p2 : {x: x[0], y: y[0]}, L : 0.0});
+
+   addCamera(scene, {o: {x: -0.5, y: 1.5}, d: {x: 1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
+
+   var distToLight = 1.3;
+   scene.camera.o.x = distToLight;
+
+
    var fourier_bt_press = false;
    function render_fourier_occl() {
       FFT.init(w);
@@ -1048,25 +1068,6 @@ var occlOperator01Step00 = function(snap) {
       SpectrumViewer.render(re, im, false, 10);
    }
 
-   var scene = createScene();
-   addObject(scene, {p1 : {x: 10.0, y: -1000}, p2 : {x: 10.0, y: 1000}, L : 1.0});
-
-   // addObject(scene, {p1 : {x: 1.0, y: 0.0}, p2 : {x: 2.0, y: 0.0}, L : 0.0});
-   // addObject(scene, {p1 : {x: 2.0, y: 0.0}, p2 : {x: 2.0, y: 2.0}, L : 0.0});
-   // addObject(scene, {p1 : {x: 2.0, y: 2.0}, p2 : {x: 1.0, y: 2.0}, L : 0.0});
-   // addObject(scene, {p1 : {x: 1.0, y: 2.0}, p2 : {x: 1.0, y: 0.0}, L : 0.0});
-   var x = [-1.4142, 0.0, 1.4142, 0.0];
-   var y = [0.0, 1.4142, 0.0, -1.4142];
-   addObject(scene, {p1 : {x: x[0], y: y[0]}, p2 : {x: x[1], y: y[1]}, L : 0.0});
-   addObject(scene, {p1 : {x: x[1], y: y[1]}, p2 : {x: x[2], y: y[2]}, L : 0.0});
-   addObject(scene, {p1 : {x: x[2], y: y[2]}, p2 : {x: x[3], y: y[3]}, L : 0.0});
-   addObject(scene, {p1 : {x: x[3], y: y[3]}, p2 : {x: x[0], y: y[0]}, L : 0.0});
-
-   addCamera(scene, {o: {x: -0.5, y: 1.5}, d: {x: 1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
-
-   var distToLight = 1.3;
-   scene.camera.o.x = distToLight;
-
    render(canvas, scene, 0);
    if(fourier_bt_press) {
       render_fourier_occl();
@@ -1077,7 +1078,10 @@ var occlOperator01Step00 = function(snap) {
    var text = snap.text(bbox.cx, bbox.y+bbox.height+40, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
    var tbb  = text.getBBox();
    var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5/*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
-   var g    = snap.g(rect, text).click(function() {
+   var g    = snap.g(rect, text);
+
+
+   g.click(function() {
       fourier_bt_press = !fourier_bt_press;
       render(canvas, scene, 0);
       if(fourier_bt_press) {
@@ -1185,21 +1189,95 @@ function curvOperator01Step00(snap) {
 
    // TODO create a real curved scene
    var scene = createScene();
-   addObject(scene, {p1 : {x: 10.0, y: -1}, p2 : {x: 10.0, y: 1}, L : 1.0});
-   addCamera(scene, {o: {x: -0.5, y: 1.5}, d: {x: 1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
+   // addObject(scene, {p1 : {x: -1.0, y: 1.0}, p2 : {x: 1.0, y: 1.0}, L : 1.0});
+   // addCamera(scene, { o  : {x:  0.0, y:  0.0}, 
+   //                    d  : {x:  0.0, y:  1.0},
+   //                    up : {x:  1.0, y:  0.0},
+   //                    t  : {x:  1.0, y:  0.0},
+   //                    r  : 100.0,
+   //                    scale : 1.0});
+   var lY = 5;
+   var exponent = 1.0E8;
+   //addObject(scene, {p1 : {x: -10.0, y: 0}, p2 : {x: 10.0, y: 0}, E : exponent});
+   var r = 100;
+   addObject(scene, {t: 1, c: {x: 0, y: -r}, r: r, E : exponent});
+   addObject(scene, {p1 : {x: -1, y: lY}, p2 : {x: 1, y: lY}, L : 1.0});
+   addCamera(scene, {o: {x: 0.0, y: 0.1}, d: {x: 0.0, y: -1.0}, up : {x: 1.0, y:0.0}, scale: 0.5});
+
+
+
+   var fourier_bt_press = false;
+   function render_fourier_curv() {
+      FFT.init(w);
+      FrequencyFilter.init(w);
+      var src = canvas.getContext('2d').getImageData(0, 0, w, h);
+      var dat = src.data;
+      var re = [], im = [];
+      for(var y=0; y<h; y++) {
+         var i = y*w;
+         for(var x=0; x<w; x++) {
+            var W = 0.25 * (1.0 - Math.cos(2.0*Math.PI * y/(h-1))) * (1.0-Math.cos(2.0*Math.PI * x/(w-1)));
+            var L = dat[(i << 2) + (x << 2) + 0]
+                  + dat[(i << 2) + (x << 2) + 1]
+                  + dat[(i << 2) + (x << 2) + 2];
+            re[i + x] = W*L;
+            im[i + x] = 0.0;
+         }
+      }
+      FFT.fft2d(re, im);
+      FrequencyFilter.swap(re, im);
+
+      var occl_spectrum = document.querySelector('#draw_cov_curv-cv').getContext('2d');
+      SpectrumViewer.init(occl_spectrum);
+      SpectrumViewer.render(re, im, false, 10);
+   }
+
    render(canvas, scene, 0);
+   if(fourier_bt_press) {
+      render_fourier_curv();
+   }
+
+   // Create the clickable button
+   var bbox = box.getBBox();
+   var text = snap.text(bbox.cx, bbox.y+bbox.height+60, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.6em"});
+   var tbb  = text.getBBox();
+   var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5/*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
+   var g    = snap.g(rect, text);
+
+
+   g.click(function() {
+      fourier_bt_press = !fourier_bt_press;
+      render(canvas, scene, 0);
+      if(fourier_bt_press) {
+            text.attr({text: "Apply inverse Fourier Transform"});
+            var tbb  = text.getBBox();
+            rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
+            render_fourier_curv();
+      } else {
+            text.attr({text: "Apply Fourier Transform"});
+            var tbb  = text.getBBox();
+            rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
+      }
+   });
+   snap.select("#layer1").append(g);
+
+
 
 
    function dragInset(dx, dy, x, y, event) {
-     var dr = 10*(dx-dy);
-     var r  = init + dr;
-     if(r > 120) {
-      sphere.attr({r: r, cy: initcy+dr});
+      var dr = 10*(dx-dy);
+      var r  = init + dr;
+      if(r > 140) {
+         sphere.attr({r: r, cy: initcy+dr});
 
-      scene.objects[0].p1.x = r/1000;
-      scene.objects[0].p2.x = r/1000;
-      render(canvas, scene, 0);
-     }
+         scene.objects[0].c.y = -r / 100;
+         scene.objects[0].r   =  r / 100;
+         //scene.camera.r = r / 100.0;
+         render(canvas, scene, 0);
+         if(fourier_bt_press) {
+            render_fourier_curv();
+         }
+      }
    }
    function dragStart(x, y, event) {
      init   = parseFloat(sphere.attr("r"));
