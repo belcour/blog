@@ -17,7 +17,11 @@ function setData(ctx, id, dat) {
 }
 
 const loadSVG = function(uri, elem, call) {
-   Snap.load(getData("general", "baseurl") + uri, function (f) {
+   var base = getData("general", "baseurl");
+   if(base == undefined) {
+      base = "";
+   }
+   Snap.load(base + uri, function (f) {
       var s = Snap(elem);
       s.append(f);
 
