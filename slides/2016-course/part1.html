@@ -481,7 +481,7 @@ Cov = Cov + Occ
                   const M = c.transform().localMatrix;
                   Snap.animate(start, end, function(val) {
                     c.transform(M);
-                    var temp = Snap.matrix(1, 0, -val, 1, 0, 0);
+                    var temp = Snap.matrix(1, 0, val, 1, 0, 0);
                     c.transform(c.transform().localMatrix.add(temp));
                   }, 500);
                 }
