@@ -47,7 +47,8 @@ function CreateFrame(snap, posX, posY, width, height) {
    elems = tex2.selectAll("tspan");
    elems[1].attr({baselineShift: "-10%", fontSize: "0.7em"});
 
-   return rect
+   var g = snap.g(rect, lin1, lin2, tex1, tex2);
+   return g;
 }
 
 function CreateBacket(snap, p1, p2, dwidth, dspacing) {
@@ -76,7 +77,9 @@ function CreateBacket(snap, p1, p2, dwidth, dspacing) {
                     ).attr({ stroke: "#000000", fillOpacity: 0, strokeWidth: "2px"});
 }
 
-function CreateCovariance(snap, elem, matrix) {
+function CreateCovariance(snap, frame, matrix) {
+   var elem = frame.select("rect");
+   if(elem == undefined) { elem = frame; }
    var Tr = elem.transform().diffMatrix;
    var BB = elem.getBBox();
    var cx = Tr.x(BB.cx, BB.cy);
