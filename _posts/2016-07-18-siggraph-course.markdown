@@ -36,7 +36,7 @@ document.getElementById("local-analysis-01-img").onload = function() {
 
 #### Course description
 
-Frequency Analysis of Light Transport expresses Physically Based Rendering (PBR) using signal processing tools. It is thus tailored to predict sampling rate, perform denoising, perform anti-aliasing, etc. Many method have been proposed to deal with specific cases of light transport (motion, lenses, etc). This course aims to introduce concepts and present practical application scenarios of frequency analysis of light transport in a unified context. To ease the understanding of theoretical elements, frequency analysis will be introduced in pair with an implementation.
+Frequency Analysis of Light Transport expresses Physically Based Rendering (PBR) using signal processing tools. It is thus tailored to predict sampling rate, perform denoising, perform anti-aliasing, etc. Many method have been proposed to deal with specific cases of light transport (motion, lenses, etc). This course aims to introduce concepts and present practical application scenarii of frequency analysis of light transport in a unified context. To ease the understanding of theoretical elements, frequency analysis will be introduced in pair with an implementation.
 
 #### Schedule
 
