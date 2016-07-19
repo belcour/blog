@@ -242,7 +242,17 @@ function raytrace(ray, scene, depth) {
 
             var wo;
             if(object.i == 1) {
-               wo = ray.d;
+
+               var eta  = 1.0/object.n;
+               var dNI  = dot(hit.n, ray.d);
+              
+               var k    = 1.0 - eta*eta*(1.0 - dNI*dNI);
+
+               if(k < 0) { return 0.0; }
+
+               var zeta = eta*dNI + Math.sqrt(k);
+               wo = sub(mul(eta, ray.d), mul(zeta, hit.n));
+
             } else {
                wo = sample(wi, hit.n, object.E);
             }

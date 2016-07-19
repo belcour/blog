@@ -1293,11 +1293,11 @@ function curvOperator01Step00(snap) {
 
 
 /* Curvature operators */
-function btdfOperator01Step00(snap) {
+function bsdfOperator01Step00(snap) {
    var layer  = snap.select("#layer1");
 
    // Raytracing code
-   var canvas = document.getElementById("draw_cov_btdf-cv");
+   var canvas = document.getElementById("draw_cov_bsdf-cv");
    if(!canvas) {
    alert("Impossible de récupérer le canvas");
    }
@@ -1313,7 +1313,70 @@ function btdfOperator01Step00(snap) {
 
    // TODO create a real transmitive material
    var scene = createScene();
-   addObject(scene, {p1 : {x: 10.0, y: -1}, p2 : {x: 10.0, y: 1}, L : 1.0});
-   addCamera(scene, {o: {x: -0.5, y: 1.5}, d: {x: 1.0, y: 0.0}, up : {x: 0.0, y:1.0}});
-   render(canvas, scene, 0);
+   addObject(scene, {p1 : {x: -1, y: 5}, p2 : {x: 1, y: 5}, L : 1.0});
+   addObject(scene, {i: 1, n: 1.0, p1 : {x: -10.0, y: 1}, p2 : {x: 10.0, y: 1}, E : 1000000.0});
+   addCamera(scene, {o: {x: 0, y: 0}, d: {x: 0.0, y: 1.0}, up : {x: 1.0, y: 0.0}});
+
+   var fourier_bt_press = false;
+
+   // Function to render the image and apply the Fourier transform if necessary
+   function render_scene_bsdf(canvas, scene) {
+      render(canvas, scene, 0);
+
+      if(fourier_bt_press) {
+         const w = canvas.width,
+               h = canvas.width;
+         FFT.init(w);
+         FrequencyFilter.init(w);
+         var src = canvas.getContext('2d').getImageData(0, 0, w, h);
+         var dat = src.data;
+         var re = [], im = [];
+         for(var y=0; y<h; y++) {
+            var i = y*w;
+            for(var x=0; x<w; x++) {
+               var W = 0.25 * (1.0 - Math.cos(2.0*Math.PI * y/(h-1))) * (1.0-Math.cos(2.0*Math.PI * x/(w-1)));
+               var L = dat[(i << 2) + (x << 2) + 0]
+                     + dat[(i << 2) + (x << 2) + 1]
+                     + dat[(i << 2) + (x << 2) + 2];
+               re[i + x] = W*L;
+               im[i + x] = 0.0;
+            }
+         }
+         FFT.fft2d(re, im);
+         FrequencyFilter.swap(re, im);
+
+         var tr_spectrum = document.querySelector('#draw_cov_bsdf-cv').getContext('2d');
+         SpectrumViewer.init(tr_spectrum);
+         SpectrumViewer.render(re, im, false, 15);
+      }
+   }
+
+   render_scene_bsdf(canvas, scene);
+
+   var bbox = box.getBBox();
+   var text = snap.text(bbox.cx, bbox.y+bbox.height+60, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.6em"});
+   var tbb  = text.getBBox();
+   var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5 /*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
+   var g    = snap.g(rect, text).click(function() {
+      fourier_bt_press = !fourier_bt_press;
+      render_scene_bsdf(canvas, scene);
+      if(fourier_bt_press) {
+            text.attr({text: "Apply inverse Fourier Transform"});
+            var tbb  = text.getBBox();
+            rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
+      } else {
+            text.attr({text: "Apply Fourier Transform"});
+            var tbb  = text.getBBox();
+            rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
+      }
+   });
+   snap.select("#layer1").append(g);
+
+
+   // Slider
+   var slider = document.getElementById("draw_cov_bsdf-slider");
+   slider.onchange = function(value) {
+      scene.objects[1].n = this.value;
+      render_scene_bsdf(canvas, scene, 0);
+   }
 }
