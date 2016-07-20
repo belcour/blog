@@ -50,7 +50,7 @@ simulation or to adapt the sampling budget locally.
   <td style="vertical-align:top;"><b>Interactive Rendering of Acquired Materials on Dynamic Geometry Using Frequency Analysis</b> <br />
       Mahdi Bagher, Cyril Soler, Kartic Subr, Laurent Belcour, Nicolas Holzschuch<br />
       <em>IEEE Transactions on Visualization and Computer Graphics</em><em>, 2013, 19(5),
-      <a href="https://hal.archives-ouvertes.fr/hal-00814104v1/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-00814104v1/bibtex">bib</a> <a href="https://hal.archives-ouvertes.fr/hal-00652066v4">I3D paper</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-00814104v1/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-00814104v1/bibtex">bib</a> <a href="https://hal.archives-ouvertes.fr/hal-00652066v4">I3D paper</a> <a href="https://hal.archives-ouvertes.fr/hal-00652066v4/file/Final_Video-11-Apr-2012_QT_5Mbps.mov">video</a>
   </em></td>
 </tr>
 </table>
