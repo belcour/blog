@@ -407,15 +407,13 @@ Cov = Tr' * Cov * Tr
             </section>
             <section>
                <h4>Visibility Operator</h4><br/>
-               <div style="width:60%">
-               <ul>
+               <center><div style="width:80%;text-align:left;"><ul>
                  <li>Add frequencies in the spatial domain
                     <ul>
                        <li>Has infinite bandwidth!</li>
                     </ul>
                  </li>
-               </ul>
-               </div>
+               </ul></div></center>
                <svg id="operator-occl-02" width="400px" height="250px"></svg>
                <script>
                  var snap  = Snap("#operator-occl-02");
@@ -436,10 +434,16 @@ Cov = Cov + Occ
             <section>
                <h4>Shading Operator<strong>s</strong></h4><br/>
                <center><div style="width:80%;text-align:left;"><ul>
-                 <li>Shading requires to decompose:
+                 <li>Shading requires to decompose
                    <ul>
                      <li>Final travel to the surface (projection)</li>
                      <li>Material (Textures / BSDF)</li>
+                   </ul>
+                 </li><br />
+                 <li class="fragment">Elements we won't cover
+                   <ul>
+                     <li>Foreshortenning scale the spatial componnent</li>
+                     <li>Texture increase the spatial componnent</li>
                    </ul>
                  </li>
                </ul></div></center>

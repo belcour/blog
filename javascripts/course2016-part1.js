@@ -829,8 +829,13 @@ var travelOperator01Step00 = function(snap) {
       render_fourier_travel();
    }
 
-   var text = snap.text(bbox.cx, bbox.y+bbox.height+40, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
+   CreateFourierButton(snap, box);
+   var text = snap.text(0, 0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
    var tbb  = text.getBBox();
+   tbb.x      = -100;
+   tbb.y      = -15;
+   tbb.width  = 200;
+   tbb.height = 20;
    var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5/*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
    var g    = snap.g(rect, text).click(function() {
       fourier_bt_press = !fourier_bt_press;
@@ -846,6 +851,8 @@ var travelOperator01Step00 = function(snap) {
             rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
       }
    });
+   var px = bbox.cx, py = bbox.y+bbox.height+40;
+   g.transform(Snap.matrix(1, 0, 0, 1, px, py));
    snap.select("#layer1").append(g);
 
    // SVG drawing code
