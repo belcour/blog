@@ -107,5 +107,30 @@ simulation or to adapt the sampling budget locally.
       <a href="https://hal.archives-ouvertes.fr/hal-01083366/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01083366/bibtex">bib</a>
   </td>
 </tr>
+</table><br />
+
+
+### *Co-supervised* master theses
+
+I helped (unofficially) the following master students:
+<table>
+<tr>
+  <td><a href="http://hdl.handle.net/1866/13443"><img src="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/13443/Milaenen_David_2015_memoire.pdf.jpg?sequence=4&isAllowed=y" alt="DavidMilaenen" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></a></td>
+  <td style="vertical-align:top;"><b>Theory and numerical integration of subsurface light transport </b> <br />
+      David Milaenen  <br />
+      <em>Université de Montréal</em>, March 2016 
+      <a href="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/13443/Milaenen_David_2015_memoire.pdf?sequence=2&isAllowed=y
+">pdf</a>
+  </td>
+</tr>
+<tr>
+  <td><a href="http://hdl.handle.net/1866/12834"><img src="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/12834/Dubouchet_Renaud_2014_memoire.pdf.jpg?sequence=4&isAllowed=y" alt="AdrienDubouchet" width="90" height="90" style="padding-bottom:10px;padding-right:10px;border:1px;" /></a></td>
+  <td style="vertical-align:top;"><b>Theory and numerical integration of subsurface light transport </b> <br />
+      Adrien Dubouchet <br />
+      <em>Université de Montréal</em>, February 2015 
+      <a href="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/12834/Dubouchet_Renaud_2014_memoire.pdf?sequence=2&isAllowed=y">pdf</a>
+  </td>
+</tr>
 </table>
+
 <br />
