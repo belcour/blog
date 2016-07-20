@@ -538,7 +538,6 @@ Cov = Cv' * Cov * Cv
                  var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, -0.9, 0, 0.1, 0, 0));
                  snap.rect(100, 100, 200, 100).attr({fill: "#aa0000", fillOpacity: 0.3});
                </script>
-
                <pre style="width:60%;" class="fragment">
                <code class="matlab">
 % BRDF with cut at 'b'
@@ -552,18 +551,19 @@ Cov = inverse(inverse(Cov) + B)
             <!-- Transmission operator -->
             <section>
               <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-10px;"><img src="../../data/images/thesis.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-7px;">&nbsp;<a href="#url(belcourThesis)">Belcour 2012</a></span>
-               <h4>Transmission Operator</h4><br/>
+               <h4>Refraction Operator</h4><br/>
                <center>
                   <div style="position:relative;width:900px;height:500px;">
-                  <canvas id="draw_cov_btdf-cv" style="position:absolute;"></canvas>
-                  <svg id="draw_cov_btdf-svg" width="900px" height="500px" style="position:absolute;top:0px;left:0px;"></svg></div>
+                  <canvas id="draw_cov_bsdf-cv" style="position:absolute;"></canvas>
+                  <svg id="draw_cov_bsdf-svg" width="900px" height="500px" style="position:absolute;top:0px;left:0px;"></svg></div>
+                  <div style="font-size:0.7em;position:absolute;top:670px;left:630px;">Refractive index: 1 <input style="vertical-align: middle;" type="range" min="1.0" max="3.0" value="1.0" step="0.05" id="draw_cov_bsdf-slider" /> 3</div>
                </center>
                <script type="text/javascript">
-                  loadSVG("data/svg/cov_bsdf.svg", "#draw_cov_btdf-svg", btdfOperator01Step00);
+                  loadSVG("data/svg/cov_bsdf.svg", "#draw_cov_bsdf-svg", bsdfOperator01Step00);
                </script>
             </section>
             <section>
-               <h4>Transmission Operator</h4><br/>
+               <h4>Refraction Operator</h4><br/>
                <div style="width:80%">
                <ul>
                  <li>Snell laws scale the angular component
@@ -575,12 +575,34 @@ Cov = inverse(inverse(Cov) + B)
                </ul>
                </div>
 
-               <svg id="operator-btdf-01" width="400px" height="250px"></svg>
+               <svg id="operator-bsdf-01" width="400px" height="250px"></svg>
                <script>
-                 var snap  = Snap("#operator-btdf-01");
+                 var snap  = Snap("#operator-bsdf-01");
                  var frame = CreateFrame(snap, 100, 50, 200, 200);
-                 var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, -0.9, 0, 0.1, 0, 0));
+                 var cov   = CreateCovariance(snap, frame, Snap.matrix(0.8, 0.5, 0.5, 0.2, 0, 0));
+
+
+                 var BsdfScaleAnimation = function(start, end) {
+                  var s = Snap("#operator-bsdf-01");
+                  var c = s.select("#circle");
+
+                  const M = c.transform().localMatrix;
+                  Snap.animate(start, end, function(val) {
+                    c.transform(M);
+                    var temp = Snap.matrix(1, 0, 0, val, 0, 0);
+                    c.transform(c.transform().localMatrix.add(temp));
+                  }, 500);
+                }
+
+
+                Reveal.addEventListener( 'fragmentshown', function( event ) {
+                    if(event.fragment.id == "operator-bsdf-01-scale") {  BsdfScaleAnimation(1, 0.5); }
+                });
+                Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                    if(event.fragment.id == "operator-bsdf-01-scale") { BsdfScaleAnimation(1, 2.0); }
+                });                 
                </script>
+               <pre class="fragment" id="operator-bsdf-01-scale"></pre>
 
                <pre style="width:60%;" class="fragment">
                <code class="matlab">
@@ -753,7 +775,7 @@ Cov = M' * (M' * Cov * M + O) * M
             <section>
               <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-10px;"><img src="../../data/images/acm.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-5px;">&nbsp;<a href="#url(belcour2014)">Belcour et al. 2014</a></span>
                <h4>Participating Media Operators</h4><br/>
-               <center><div style="width:80%;text-align:left;"><ul>
+               <center style="padding-top:0px;"><div style="width:80%;text-align:left;"><ul>
                   <li>Using a different <em>rendering equation</em>:
                     <ul>
                         <li>Radiative Transfert Equation [<a href="#url(ishimaru1986)">Ishimaru 1986</a>]</li>
@@ -761,26 +783,27 @@ Cov = M' * (M' * Cov * M + O) * M
                     </ul>
                   </li>
                </ul></div></center><br />
+               <img style="border:0px;box-shadow:0px 0px;" src="../../data/svg/course-volume-01.svg" width="900px" />
             </section>
             <section>
                <h4>Absorption Operator</h4><br/>
-               <div style="width:80%">
-               <ul>
+               <center style="padding-top:0px;"><div style="width:80%;text-align:left;"><ul>
                  <li>Same operator as occlusion
                     <ul class="sublist">
                       <li>However not an infinite bandwidth</li>
                     </ul>
                   </li>
-               </ul>
-               </div>
+               </ul></div></center>
             </section>
             <section>
                <h4>Scattering Operator</h4><br/>
-               <div style="width:80%">
-               <ul>
-                 <li>Same operator as BRDF</li>
-               </ul>
-               </div>
+               <center style="padding-top:0px;"><div style="width:80%;text-align:left;"><ul>
+                 <li>Same operator as BRDF
+                   <ul>
+                     <li>Analytical forms for the Henyey-Greenstein phase function
+                   </ul>
+                 </li>
+               </ul></div></center>
             </section>
 
             <!-- Summary of all the operators -->
