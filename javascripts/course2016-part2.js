@@ -80,8 +80,8 @@ function CreateCovariance(snap, frame, matrix) {
    if(elem == undefined) { elem = frame; }
    var Tr = elem.transform().diffMatrix;
    var BB = elem.getBBox();
-   var cx = Tr.x(BB.cx, BB.cy);
-   var cy = Tr.y(BB.cx, BB.cy);
+   var cx = BB.cx;
+   var cy = BB.cy;
    var wx = 0.5*elem.getBBox().height;
    var wy = 0.5*elem.getBBox().width;
    //var tmatrix = Snap.matrix(1, 0, 0, 1, wx, wy);
@@ -89,7 +89,7 @@ function CreateCovariance(snap, frame, matrix) {
    if(matrix) {
       tmatrix.add(matrix);
    }
-   var cov = snap.circle(0, 0, wx).transform(tmatrix);
+   var cov = snap.circle(cx, cy, wx).transform(tmatrix);
    cov.attr({id: "circle", stroke: "#0000ff",
              fillOpacity: 0,
              strokeWidth: 2,
@@ -272,10 +272,11 @@ const createExample01 = function(snap) {
    var c3 = snap.circle(x3, y3, 3).attr({fill: "#ffffff", stroke: "#ff0000", storkeSize: "2px", id: "vertex03"});
    snap.g(path, c1, c2, c3).attr({ id: "sample01" });
 
-   const fourier = snap.select("#fourierdomain");
-   const FBB     = fourier.getBBox();
-   const FTr     = fourier.transform().diffMatrix;
-   CreateCovariance(snap, fourier, Snap.matrix(1, -1, 0, 0.5, 0, 0));
+   var fourier = snap.select("#fourierDomain").attr({ opacity: 0});
+//    const FBB     = fourier.getBBox();
+//    const FTr     = fourier.transform().diffMatrix;
+   fourier = CreateFrame(snap, 686, 100, 173, 173);
+   CreateCovariance(snap, fourier, Snap.matrix(0.1, -0.1, 0, 0.5, 0, 0));
 
 
    // Generate the samples within the sample space
