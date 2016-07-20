@@ -95,6 +95,8 @@
 
                    function adaptiveSampling01(snap) {
                      snap.select("#samples").attr({class: 'fragment'});
+                     snap.select("#samples02").attr({class: 'fragment'});
+                     snap.select("#splat01").attr({ opacity: 0 });
                    }
 
                    loadSVG(uri, elem, adaptiveSampling01);
@@ -180,6 +182,22 @@
                       </ul>
                   </li>
                </ul></div></center>
+               <center style="padding-top:10px;transform:scale(1.0);">
+                   <svg id="splatting-sampling-01-svg" width="800px" height="235px"></svg>
+               </center>
+               <script type="text/javascript" >
+                   var uri  = "data/svg/course-integration02.svg";
+                   var elem = "#splatting-sampling-01-svg";
+
+                   function adaptiveSampling01(snap) {
+                     snap.select("#samples").attr({opacity: 0});
+                     snap.select("#samples02").attr({opacity: 0});
+                     snap.select("#splat01").attr({ class: "fragment" });
+                     snap.select("#subsamples").attr({ class: "fragment" });
+                   }
+
+                   loadSVG(uri, elem, adaptiveSampling01);
+               </script>
             </section>
             <section>
                 <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-20px;"><img src="../../data/images/acm.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-5px;">&nbsp;<a href="#url(bagher2013)">Bagher et al. 2013</a></span>
@@ -214,7 +232,7 @@
                       <ul>
                           <li>Density estimation <em>blurs</em> the ground truth</li>
                           <li>Low variation of GT in the kernel means low bias</li>
-                          <li>Theoretically: the $ \mbox{bias} \prop  \mbox{Hessian} $</li>
+                          <li>Theoretically: the $ \mbox{bias} \propto  \mbox{Hessian} $</li>
                       </ul>
                   </li>
                </ul></div></center><br />
