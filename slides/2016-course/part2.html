@@ -65,7 +65,7 @@
 
             <section>
                <h4>Working with Operators</h4>
-               <center style="width: 100%;position:absolute;top: 50px;left: 0;">
+               <center style="width: 100%;position:absolute;top: 50px;left: 0; transform: scale(0.9);">
                <svg id="working-operators-01" width="1080" style="border-width: 0px;margin: 0;"></svg>
                </center>
 
@@ -78,9 +78,31 @@ function workingOperator01Step00 (snap) {
    snap.select("#path2-00").attr({ opacity: 0 });
    snap.select("#path2-01").attr({ opacity: 0 });
 
+   var t1 = 0; // light
+   var t2 = 335; // dragon
+   var t3 = 1000; //sensor
+
+   // Point at light
+   var p = snap.select("#path1-00").getPointAtLength(t1);
+   var c = snap.circle(p.x, p.y, 7).attr({ fill: "#ffffff", stroke: "#ff0000", strokeWidth: "4px", id: "cursor", filter: "drop-shadow( 2px 2px 2px #666 )"})
+   snap.select("#lens").after(c);
+
    // Adding Fourier stuff
    var frame = CreateFrame(snap, 950, 100, 120, 120);
    var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, 0, 0, 0.1, 0, 0));
+   var gcov  = snap.g(frame, cov).attr({ id: "covariance-01"});
+
+   frame = CreateFrame(snap, 950, 400, 120, 120);
+   cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, 0.9, 0, 0.1, 0, 0));
+   gcov  = snap.g(frame, cov).attr({ id: "covariance-02"});
+
+   frame = CreateFrame(snap, 700, 550, 120, 120);
+   cov   = CreateCovariance(snap, frame, Snap.matrix(0.6, -0.6, 0, 0.1, 0, 0));
+   gcov  = snap.g(frame, cov).attr({ id: "covariance-03"});
+
+   frame = CreateFrame(snap, 170, 550, 120, 120);
+   cov   = CreateCovariance(snap, frame, Snap.matrix(0.6, 0.1, 0, 0.1, 0, 0));
+   gcov  = snap.g(frame, cov).attr({ id: "covariance-04"});
 }
 loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01Step00);
                </script>
@@ -205,9 +227,7 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                      <img style="border:0px;box-shadow:0px 0px;" src="../../data/svg/course-adaptive-hachisuka.svg" height="258px" /><br />
                      [<a href="hachisuka2009">Hachisuka et al. 2009</a>]
                   </div>
-
-               </div>
-               </center>
+               </div></center>
             </section>
 
             <!-- Upsampling -->
@@ -247,16 +267,30 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                 </div>
             </section>
              <section><!-- Integration sapce and reconstruction space -->
-                <h4>Alternative Methods</h4><br />
+                <h4>Alternative Methods</h4>
                 <center><div style="width:80%;text-align:left;"><ul>
-                  <li>Heuristic upsampling
+                  <li>Shading <strong>bigger</strong> pixels
                       <ul>
-                          <li>Real-time [<a href="nichols2009">Nichols et al. 2009</a>]</li>
-                          <li>Off-line & resampling [<a href="lehtinen2011">Lehtinen et al. 2011</a>, <a href="lehtinen2012">Lehtinen et al. 2012</a>]</li>
+                          <li>Global-Illumination upsampling [<a href="nichols2009">Nichols et al. 2009</a>]</li>
+                          <li>Coarse Pixel Shading [<a href="vaidyanathan2014">Vaidyanathan et al. 2014</a>]</li>
                       </ul>
                   </li><br />
+                  <li>Splatting more samples
+                      <ul>
+                          <li>Off-line resampling [<a href="lehtinen2011">Lehtinen et al. 2011</a>, <a href="lehtinen2012">Lehtinen et al. 2012</a>]</li>
+                      </ul>
+                  </li>
                </ul></div></center><br />
-                TODO: images of the methods
+               <center><div style="font-size:0.5em;width:50%;">
+                  <div style="float:left;">
+                     <img src="../../data/images/course-lehtinen2011.png" height="256px" /><br />
+                     [<a href="lehtinen2011">Lehtinen et al. 2011</a>]
+                  </div>
+                  <div style="float:left;">
+                     <img src="../../data/images/course-vaidyanathan2014.png" height="256px" /><br />
+                     [<a href="vaidyanathan2014">Vaidyanathan et al. 2014</a>]
+                  </div>
+               </div></center>
             </section>
 
             <!-- Adaptive density estimation -->
