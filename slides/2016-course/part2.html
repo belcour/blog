@@ -156,9 +156,12 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                    var elem = "#adaptive-sampling-01-svg";
 
                    function adaptiveSampling01(snap) {
-                     snap.select("#samples").attr({class: 'fragment'});
-                     snap.select("#samples02").attr({class: 'fragment'});
+                     snap.select("#samples").attr({class: 'fragment', 'data-fragment-index': 1});
+                     snap.select("#samples02").attr({class: 'fragment', 'data-fragment-index': 2});
                      snap.select("#splat01").attr({ opacity: 0 });
+
+                     snap.text(700, 40, "Requires many samples").attr({ fontSize: "0.6em", class: 'fragment', 'data-fragment-index': 1 });
+                     snap.text(700, 420, "Requires few samples").attr({ fontSize: "0.6em", class: 'fragment', 'data-fragment-index': 2 });
                    }
 
                    loadSVG(uri, elem, adaptiveSampling01);
@@ -331,6 +334,7 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
 
             <!-- Antialiasing -->
             <section>
+               <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-40px;"><img src="../../data/images/thesis.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-7px;">&nbsp;<a href="#url(belcour2015)">Belcour et al. 2015</a></span>
                <h4>Antialiasing Surface Appearance</h4><br />
                <center><div style="width:80%;text-align:left;"><ul>
                   <li>Idea: bound the outgoing radiance frequencies

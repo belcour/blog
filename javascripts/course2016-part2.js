@@ -394,11 +394,11 @@ var antialiasingAppearance06Step00 = function(s) {
     layer.transform(Snap.matrix(1, 0, 0, 1, 1580, 0));
 
     // Covariance window
-    var cx = 30, cy = 350, w = 170;
+    var cx = 105, cy = 425, w = 170;
     var frame = CreateFrame(s, cx, cy, w, w);
     CreateCovariance(s, frame, Snap.matrix(0.9, 0, 0, 0.1, 0, 0));
-    s.text(cx+w/2, cy+w+30, "Covariance").attr({fontSize: "0.6em", textAnchor: "middle"});
-    var quad = s.paper.rect(cx, cy+w/2 - 2, w, 4).attr({fillOpacity: 0.5, fill: "#ff0000"});
+    s.text(cx, cy+w/2+30, "Covariance").attr({fontSize: "0.6em", textAnchor: "middle"});
+    var quad = s.paper.rect(cx-w/2, cy - 2, w, 4).attr({fillOpacity: 0.5, fill: "#ff0000"});
 
     // Plot the kernel
     var x0 = 255, y0 = 300, w = 300, h=100;
