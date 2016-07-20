@@ -88,21 +88,21 @@ function workingOperator01Step00 (snap) {
    snap.select("#lens").after(c);
 
    // Adding Fourier stuff
-   var frame = CreateFrame(snap, 950, 100, 120, 120);
+   var frame = CreateFrame(snap, 950, 150, 120, 120);
    var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, 0, 0, 0.1, 0, 0));
-   var gcov  = snap.g(frame, cov).attr({ id: "covariance-01"});
+   //var gcov  = snap.g(frame, cov).attr({ id: "covariance-01"});
 
-   frame = CreateFrame(snap, 950, 400, 120, 120);
+   frame = CreateFrame(snap, 950, 450, 120, 120);
    cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, 0.9, 0, 0.1, 0, 0));
-   gcov  = snap.g(frame, cov).attr({ id: "covariance-02"});
+   //gcov  = snap.g(frame, cov).attr({ id: "covariance-02"});
 
-   frame = CreateFrame(snap, 700, 550, 120, 120);
+   frame = CreateFrame(snap, 750, 600, 120, 120);
    cov   = CreateCovariance(snap, frame, Snap.matrix(0.6, -0.6, 0, 0.1, 0, 0));
-   gcov  = snap.g(frame, cov).attr({ id: "covariance-03"});
+   //gcov  = snap.g(frame, cov).attr({ id: "covariance-03"});
 
-   frame = CreateFrame(snap, 170, 550, 120, 120);
+   frame = CreateFrame(snap, 230, 600, 120, 120);
    cov   = CreateCovariance(snap, frame, Snap.matrix(0.6, 0.1, 0, 0.1, 0, 0));
-   gcov  = snap.g(frame, cov).attr({ id: "covariance-04"});
+   //gcov  = snap.g(frame, cov).attr({ id: "covariance-04"});
 }
 loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01Step00);
                </script>
