@@ -65,6 +65,25 @@
 
             <section>
                <h4>Working with Operators</h4>
+               <center style="width: 100%;position:absolute;top: 50px;left: 0;">
+               <svg id="working-operators-01" width="1080" style="border-width: 0px;margin: 0;"></svg>
+               </center>
+
+               <script type="text/javascript">
+function workingOperator01Step00 (snap) {
+   // Cleaning elements
+   var layer = snap.select("#svg2");
+   layer.attr({width: 1080});
+   snap.select("#lens").attr({ opacity: 0 });
+   snap.select("#path2-00").attr({ opacity: 0 });
+   snap.select("#path2-01").attr({ opacity: 0 });
+
+   // Adding Fourier stuff
+   var frame = CreateFrame(snap, 950, 100, 120, 120);
+   var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, 0, 0, 0.1, 0, 0));
+}
+loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01Step00);
+               </script>
             </section>
             <section>
                <h4>Working with Operators</h4>
