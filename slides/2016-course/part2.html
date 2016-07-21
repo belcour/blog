@@ -208,7 +208,8 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                </script>
             </section>
             <!--<section>
-            <h4>Results</h4><br />            
+            <h4>Results</h4><br />
+            </section>-->            
              <section><!-- Integration sapce and reconstruction space -->
                 <h4>Alternative Methods</h4>
                 <center style="padding-top:20px;"><div style="width:80%;text-align:left;"><ul>
@@ -272,7 +273,8 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                 </div>
             </section>
             <!--<section>
-            <h4>Results</h4><br />            
+            <h4>Results</h4><br />
+            </section>-->
              <section><!-- Integration sapce and reconstruction space -->
                 <h4>Alternative Methods</h4>
                 <center><div style="width:80%;text-align:left;"><ul>
@@ -443,9 +445,26 @@ Spectrum RayTrace(Ray r, Covariance c){
                <pre class="fragment" id="photonMapping02Step03"></pre>
                <pre class="fragment" id="photonMapping02Step04"></pre>
             </section>
+            <section>
+               <h4>Adaptive Density Estimation</h4>
+               <center><div style="width:80%;text-align:left;padding-top:15px;"><ul>
+                  <li>How to Estimate Hessian?
+                      <ul>
+                          <li>Covariance in Fourier = Hessian!</li>
+                          <li>Each photon computes its covariance</li>
+                          <li>Covariance is averaged for each kernel</li>
+                      </ul>
+                  </li><br />
+                  <li class="fragment">Works as well in volumes
+                      <ul>
+                          <li>Adapt kernels for the Photon Beams method [<a href="jarosz2011">Jarosz et al. 2011</a>]</li>
+                          <li>Covariance must be stored in a 3D grid</li>
+                      </ul>
+                  </li>
+               </ul></div></center>
+            </section>            
             <!--<section>
             <h4>Results</h4><br />
-            
             </section>-->
             <section><!-- Talk about Anton's paper APPM -->
                 <h4>Alternative Methods</h4><br />
