@@ -109,24 +109,24 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
             </section>
             <section>
                <h4>Working with Operators</h4>
-               <center><div style="width:80%;text-align:left;"><ul>
-                  <li>Compatible with you favorite math toolbox
-                     <ul class="fragment" data-fragment-index="1"><li>Last example with Mathematica</li></ul>
+               <center style="padding-top:10px;"><div style="width:80%;text-align:left;"><ul>
+                   <li class="fragment" data-fragment-index="1">Static analysis: using closed forms</li><br />
+                  <li  class="fragment" data-fragment-index="2">Compatible with you favorite math toolbox
+                     <ul class="fragment" data-fragment-index="2"><li>Last example with Mathematica</li></ul>
                   </li>
-               </ul></div></center><br />
-
-               <center class="fragment" data-fragment-index="1"><div style="width:60%; background: #ffffff; text-align: left; padding: 25px 25px; box-shadow: 5px 5px 35px #dddddd;">
+               </ul></div></center>
+               <center class="fragment" data-fragment-index="3" style="padding-top:10px;"><div style="width:60%; background: #ffffff; text-align: left; padding: 25px 25px; box-shadow: 5px 5px 35px #dddddd;">
                      <div><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px; margin-bottom: 10px;" src="../../data/images/course-2d-covariance-01.gif" /></div>
-                     <div class="fragment" data-fragment-index="2"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px; margin-bottom: -30px;" src="../../data/images/course-2d-covariance-02.gif" /></div>
-                     <div class="fragment" data-fragment-index="3"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px;" src="../../data/images/course-2d-covariance-03.png" /></div>
-                     <div class="fragment" data-fragment-index="3"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px;" src="../../data/images/course-2d-covariance-04.png" /></div>
+                     <div class="fragment" data-fragment-index="4"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px; margin-bottom: -30px;" src="../../data/images/course-2d-covariance-02.gif" /></div>
+                     <div class="fragment" data-fragment-index="5"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px;" src="../../data/images/course-2d-covariance-03.png" /></div>
+                     <div class="fragment" data-fragment-index="5"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px;" src="../../data/images/course-2d-covariance-04.png" /></div>
                </div></center>
             </section>
 
 
             <!-- Adaptive sampling and reconstruction -->
             <section>
-               <h4>Adaptive Sampling and Reconstruction</h4><br /><br />
+               <h4>Adaptive Sampling and Reconstruction</h4><br />
                <center><div style="width:80%;text-align:left;"><ul>
                   <li>Direct application of Nyquist/Shannon:
                     <ul>
@@ -294,6 +294,61 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                      [<a href="vaidyanathan2014">Vaidyanathan et al. 2014</a>]
                   </div>
                </div></center>
+            </section>
+
+            <!-- Tracing from the light ! -->
+            <section>
+                <h4>"Online" Frequency Analysis</h4>
+               <center><div style="width:80%;text-align:left;"><ul>
+                  <li>When closed forms are not possible
+                      <ul>
+                          <li>Multiple scattering dominant</li>
+                          <li>Multiple scenarios but same code (reflexion and refraction)</li>
+                      </ul>
+                  </li><br />
+                  <li>Inline frequency analysis in raytracing
+                      <ul>
+                          <li>See source code on <a href="https://github.com/belcour/CovarianceTracing">github</a></li>
+                      </ul>
+                  </li>
+                </ul></div></center>
+                <pre style="width:47%;float:left;margin:5px;padding:0px;">
+                    <code>
+Spectrum RayTrace(Ray r){
+
+   // Check intersection
+   hit = Intersect(scene, r);
+   if(! hit) return Black;
+
+   // Interaction with material
+   Ray new_r = SampleBRDF(hit);
+   return RayTrace(new_r);
+}
+                    </code>
+                </pre><div style="float:left;padding-top:100px;padding-left:15px;width:2%;">></div>
+                <pre  style="width:47%;float:right;margin:5px;padding:0px;">
+                    <code>
+Spectrum RayTrace(Ray r, Covariance c){
+
+   // Check intersection
+   hit = Intersect(scene, r);
+   if(! hit) return Black;
+
+   // Evaluate covariance at the surface
+   c.Travel(hit);
+   c.Projection(hit);
+
+   // Interaction with material
+   Ray new_r = SampleBRDF(hit);
+
+   // Compute reflected covariance
+   c.Reflection(hit);
+   c.InverseProjection(hit);
+
+   return RayTrace(new_r, c);
+}     
+                    </code>
+                </pre>
             </section>
 
             <!-- Adaptive density estimation -->
