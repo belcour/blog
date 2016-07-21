@@ -103,7 +103,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -172,18 +172,18 @@
          y="150.49873"
          x="-17.727112"
          id="tspan5170"
-         sodipodi:role="line">bias</tspan></text>
+         sodipodi:role="line">variance</tspan></text>
     <text
        transform="matrix(0,-1,1,0,0,0)"
        xml:space="preserve"
-       style="font-size:15px;text-anchor:end;fill:#0ca400;fill-opacity:1;-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:Comfortaa;-inkscape-font-specification:Comfortaa;text-anchor:end;fill:#0ca400;fill-opacity:1"
        x="-17.727112"
        y="553.71301"
        id="text5286"><tspan
          sodipodi:role="line"
          id="tspan5288"
          x="-17.727112"
-         y="553.71301">variance</tspan></text>
+         y="553.71301">bias</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker5298)"
        d="m 370,80.57649 0,68.92857"
