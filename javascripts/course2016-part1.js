@@ -829,7 +829,7 @@ var travelOperator01Step00 = function(snap) {
       render_fourier_travel();
    }
 
-   CreateFourierButton(snap, box);
+   //CreateFourierButton(snap, box);
    var text = snap.text(0, 0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
    var tbb  = text.getBBox();
    tbb.x      = -100;
@@ -983,7 +983,7 @@ var brdfOperator01Step00 = function(snap) {
    render_scene_brdf(canvas, scene);
 
    var bbox = box.getBBox();
-   var text = snap.text(bbox.cx, bbox.y+bbox.height+40, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
+   var text = snap.text(0,0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
    var tbb  = text.getBBox();
    var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5 /*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
    var g    = snap.g(rect, text).click(function() {
@@ -1000,6 +1000,8 @@ var brdfOperator01Step00 = function(snap) {
       }
    });
    snap.select("#layer1").append(g);
+   var px = bbox.cx, py = bbox.y+bbox.height+40;
+   g.transform(Snap.matrix(1, 0, 0, 1, px, py));
 
    slider.onchange = function(value) {
       var canvas = document.getElementById("draw_cov_brdf-gl");
@@ -1021,7 +1023,8 @@ var occlOperator01Step00 = function(snap) {
    }
 
    // Align the rendering canvas with the axis-rectangle
-   var box = snap.select("#rect4136");
+   var box  = snap.select("#rect4136");
+   var bbox = box.getBBox();
    AlignCanvasWithSVG(canvas, box, {x: 1, y: -1});
 
    // Fix the resolution of the image
@@ -1081,14 +1084,37 @@ var occlOperator01Step00 = function(snap) {
    }
 
    // Create the clickable button
-   var bbox = box.getBBox();
-   var text = snap.text(bbox.cx, bbox.y+bbox.height+40, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
+//    var bbox = box.getBBox();
+//    var text = snap.text(bbox.cx, bbox.y+bbox.height+40, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
+//    var tbb  = text.getBBox();
+//    var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5/*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
+//    var g    = snap.g(rect, text);
+
+
+//    g.click(function() {
+//       fourier_bt_press = !fourier_bt_press;
+//       render(canvas, scene, 0);
+//       if(fourier_bt_press) {
+//             text.attr({text: "Apply inverse Fourier Transform"});
+//             var tbb  = text.getBBox();
+//             rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
+//             render_fourier_occl();
+//       } else {
+//             text.attr({text: "Apply Fourier Transform"});
+//             var tbb  = text.getBBox();
+//             rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
+//       }
+//    });
+//    snap.select("#layer1").append(g);
+
+   var text = snap.text(0, 0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
    var tbb  = text.getBBox();
+   tbb.x      = -100;
+   tbb.y      = -15;
+   tbb.width  = 200;
+   tbb.height = 20;
    var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5/*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
-   var g    = snap.g(rect, text);
-
-
-   g.click(function() {
+   var g    = snap.g(rect, text).click(function() {
       fourier_bt_press = !fourier_bt_press;
       render(canvas, scene, 0);
       if(fourier_bt_press) {
@@ -1102,7 +1128,10 @@ var occlOperator01Step00 = function(snap) {
             rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
       }
    });
+   var px = bbox.cx, py = bbox.y+bbox.height+40;
+   g.transform(Snap.matrix(1, 0, 0, 1, px, py));
    snap.select("#layer1").append(g);
+
 
    // SVG drawing code
    var occl_svg = document.getElementById('draw_cov_occl-cv');
@@ -1186,7 +1215,8 @@ function curvOperator01Step00(snap) {
    }
 
    // Align the rendering canvas with the axis-rectangle
-   var box = snap.select("#rect4136");
+   var box  = snap.select("#rect4136");
+   var bbox = box.getBBox();
    AlignCanvasWithSVG(canvas, box, {x: .5, y: -.5});
 
    // Fix the resolution of the image
@@ -1245,12 +1275,13 @@ function curvOperator01Step00(snap) {
    }
 
    // Create the clickable button
-   var bbox = box.getBBox();
-   var text = snap.text(bbox.cx, bbox.y+bbox.height+60, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.6em"});
+   //var bbox = box.getBBox();
+   var text = snap.text(0, 0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.6em"});
    var tbb  = text.getBBox();
    var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5/*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
    var g    = snap.g(rect, text);
-
+   var px = bbox.cx, py = bbox.y+bbox.height+60;
+   g.transform(Snap.matrix(1, 0, 0, 1, px, py));
 
    g.click(function() {
       fourier_bt_press = !fourier_bt_press;
@@ -1361,7 +1392,7 @@ function bsdfOperator01Step00(snap) {
    render_scene_bsdf(canvas, scene);
 
    var bbox = box.getBBox();
-   var text = snap.text(bbox.cx, bbox.y+bbox.height+60, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.6em"});
+   var text = snap.text(0,0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.6em"});
    var tbb  = text.getBBox();
    var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5 /*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
    var g    = snap.g(rect, text).click(function() {
@@ -1378,6 +1409,8 @@ function bsdfOperator01Step00(snap) {
       }
    });
    snap.select("#layer1").append(g);
+   var px = bbox.cx, py = bbox.y+bbox.height+40;
+   g.transform(Snap.matrix(1, 0, 0, 1, px, py));
 
 
    // Slider

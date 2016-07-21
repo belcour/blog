@@ -418,8 +418,28 @@ Cov = Tr' * Cov * Tr
                <script>
                  var snap  = Snap("#operator-occl-02");
                  var frame = CreateFrame(snap, 200, 150, 200, 200);
-                 var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, -0.9, 0, 0.1, 0, 0));
+                 var cov   = CreateCovariance(snap, frame, Snap.matrix(0.1, 0, 0, 0.2, 0, 0));
+                 var ShearAnimation = function(start, end) {
+                  var s = Snap("#operator-occl-02");
+                  var c = s.select("#circle");
+
+                  const M = c.transform().localMatrix;
+                  Snap.animate(start, end, function(val) {
+                    var temp = M;
+                    temp.a = val;
+                    c.transform(temp);
+                  }, 500);
+                }
+
+
+                Reveal.addEventListener( 'fragmentshown', function( event ) {
+                    if(event.fragment.id == "operator-occlusion-02-scale") {  ShearAnimation(0.1, 1); }
+                });
+                Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                    if(event.fragment.id == "operator-occlusion-02-scale") { ShearAnimation(1, 0.1); }
+                });
                </script>
+               <pre class="fragment" id="operator-occlusion-02-scale"></pre>
                <pre style="width:60%;" class="fragment">
                <code class="matlab">
 % Visibility operation
