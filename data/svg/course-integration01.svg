@@ -26,17 +26,17 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.5904131"
-     inkscape:cx="218.70781"
-     inkscape:cy="178.86015"
+     inkscape:cx="468.95726"
+     inkscape:cy="124.15738"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      showguides="true"
-     inkscape:window-width="2560"
-     inkscape:window-height="1403"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-width="2254"
+     inkscape:window-height="884"
+     inkscape:window-x="91"
+     inkscape:window-y="351"
+     inkscape:window-maximized="0"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
@@ -1634,6 +1634,16 @@
          x="539.80786"
          id="tspan6824"
          sodipodi:role="line">XU samples</tspan></text>
+    <text
+       style="font-size:16.40996361px;text-anchor:middle"
+       id="fourierSpaceText"
+       y="281.84875"
+       x="773.82434"
+       xml:space="preserve"><tspan
+         y="281.84875"
+         x="773.82434"
+         id="tspan6840"
+         sodipodi:role="line">Fourier Space (lens)</tspan></text>
     <g
        id="fourierDomain">
       <rect
@@ -1699,16 +1709,6 @@
          d="m 773.66409,254.23782 0,-194.701368"
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.03000009;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker5782)"
          sodipodi:nodetypes="cc" />
-      <text
-         style="font-size:16.40996361px;text-anchor:middle"
-         id="fourierSpaceText"
-         y="281.84875"
-         x="773.82434"
-         xml:space="preserve"><tspan
-           y="281.84875"
-           x="773.82434"
-           id="tspan6840"
-           sodipodi:role="line">Fourier Space (lens)</tspan></text>
     </g>
   </g>
   <g

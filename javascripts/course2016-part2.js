@@ -42,13 +42,16 @@ function CreateFrame(snap, posX, posY, width, height, labels) {
    var markerUp = arrowUp.marker(0,0, 5,5, 2.5,2.5);
    var markerDw = arrowDw.marker(0,0, 5,5, 2.5,2.5);
 
+   var strokeWidth = (width<120) ? 1.5 : 1.0;
+   strokeWidth += "px";
+
    var px = -0.5*width;
    var py = -0.5*height;
    var wx = 0.5*width;
    var wy = 0.5*height;
-   var rect = snap.rect(px, py, width, height).attr({ fill: "#ffffff", stroke: "#000000", strokeWidth: "2px" })
-   var lin1 = snap.polyline(-0.55*width, +0.0*height, +0.6*width, +0*height).attr({ stroke: "#000000", strokeWidth: "2px", markerEnd: markerUp })
-   var lin2 = snap.polyline(+0.0*height, -0.6*width, +0.0*height, +0.55*width).attr({ stroke: "#000000", strokeWidth: "2px", markerStart: markerDw })
+   var rect = snap.rect(px, py, width, height).attr({ fill: "#ffffff", stroke: "#000000", strokeWidth: strokeWidth })
+   var lin1 = snap.polyline(-0.55*width, +0.0*height, +0.6*width, +0*height).attr({ stroke: "#000000", strokeWidth: strokeWidth, markerEnd: markerUp })
+   var lin2 = snap.polyline(+0.0*height, -0.6*width, +0.0*height, +0.55*width).attr({ stroke: "#000000", strokeWidth: strokeWidth, markerStart: markerDw })
 
    var xlabel = "x", 
        ulabel = "u";
@@ -57,7 +60,7 @@ function CreateFrame(snap, posX, posY, width, height, labels) {
        ulabel = labels.u;
    }
 
-   var p = 0.11*width;
+   var p = (width < 120) ? 0.11*width : 0.09*width;
    var tex1 = snap.text(+0.60*width, -0.05*height, ["Ω", xlabel]).attr({ fontFamily: "Times New Roman", fontSize: p+"px", textAnchor: "middle"})
    var tex2 = snap.text(+0.10*width, -0.56*height, ["Ω", ulabel]).attr({ fontFamily: "Times New Roman", fontSize: p+"px", textAnchor: "middle"})
 
@@ -275,7 +278,7 @@ const createExample01 = function(snap) {
    var fourier = snap.select("#fourierDomain").attr({ opacity: 0});
 //    const FBB     = fourier.getBBox();
 //    const FTr     = fourier.transform().diffMatrix;
-   fourier = CreateFrame(snap, 686, 100, 173, 173);
+   fourier = CreateFrame(snap, 670, 109, 173, 173);
    CreateCovariance(snap, fourier, Snap.matrix(0.1, -0.1, 0, 0.5, 0, 0));
 
 
