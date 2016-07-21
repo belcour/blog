@@ -207,6 +207,8 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                    loadSVG(uri, elem, createExample01);
                </script>
             </section>
+            <!--<section>
+            <h4>Results</h4><br />            
              <section><!-- Integration sapce and reconstruction space -->
                 <h4>Alternative Methods</h4>
                 <center style="padding-top:20px;"><div style="width:80%;text-align:left;"><ul>
@@ -269,6 +271,8 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                     <object width="100%" data="../../data/svg/course-applications02.svg" type="image/svg+xml"></object>
                 </div>
             </section>
+            <!--<section>
+            <h4>Results</h4><br />            
              <section><!-- Integration sapce and reconstruction space -->
                 <h4>Alternative Methods</h4>
                 <center><div style="width:80%;text-align:left;"><ul>
@@ -367,7 +371,7 @@ Spectrum RayTrace(Ray r, Covariance c){
                       </ul>
                   </li>
                </ul></div></center>
-               <center>
+               <center style="width:100%;padding-left:40px;">
                  <object width="1200px" data="../../data/svg/course-photon-mapping-01.svg" type="image/svg+xml"></object>
                </center>
             </section>
@@ -384,6 +388,7 @@ Spectrum RayTrace(Ray r, Covariance c){
                 function photonMapping02Step00(snap) {
                     snap.select("#variance").attr({ opacity: 0 });
                     snap.select("#bias").attr({ opacity: 0 });
+                    snap.select("#adaptive").attr({ opacity: 0 });
                 }
 
                 function photonMapping02Step01(opacity) {
@@ -414,6 +419,7 @@ Spectrum RayTrace(Ray r, Covariance c){
                     gp2.animate({ rx : val2*gp2.attr('rx'), ry : val2*gp2.attr('ry')}, 500);
                     gp3.animate({ rx : val2*gp3.attr('rx'), ry : val2*gp3.attr('ry')}, 500);
                     snap.select("#variance").animate({ opacity: opacity }, 500);
+                    snap.select("#adaptive").animate({ opacity: 1.0-opacity }, 500);
                 }
 
                 loadSVG(uri, elem, photonMapping02Step00);
@@ -437,25 +443,29 @@ Spectrum RayTrace(Ray r, Covariance c){
                <pre class="fragment" id="photonMapping02Step03"></pre>
                <pre class="fragment" id="photonMapping02Step04"></pre>
             </section>
-             <section><!-- Talk about Anton's paper APPM -->
+            <!--<section>
+            <h4>Results</h4><br />
+            
+            </section>-->
+            <section><!-- Talk about Anton's paper APPM -->
                 <h4>Alternative Methods</h4><br />
                 <center><div style="width:80%;text-align:left;"><ul>
-                  <li>Progressive Hessian estimation
-                      <ul>
-                          <li>[<a href="hachisuka20">Hachisuka 2010</a>] [<a href="kaplanyan2013">Kaplanyan et al. 2013</a>]</li>
-                      </ul>
-                  </li><br />
-               </ul></div></center><br />
-               <center><div style="font-size:0.5em;width:50%;">
-                  <div style="float:left;padding-left:50px;">
-                     <img src="../../data/svg/course-hachisuka2010.svg" height="256px" style="max-width:100%;" /><br />
-                     [<a href="hachisuka2010">Hachisuka et al. 2010</a>]
-                  </div>
-                  <div style="float:left;padding-left:50px;">
-                     <img src="../../data/svg/course-kaplanyan2013.svg" height="256px" style="max-width:100%;" /><br />
-                     [<a href="kaplanyan2013">Kaplanyan et al. 2013</a>]
-                  </div>
-               </div></center>
+                <li>Progressive Hessian estimation
+                    <ul>
+                        <li>[<a href="hachisuka20">Hachisuka 2010</a>] [<a href="kaplanyan2013">Kaplanyan et al. 2013</a>]</li>
+                    </ul>
+                </li><br />
+            </ul></div></center><br />
+            <center><div style="font-size:0.5em;width:50%;">
+                <div style="float:left;padding-left:50px;">
+                    <img src="../../data/svg/course-hachisuka2010.svg" height="256px" style="max-width:100%;" /><br />
+                    [<a href="hachisuka2010">Hachisuka et al. 2010</a>]
+                </div>
+                <div style="float:left;padding-left:50px;">
+                    <img src="../../data/svg/course-kaplanyan2013.svg" height="256px" style="max-width:100%;" /><br />
+                    [<a href="kaplanyan2013">Kaplanyan et al. 2013</a>]
+                </div>
+            </div></center>
             </section>
 
             <!-- Antialiasing -->
