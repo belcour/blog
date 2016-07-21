@@ -353,8 +353,8 @@ Spectrum RayTrace(Ray r, Covariance c){
 
             <!-- Adaptive density estimation -->
             <section>
-               <h4>Adaptive Density Estimation</h4><br />
-               <center><div style="width:80%;text-align:left;"><ul>
+               <h4>Adaptive Density Estimation</h4>
+               <center><div style="width:80%;text-align:left;padding-top:15px;"><ul>
                   <li>Used for Photon Mapping
                       <ul>
                           <li>Balance bias and variance using prediction</li>
@@ -362,12 +362,14 @@ Spectrum RayTrace(Ray r, Covariance c){
                   </li><br />
                   <li>Mathematical insight:
                       <ul>
-                          <li>Density estimation <em>blurs</em> the ground truth</li>
-                          <li>Low variation of GT in the kernel means low bias</li>
-                          <li>Theoretically: the $ \mbox{bias} \propto  \mbox{Hessian} $</li>
+                          <li>Density estimation <em>blurs</em> the target result</li>
+                          <li>Theoretically: $ \mbox{bias} \propto  \frac{\mbox{Hessian}}{\mbox{radius}} $</li>
                       </ul>
                   </li>
-               </ul></div></center><br />
+               </ul></div></center>
+               <center>
+                 <object width="1200px" data="../../data/svg/course-photon-mapping-01.svg" type="image/svg+xml"></object>
+               </center>
             </section>
             <section>
                <h4>Adaptive Density Estimation</h4><br />
