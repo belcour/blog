@@ -97,7 +97,7 @@ var filterNyquist01 = function(snap, coeffs, shifts, x0, y0, w, h, bwCut, orient
    // Bandwidth
    var bwX0  = x0+0.5*w*(1 - bwCut/(coeffs.length-1));
    var bwW   = w*bwCut/(coeffs.length-1);
-   var textB = snap.text(bwX0+0.75*bwW, y0-h/2-15, "Bandwidth").attr({fill: "#ff0000", fontSize: "0.5em", textAnchor: "middle"});
+   var textB = snap.text(bwX0+0.75*bwW, y0-h/2-15, "Bw").attr({fill: "#ff0000", fontSize: "0.5em", textAnchor: "middle"});
    var bandP = snap.path("M " + (x0+w/2) + " " + (y0-h/2) + " " + (bwX0+bwW) + " " + (y0-h/2));
    bandP.attr({strokeWidth: 2, stroke: "#ff0000", markerEnd: endB, markerStart: endB});
 
