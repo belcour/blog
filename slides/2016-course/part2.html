@@ -358,7 +358,7 @@ Spectrum RayTrace(Ray r, Covariance c){
             </section>
 
             <!-- Adaptive density estimation -->
-            <section>
+            <section data-transition="fade-in slide-out">
                <h4>Adaptive Density Estimation</h4>
                <center><div style="width:80%;text-align:left;padding-top:15px;"><ul>
                   <li>Used for Photon Mapping
@@ -375,9 +375,9 @@ Spectrum RayTrace(Ray r, Covariance c){
                </ul></div></center>
                <center style="width:100%;padding-left:40px;">
                  <object width="1200px" data="../../data/svg/course-photon-mapping-01.svg" type="image/svg+xml"></object>
-               </center>
+               </center>                
             </section>
-            <section>
+            <section data-transition="slide-in slide-out">
                <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-40px;"><img src="../../data/images/acm.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-7px;">&nbsp;<a href="#url(belcour2011)">Belcour and Soler 2011</a></span>
                <h4>Adaptive Density Estimation</h4>
                <center style="width:100%">
@@ -385,12 +385,34 @@ Spectrum RayTrace(Ray r, Covariance c){
                </center>
                <script type="text/javascript" >
                 var uri  = "data/svg/course-photon-mapping-02.svg";
-                var elem = "#photon-mapping-02";
+                var elem = "#photon-mapping-02"
 
                 function photonMapping02Step00(snap) {
                     snap.select("#variance").attr({ opacity: 0 });
                     snap.select("#bias").attr({ opacity: 0 });
                     snap.select("#adaptive").attr({ opacity: 0 });
+
+                    snap.select("#eye01a").attr({ opacity: 0 });
+                    snap.select("#hit01").attr({ opacity: 0 });
+                    snap.select("#eye02").attr({ opacity: 0 });
+                    snap.select("#eye03").attr({ opacity: 0 });
+
+                    snap.select("#photona").attr({ opacity: 0 });
+                    snap.select("#photonb").attr({ opacity: 0 });
+                }
+
+                function photonMapping02Step00a(opacity) {
+                    var snap = Snap(elem);
+                    snap.select("#eye01a").attr({ opacity: opacity });
+                    snap.select("#hit01").attr({ opacity: opacity });
+                    snap.select("#eye02").attr({ opacity: opacity });
+                    snap.select("#eye03").attr({ opacity: opacity });
+                }
+
+                function photonMapping02Step00b(opacity) {
+                    var snap = Snap(elem);
+                    snap.select("#photona").animate({ opacity: opacity}, 500);
+                    snap.select("#photonb").animate({ opacity: opacity}, 1000);
                 }
 
                 function photonMapping02Step01(opacity) {
@@ -428,24 +450,30 @@ Spectrum RayTrace(Ray r, Covariance c){
 
                 var gpScale = 0.25;
                 Reveal.addEventListener( 'fragmentshown', function( event ) {
+                    if(event.fragment.id == "photonMapping02Step00a") { photonMapping02Step00a(1); }
+                    if(event.fragment.id == "photonMapping02Step00b") { photonMapping02Step00b(1); }                   
                     if(event.fragment.id == "photonMapping02Step01") { photonMapping02Step01(1); }
                     if(event.fragment.id == "photonMapping02Step02") { photonMapping02Step02(gpScale, 0); }
                     if(event.fragment.id == "photonMapping02Step03") { photonMapping02Step03(1); }
                     if(event.fragment.id == "photonMapping02Step04") { photonMapping02Step04(1.0/gpScale, 0); }
                 });
                 Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                    if(event.fragment.id == "photonMapping02Step00a") { photonMapping02Step00a(0); }
+                    if(event.fragment.id == "photonMapping02Step00b") { photonMapping02Step00b(0); }                    
                     if(event.fragment.id == "photonMapping02Step01") { photonMapping02Step01(0); }
                     if(event.fragment.id == "photonMapping02Step02") { photonMapping02Step02(1.0/gpScale, 1); }
                     if(event.fragment.id == "photonMapping02Step03") { photonMapping02Step03(0); }
                     if(event.fragment.id == "photonMapping02Step04") { photonMapping02Step04(gpScale, 1); }
                 });
                </script>
+               <pre class="fragment" id="photonMapping02Step00a"></pre>
+               <pre class="fragment" id="photonMapping02Step00b"></pre>               
                <pre class="fragment" id="photonMapping02Step01"></pre>
                <pre class="fragment" id="photonMapping02Step02"></pre>
                <pre class="fragment" id="photonMapping02Step03"></pre>
-               <pre class="fragment" id="photonMapping02Step04"></pre>
+               <pre class="fragment" id="photonMapping02Step04"></pre>   
             </section>
-            <section>
+            <section data-transition="slide-in fade-out">
                <h4>Adaptive Density Estimation</h4>
                <center><div style="width:80%;text-align:left;padding-top:15px;"><ul>
                   <li>How to Estimate Hessian?
