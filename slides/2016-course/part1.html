@@ -358,7 +358,7 @@ Cov = {sxx, sxu;
                  var cov   = CreateCovariance(snap, frame, Snap.matrix(0.9, 0, 0, 0.1, 0, 0));
                  cov.attr({id: "cov"})
 
-                 var ShearAnimation = function(start, end) {
+                 var operatorTravelShear = function(start, end) {
                   var s = Snap("#operator-travel-02");
                   var c = s.select("#cov");
 
@@ -372,10 +372,10 @@ Cov = {sxx, sxu;
 
 
                 Reveal.addEventListener( 'fragmentshown', function( event ) {
-                    if(event.fragment.id == "operator-travel-02-shear") {  ShearAnimation(0, 9); }
+                    if(event.fragment.id == "operator-travel-02-shear") {  operatorTravelShear(0, 9); }
                 });
                 Reveal.addEventListener( 'fragmenthidden', function( event ) {
-                    if(event.fragment.id == "operator-travel-02-shear") { ShearAnimation(0, -9); }
+                    if(event.fragment.id == "operator-travel-02-shear") { operatorTravelShear(0, -9); }
                 });
                </script>
                <pre class="fragment" id="operator-travel-02-shear"></pre>

@@ -235,15 +235,93 @@ const updatePathExample01 = function(x, u) {
    path.attr({d: "M " + x1 + " " + y1 + " " + x2 + " " + y2 + " " + x3 + " " + y3})
 }
 
+function adaptiveSamplingRandomSamples(snap) {
+   const box1 = snap.select("#samplespace");
+   const BB1  = box1.getBBox();
+   const tr1  = box1.transform().diffMatrix;
+
+   var g = snap.g().attr({ id: "samples" });
+   for(var i=0; i<5; i++) {
+      for(var j=0; j<5; j++) {
+         var ex = (i + Math.random()) / 5;
+         var eu = (j + Math.random()) / 5;
+
+         var x = BB1.x + ex*BB1.width;
+         var y = BB1.y + eu*BB1.height;
+
+         var c = snap.circle(tr1.x(x, y), tr1.y(x, y), 3).attr({fill: "#ff0000", ex: ex, eu: eu});
+         c.mouseover(function (e) {
+            e.target.setAttribute("fill", "#00ff00");
+            var ex = e.target.getAttribute("ex");
+            var eu = e.target.getAttribute("eu");
+            updatePathExample01(ex, eu);
+
+            var lastElem = getData("example01", "lastElem")
+            if(lastElem) {
+               lastElem.setAttribute("fill", "#ff0000");
+            }
+            setData("example01", "lastElem", e.target);
+         });
+
+         g.append(c);
+      }
+   }
+}
+
+function adaptiveSamplingStructuredSamples(snap) {
+   const box1 = snap.select("#samplespace");
+   const BB1  = box1.getBBox();
+   const tr1  = box1.transform().diffMatrix;
+
+   var Ns = [5,3,2,4,8,7,2,1];
+
+   var g1 = snap.g().attr({ id: "samples", opacity: 0 });
+   var g2 = snap.g().attr({ id: "mainsamples" });
+   for(var i=0; i<5; i++) {
+
+       // Coordinates of a point
+      var ex = (i + Math.random()) / 5;
+      ex = ex*ex;
+      var x = BB1.x + ex*BB1.width;
+      var eu = 0.52;
+      var y = BB1.y + eu*BB1.height; 
+      var n  = Ns[Math.floor(ex*5)];//8*Math.random();
+      console.log(ex, n);
+
+      // Add the sample
+      var c = snap.circle(tr1.x(x, y), tr1.y(x, y), 3).attr({fill: "#0000ff", ex: ex, eu: eu});
+      g2.append(c);
+
+      for(var j=0; j<n; j++) {
+
+         eu = (j + Math.random()) / (n+1);
+         y = BB1.y + eu*BB1.height;
+
+         c = snap.circle(tr1.x(x, y), tr1.y(x, y), 3).attr({fill: "#ff0000", ex: ex, eu: eu});
+         c.mouseover(function (e) {
+            e.target.setAttribute("fill", "#00ff00");
+            var ex = e.target.getAttribute("ex");
+            var eu = e.target.getAttribute("eu");
+            updatePathExample01(ex, eu);
+
+            var lastElem = getData("example01", "lastElem")
+            if(lastElem) {
+               lastElem.setAttribute("fill", "#ff0000");
+            }
+            setData("example01", "lastElem", e.target);
+         });
+
+         g1.append(c);
+      }
+   }
+
+   snap.g(g1, g2).attr({id: 'totalsamples'});
+}
+
 const createExample01 = function(snap) {
 
    // Set the focal length of the lens
    setData("example01", "f0", 10000);
-
-   // Add labels
-//    snap.text(170, 225, "Scene").attr({fontSize: "20px", textAnchor: "middle"});
-//    snap.text(440, 225, "(xu) Samples").attr({fontSize: "20px", textAnchor: "middle"});
-//    snap.text(670, 225, "Fourier transform").attr({fontSize: "20px", textAnchor: "middle"});
 
    // Add moving elements
    const pixels  = snap.select("#pixels");
@@ -276,8 +354,6 @@ const createExample01 = function(snap) {
    snap.g(path, c1, c2, c3).attr({ id: "sample01" });
 
    var fourier = snap.select("#fourierDomain").attr({ opacity: 0});
-//    const FBB     = fourier.getBBox();
-//    const FTr     = fourier.transform().diffMatrix;
    fourier = CreateFrame(snap, 670, 109, 173, 173);
    CreateCovariance(snap, fourier, Snap.matrix(0.1, -0.1, 0, 0.5, 0, 0));
 
@@ -291,34 +367,39 @@ const createExample01 = function(snap) {
    const p01 = snap.select("#pixel01");
    const px0 = p00.transform().diffMatrix.x(p00.getBBox().x, p00.getBBox().y);
    const px1 = p01.transform().diffMatrix.x(p01.getBBox().x, p01.getBBox().y);
-   snap.rect(px0, 0, px1-px0, BB1.height).attr({fill: "#ff0000", opacity: 0.5});
+   snap.rect(px0, 0, px1-px0, BB1.height).attr({id: "integrationdomain", fill: "#ff0000", opacity: 0.5});
 
-   for(var i=0; i<5; i++) {
-      for(var j=0; j<5; j++) {
-         var ex = (i + Math.random()) / 5;
-         var eu = (j + Math.random()) / 5;
-
-         var x = BB1.x + ex*BB1.width;
-         var y = BB1.y + eu*BB1.height;
-
-         var c = snap.circle(tr1.x(x, y), tr1.y(x, y), 3).attr({fill: "#ff0000", ex: ex, eu: eu});
-         c.mouseover(function (e) {
-            e.target.setAttribute("fill", "#00ff00");
-            var ex = e.target.getAttribute("ex");
-            var eu = e.target.getAttribute("eu");
-            updatePathExample01(ex, eu);
-
-            var lastElem = getData("example01", "lastElem")
-            if(lastElem) {
-               lastElem.setAttribute("fill", "#ff0000");
-            }
-            setData("example01", "lastElem", e.target);
-         });
-      }
-   }
+   // Add the samples
+   adaptiveSamplingRandomSamples(snap);
+   //adaptiveSamplingStructuredSamples(snap);
 
    setData("example01", "lastElem", undefined)
 }
+
+function adaptiveSampling01Step01(offset) {
+    snap = Snap("#example01-svg");
+
+    if(offset > 0) {
+        snap.select("#samples").remove();
+        snap.select("#integrationdomain").attr({ opacity: 0 });
+        adaptiveSamplingStructuredSamples(snap);
+    } else {
+        snap.select("#totalsamples").remove();
+        snap.select("#integrationdomain").attr({ opacity: 0.5 });
+        adaptiveSamplingRandomSamples(snap);
+    }
+}
+
+function adaptiveSampling01Step02(offset) {
+    snap = Snap("#example01-svg");
+
+    if(offset > 0) {
+        snap.select("#samples").attr({ opacity: 1 });
+    } else {
+        snap.select("#samples").attr({ opacity: 0 });
+    }
+}
+
 
 /* ANTIALIASING SECTION */
 

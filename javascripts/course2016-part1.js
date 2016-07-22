@@ -573,12 +573,10 @@ var localAnalysis01CreateInset = function(imgId, inset, window) {
       var canvas = document.getElementById(inset.canvas);
       var bbox   = fourBorder.getBBox();
       var transf = fourBorder.transform().totalMatrix;
-      //console.log(transf);console.log(fourBorder.transform());
       var x = transf.x(bbox.x, bbox.y) - (window.size+15);
       var y = transf.y(bbox.x, bbox.y);
       var w = window.size;
       var h = window.size;
-      //console.log(bbox.x + " " + bbox.y + " " + x + " " + y + " " + w + " " + h);
       canvas.style.width  = w + "px";
       canvas.style.height = h + "px";
       canvas.style.left   = x + "px";
@@ -677,12 +675,10 @@ var localAnalysisCreateInset = function(snapId, imgId, inset, window) {
       var canvas = document.getElementById(inset.canvas);
       var bbox   = fourBorder.getBBox();
       var transf = fourBorder.transform().totalMatrix;
-      //console.log(transf);console.log(fourBorder.transform());
       var x = transf.x(bbox.x, bbox.y) - (window.size+15);
       var y = transf.y(bbox.x, bbox.y);
       var w = window.size;
       var h = window.size;
-      //console.log(bbox.x + " " + bbox.y + " " + x + " " + y + " " + w + " " + h);
       canvas.style.width  = w + "px";
       canvas.style.height = h + "px";
       canvas.style.left   = x + "px";
@@ -1176,7 +1172,6 @@ var occlOperator01Step00 = function(snap) {
          var temp = distToLight - dotProd/50;
          var xshift = dotProd*dirX;
          var yshift = dotProd*dirY;
-         console.log(temp);
          if(planeStart.x+xshift >= rayStart.x && planeStart.x+xshift <= rayEnd.x) {
             distToLight   = temp;
             planeStart.x += xshift;
@@ -1278,6 +1273,10 @@ function curvOperator01Step00(snap) {
    //var bbox = box.getBBox();
    var text = snap.text(0, 0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.6em"});
    var tbb  = text.getBBox();
+   tbb.x      = -150;
+   tbb.y      = -15;
+   tbb.width  = 300;
+   tbb.height = 20;
    var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5/*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
    var g    = snap.g(rect, text);
    var px = bbox.cx, py = bbox.y+bbox.height+60;
@@ -1394,6 +1393,10 @@ function bsdfOperator01Step00(snap) {
    var bbox = box.getBBox();
    var text = snap.text(0,0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.6em"});
    var tbb  = text.getBBox();
+   tbb.x      = -150;
+   tbb.y      = -15;
+   tbb.width  = 300;
+   tbb.height = 20;   
    var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5 /*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
    var g    = snap.g(rect, text).click(function() {
       fourier_bt_press = !fourier_bt_press;

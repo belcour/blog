@@ -112,7 +112,7 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                <center style="padding-top:10px;"><div style="width:80%;text-align:left;"><ul>
                    <li class="fragment" data-fragment-index="1">Static analysis: using closed forms</li><br />
                   <li  class="fragment" data-fragment-index="2">Compatible with you favorite math toolbox
-                     <ul class="fragment" data-fragment-index="2"><li>Last example with Mathematica</li></ul>
+                     <ul class="fragment" data-fragment-index="3"><li>Last example with Mathematica</li></ul>
                   </li>
                </ul></div></center>
                <center class="fragment" data-fragment-index="3" style="padding-top:10px;"><div style="width:60%; background: #ffffff; text-align: left; padding: 25px 25px; box-shadow: 5px 5px 35px #dddddd;">
@@ -205,33 +205,41 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                    var uri  = "/data/svg/course-integration01.svg";
                    var elem = "#example01-svg";
                    loadSVG(uri, elem, createExample01);
+                Reveal.addEventListener( 'fragmentshown', function( event ) {
+                    if(event.fragment.id == "adaptiveSampling01Step01") { adaptiveSampling01Step01(1); }
+                    if(event.fragment.id == "adaptiveSampling01Step02") { adaptiveSampling01Step02(1); }
+                });
+                Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                    if(event.fragment.id == "adaptiveSampling01Step01") { adaptiveSampling01Step01(0); }
+                    if(event.fragment.id == "adaptiveSampling01Step02") { adaptiveSampling01Step02(0); }
+                });
                </script>
+               <pre class="fragment" id="adaptiveSampling01Step01"></pre>
+               <pre class="fragment" id="adaptiveSampling01Step02"></pre>
+
+
             </section>
             <section>
             <h4>Results</h4><br />
                <svg id="adaptive-sampling-03" width="1325" height="462" style="position:absolute;top:150px;left:-30px;"></svg>
                <script type="text/javascript" >
-                   var uri  = "/data/svg/course-adaptive-results.svg";
-                   var elem = "#adaptive-sampling-03";
+var uri  = "/data/svg/course-adaptive-results.svg";
+var elem = "#adaptive-sampling-03";
 
-                   function adaptiveSampling03Step00(snap) {
-                    function adaptiveSampling03Inset(x, y, event) {
-                        var snap = Snap("#adaptive-sampling-03");
-                        var g = snap.select("#clipRect");
-                        var s = snap.select("#separator");
-                        var b = snap.select("#block");
-                        //g.attr({width: parseFloat(g.attr("width")) + 0.3*x});
-                        s.attr({transform: "t" + x + ",0"});
-                        g.attr({transform: "t" + x + ",0"});
-                        //g.attr({x: parseFloat(g.attr("x"))+x});
-                        //i.attr({mask: g});
-                        //console.log(y)
-                    }
+function adaptiveSampling03Step00(snap) {
+    // Create a slider from the adaptive sampling images
+    function adaptiveSampling03Inset(x, y, event) {
+        var snap = Snap("#adaptive-sampling-03");
+        var g = snap.select("#clipRect");
+        var s = snap.select("#separator");
+        var b = snap.select("#block");
+        s.attr({transform: "t" + x + ",0"});
+        g.attr({transform: "t" + x + ",0"});
+    }
+    snap.drag(adaptiveSampling03Inset);
+}
 
-                    snap.drag(adaptiveSampling03Inset);
-                   }
-
-                   loadSVG(uri, elem, adaptiveSampling03Step00);
+loadSVG(uri, elem, adaptiveSampling03Step00);
                </script>
             </section>            
              <section><!-- Integration sapce and reconstruction space -->
@@ -663,7 +671,7 @@ Spectrum RayTrace(Ray r, Covariance c){
                 <center><div style="width:80%;text-align:left;"><ul>
                     <li>Predict filtering footprint
                       <ul>
-                          <li>Ray differentials [<a href="Igehy1999">Igehy 1999</a>]</li>
+                          <li>Ray differentials [<a href="igehy1999">Igehy 1999</a>]</li>
                           <li>Path differentials [<a href="suykens2001">Suykens and Willems 2001</a>]</li>
                       </ul>
                   </li><br />
@@ -673,8 +681,17 @@ Spectrum RayTrace(Ray r, Covariance c){
                           <li>Rough transmission [<a href="derousiers2012">De Rousiers et al. 2012</a>]</li>
                       </ul>
                   </li><br />
-               </ul></div></center><br />
-                TODO: images of the methods
+               </ul></div></center>
+               <center><div style="font-size:0.5em;width:50%;">
+                  <div style="float:left;">
+                     <img src="../../data/svg/course-filtering-igehy1999.svg" height="256px" style="max-width:100%;max-height:100%;"/><br />
+                     [<a href="igehy1999">Igehy 1999</a>]
+                  </div>
+                  <div style="float:right;">
+                     <img src="../../data/svg/course-filtering-suykens2001.svg" height="256px" style="max-width:100%;max-height:100%;"/><br />
+                     [<a href="igehy1999">Suykens and Willems 2001</a>]
+                  </div>
+               </div></center>
             </section>
 
             <!-- Break before part2: applications -->
