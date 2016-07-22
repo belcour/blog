@@ -207,9 +207,33 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                    loadSVG(uri, elem, createExample01);
                </script>
             </section>
-            <!--<section>
+            <section>
             <h4>Results</h4><br />
-            </section>-->            
+               <svg id="adaptive-sampling-03" width="1325" height="462" style="position:absolute;top:150px;left:-30px;"></svg>
+               <script type="text/javascript" >
+                   var uri  = "/data/svg/course-adaptive-results.svg";
+                   var elem = "#adaptive-sampling-03";
+
+                   function adaptiveSampling03Step00(snap) {
+                    function adaptiveSampling03Inset(x, y, event) {
+                        var snap = Snap("#adaptive-sampling-03");
+                        var g = snap.select("#clipRect");
+                        var s = snap.select("#separator");
+                        var b = snap.select("#block");
+                        //g.attr({width: parseFloat(g.attr("width")) + 0.3*x});
+                        s.attr({transform: "t" + x + ",0"});
+                        g.attr({transform: "t" + x + ",0"});
+                        //g.attr({x: parseFloat(g.attr("x"))+x});
+                        //i.attr({mask: g});
+                        //console.log(y)
+                    }
+
+                    snap.drag(adaptiveSampling03Inset);
+                   }
+
+                   loadSVG(uri, elem, adaptiveSampling03Step00);
+               </script>
+            </section>            
              <section><!-- Integration sapce and reconstruction space -->
                 <h4>Alternative Methods</h4>
                 <center style="padding-top:20px;"><div style="width:80%;text-align:left;"><ul>
@@ -678,15 +702,7 @@ Spectrum RayTrace(Ray r, Covariance c){
               { src: '../js/mathjax.js', async: true },
               { src: '../js/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
             ]
-            //dependencies: [{ src: 'js/mathjax.js', async: true }]
          });
-
-         // Reveal.addEventListener( 'fragmentshown', intro01anim01fw);
-         // Reveal.addEventListener( 'fragmenthidden', intro01anim01bw);
-
-
-         // Reveal.addEventListener( 'helloshown', function() { alert("Hello"); } );
-         // Reveal.addEventListener( 'hellohidden', intro01anim01bw);
       </script>
    </body>
 </html>
