@@ -640,7 +640,7 @@ Cov = inverse(inverse(Cov) + B)
                 });
                 Reveal.addEventListener( 'fragmenthidden', function( event ) {
                     if(event.fragment.id == "operator-bsdf-01-scale") { BsdfScaleAnimation(1, 2.0); }
-                });                 
+                });
                </script>
                <pre class="fragment" id="operator-bsdf-01-scale"></pre>
 
@@ -699,7 +699,7 @@ Cov = Tf' * Cov * Tf
                  var frame = CreateFrame(snap, 200, 150, 200, 200);
                  var mat   = Snap.matrix(0.9, 0, 0, 0.1, 0, 0);
                  var cov   = CreateCovariance(snap, frame, mat);
-                 
+
                  var LensShearAnimation = function(start, end) {
                   var s = Snap("#operator-lens-01");
                   var c = s.select("#circle");
@@ -720,7 +720,7 @@ Cov = Tf' * Cov * Tf
                   Snap.animate(start, end, function(val) {
                     c.transform(M);
                     var temp2 = Snap.matrix(1, 0, val, 1, 0, 0);
-                    
+
                     c.transform(temp2.add(c.transform().localMatrix));
                   }, 100);
                 }
@@ -735,7 +735,7 @@ Cov = Tf' * Cov * Tf
                 Reveal.addEventListener( 'fragmenthidden', function( event ) {
                     if(event.fragment.id == "operator-lens-01-shear01") { LensShearAnimation(0, -shearX); }
                     if(event.fragment.id == "operator-lens-01-shear02") { LensShearAnimation02(0, -shearY); }
-                });                 
+                });
                </script>
                <pre class="fragment" id="operator-lens-01-shear01"></pre>
                <pre class="fragment" id="operator-lens-01-shear02"></pre>
@@ -855,7 +855,6 @@ Cov = {sxx, sxu, sxt;
                   Snap.animate(start, end, function(val) {
                     var temp = M;
                     temp.d = temp.d + val;
-                    //console.log(temp);
                     c.transform(temp);
                   }, 100);
                 }
@@ -872,7 +871,7 @@ Cov = {sxx, sxu, sxt;
                     if(event.fragment.id == "operator-motion-01-shear") { MotionShearAnimation(0, -shearT); }
                     if(event.fragment.id == "operator-motion-01-scale") { MotionScaleAnimation(0, -scaleX); }
                     if(event.fragment.id == "operator-motion-01-shearB") { MotionShearAnimation(0, shearT); }
-                });                 
+                });
                </script>
                <pre class="fragment" id="operator-motion-01-shear"></pre>
                <pre class="fragment" id="operator-motion-01-scale"></pre>
@@ -900,7 +899,7 @@ Cov = M' * (M' * Cov * M + O) * M
                         <li>Still defined on the radiance $ L(\mathbf{x}, \omega) $</li>
                     </ul>
                   </li>
-               </ul></div></center><br />
+               </ul></div></center>
                <img style="border:0px;box-shadow:0px 0px;" src="../../data/svg/course-volume-01.svg" width="900px" />
             </section>
             <section>
