@@ -20,13 +20,43 @@
   <defs
      id="defs4">
     <marker
+       inkscape:stockid="Arrow2Sstart"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow2Sstart"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path4450"
+         style="fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round;stroke:#e69494;stroke-opacity:1;fill:#e69494;fill-opacity:1"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="scale(0.3) translate(-2.3,0)" />
+    </marker>
+    <marker
+       inkscape:isstock="true"
+       style="overflow:visible"
+       id="marker14334"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Send">
+      <path
+         inkscape:connector-curvature="0"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)"
+         style="fill:#e69494;fill-opacity:1;fill-rule:evenodd;stroke:#e69494;stroke-width:1pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
+         id="path14336" />
+    </marker>
+    <marker
        inkscape:stockid="Arrow1Send"
        orient="auto"
        refY="0"
        refX="0"
        id="marker14134"
        style="overflow:visible"
-       inkscape:isstock="true">
+       inkscape:isstock="true"
+       inkscape:collect="always">
       <path
          id="path14136"
          d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
@@ -302,7 +332,7 @@
      inkscape:cx="433.40244"
      inkscape:cy="345.77662"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g14294"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="704"
@@ -13555,7 +13585,7 @@ KBQKvwz8D0f87naU+oh9AAAAAElFTkSuQmCC
          d="m 202.90127,134.16569 151.33478,0"
          style="fill:none;fill-rule:evenodd;stroke:#e69494;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Send)" />
       <path
-         style="fill:none;fill-rule:evenodd;stroke:#e69494;stroke-width:2.14662528;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker8490)"
+         style="fill:none;fill-rule:evenodd;stroke:#e69494;stroke-width:2.147;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker8490);marker-start:"
          d="m 252.32405,101.78934 77.48341,8.35519"
          id="path8488"
          inkscape:connector-curvature="0"

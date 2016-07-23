@@ -899,9 +899,9 @@ Cov = M' * (M' * Cov * M + O) * M
                         <li>Still defined on the radiance $ L(\mathbf{x}, \omega) $</li>
                     </ul>
                   </li>
-               </ul></div></center><br />
+               </ul></div></center>
                <!--<img style="border:0px;box-shadow:0px 0px;" src="../../data/svg/course-volume-01.svg" width="900px" />-->
-               <svg width="900px" height="400px" id="volume-equation-01"></svg>
+               <svg style="margin-top:50px;" width="900px" height="400px" id="volume-equation-01"></svg>
                <script>
 var volume01Step00 = function(snap) {
    snap.select("#Eq01").attr({ opacity: 0 });
@@ -943,7 +943,7 @@ Reveal.addEventListener( 'fragmenthidden', function( event ) {
                <pre class="fragment" id="volume01Step03"></pre>
             </section>
             <section>
-               <h4>Absorption Operator</h4><br/>
+               <h4>Absorption Operator</h4>
                <center style="padding-top:0px;"><div style="width:80%;text-align:left;"><ul>
                  <li>Same operator as occlusion
                     <ul class="sublist">
@@ -951,6 +951,40 @@ Reveal.addEventListener( 'fragmenthidden', function( event ) {
                     </ul>
                   </li>
                </ul></div></center>
+              <svg style="margin-top:150px; transform: scale(1.5);" width="700" height="400px" id="volume-equation-02"></svg>
+               <script>
+var volume02Step00 = function(snap) {
+   cx = 700-180;
+   cy = 150;
+   var frame  = CreateFrame(snap, cx, cy, 220, 220);
+   var cov    = CreateCovariance(snap, frame, Snap.matrix(0.4, 0.1, 0, 0.05, 0, 0));
+   var arrowA = snap.polyline([-110, 0, +110, 0]).attr({ id: "arrowA", strokeWidth: "2px", stroke: "#e69494", markerEnd: snap.select("#Arrow1Send"), markerStart: snap.select("#Arrow2Sstart") });
+   var arrowB = snap.polyline([-110, 0, +110, 0]).attr({ id: "arrowB", strokeWidth: "2px", stroke: "#e69494", markerEnd: snap.select("#Arrow1Send"), markerStart: snap.select("#Arrow2Sstart") });
+   frame.append(arrowA.transform(Snap.matrix().translate(0, -20)));
+   frame.append(arrowB.transform(Snap.matrix().translate(0, +20)));
+}
+var volume02Step01 = function(val, start, end) {
+   var snap = Snap("#volume-equation-02");
+   snap.select("#density02").animate({ opacity: val }, 500);
+   snap.select("#density01").animate({ opacity: 1-val }, 500);
+
+   Snap.animate(start, end, function(x) {
+      var mat = Snap.matrix(x, 0, 0, 1, 0, -20);
+      snap.select("#arrowA").transform(mat);
+      mat = Snap.matrix(x, 0, 0, 1, 0, +20);
+      snap.select("#arrowB").transform(mat);
+   }, 500);
+}
+
+loadSVG("data/svg/course-volume-02.svg", "#volume-equation-02", volume02Step00);
+Reveal.addEventListener( 'fragmentshown', function( event ) {
+    if(event.fragment.id == "volume01Step01") { volume02Step01(1, 1, 0.5); }
+});
+Reveal.addEventListener( 'fragmenthidden', function( event ) {
+    if(event.fragment.id == "volume01Step01") { volume02Step01(0, 0.5, 1); }
+});
+               </script>
+               <pre id="volume01Step01" class="fragment" />
             </section>
             <section>
                <h4>Scattering Operator</h4><br/>
