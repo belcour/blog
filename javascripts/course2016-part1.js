@@ -329,6 +329,24 @@ var showZonesFourierTransform01 = function(offset) {
 
 
 /* Rendering Equation part */
+var renderingEquation00Step00 = function(snap) {
+   snap.select("#background").attr({ style: "" });
+   snap.select("#equation").attr({opacity: 0});
+   snap.select("#inset").attr({opacity: 0});
+
+   var eye  = snap.select("#eye").attr({opacity: 0});
+   var eyeT = snap.text(120, 450, "eye").attr({ id: "eyeT", fontWeight: "bold", textAnchor: "middle", fontSize: "0.9em" }).attr({opacity: 0});
+   //eye.insert(eyeT);
+
+   var light  = snap.select("#light").attr({opacity: 0});
+   var lightT = snap.text(850, 200, "light").attr({ id: "lightT", fontWeight: "bold", fill: "#ffd932", textAnchor: "middle", fontSize: "0.9em" }).attr({opacity: 0});
+
+   var geom  = snap.select("#geometry").attr({opacity: 0});
+   var geomT = snap.text(900, 640, "geometry").attr({ id: "geomT", fontWeight: "bold", textAnchor: "middle", fontSize: "0.9em" }).attr({opacity: 0});
+
+   var mat  = snap.select("#material").attr({opacity: 0});
+   var matT = snap.text(780, 350, "material").attr({ id: "matT", fontWeight: "bold", textAnchor: "middle", fontSize: "0.9em" }).attr({opacity: 0});
+}
 
 var renderingEquation00Step01 = function(offset) {
    var snap = Snap("#rendering-equation-00");
@@ -371,25 +389,8 @@ var renderingEquation00Step04 = function(offset) {
    }
 }
 
+
 var renderingEquation01Step00 = function(snap) {
-   snap.select("feGaussianBlur").attr({ id: "feGaussianBlur00", stdDeviation: 0 });
-   snap.select("#equation").attr({opacity: 0});
-   snap.select("#inset").attr({opacity: 0});
-
-   var eye  = snap.select("#eye").attr({opacity: 0});
-   var eyeT = snap.text(120, 450, "eye").attr({ id: "eyeT", fontWeight: "bold", textAnchor: "middle", fontSize: "0.9em" }).attr({opacity: 0});
-   //eye.insert(eyeT);
-
-   var light  = snap.select("#light").attr({opacity: 0});
-   var lightT = snap.text(850, 200, "light").attr({ id: "lightT", fontWeight: "bold", fill: "#ffd932", textAnchor: "middle", fontSize: "0.9em" }).attr({opacity: 0});
-
-   var geom  = snap.select("#geometry").attr({opacity: 0});
-   var geomT = snap.text(900, 640, "geometry").attr({ id: "geomT", fontWeight: "bold", textAnchor: "middle", fontSize: "0.9em" }).attr({opacity: 0});
-
-   var mat  = snap.select("#material").attr({opacity: 0});
-   var matT = snap.text(780, 350, "material").attr({ id: "matT", fontWeight: "bold", textAnchor: "middle", fontSize: "0.9em" }).attr({opacity: 0});
-}
-var renderingEquation01Step01 = function(snap) {
 
    // Change the filter and opacity
    //snap.select("filter7119").attr({ id: "fileRE01" });

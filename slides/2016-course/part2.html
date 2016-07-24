@@ -528,7 +528,8 @@ Spectrum RayTrace(Ray r, Covariance c){
                </ul></div></center>
             </section>
             <!--<section>
-            <h4>Results</h4><br />
+                <h4>Results</h4><br />
+                <video data-autoplay  width="100%" height="600px" src="covariance-filtering.m4v" requestFullScreen></video>
             </section>-->
             <section><!-- Talk about Anton's paper APPM -->
                 <h4>Alternative Methods</h4><br />
@@ -670,11 +671,28 @@ Spectrum RayTrace(Ray r, Covariance c){
             <!-- Results -->
             <section>
                <h4>Result: Snail Scene</h4>
-               <iframe volume="0" data-autoplay width="100%" height="600px" src="https://www.youtube.com/embed/_Sh8xcspWG8?start=127&end=166&rel=0" frameborder="0" allowfullscreen></iframe>
-               <!--<video data-autoplay src="covariance-filtering.m4v"></video>-->
+               <!--<iframe volume="0" data-autoplay width="100%" height="600px" src="https://www.youtube.com/embed/_Sh8xcspWG8?start=127&end=166&rel=0" frameborder="0" allowfullscreen></iframe>-->
+               <video controls id="covariance-filtering-video">
+                   <source width="100%" height="600px" src="covariance-filtering.m4v" ></source>
+                </video>
+               <!--<script>
+                   function filteringVideoFullScreen() {
+                        var video = dom.getElementById("covariance-filtering-video");
+                        video.play();
+                        video.requestFullscreen();
+                   }
+
+                   // Animation for the slide {forward and backward}
+                  Reveal.addEventListener( 'fragmentshown', function( event ) {
+                     if(event.fragment.id == "filterinVideo") { filteringVideoFullScreen(); }
+                  });
+                  Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                  });
+                </script>
+                <pre class="fragment" id="filterinVideo" />-->
             </section>
             <section><!-- Other antialiasing kernel things? -->
-                <h4>Alternative Methods</h4><br />
+                <h4>Alternative Methods</h4>
                 <center><div style="width:80%;text-align:left;"><ul>
                     <li>Predict filtering footprint
                       <ul>

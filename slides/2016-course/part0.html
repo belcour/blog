@@ -44,17 +44,28 @@
             <section>
                <h4>Welcome</h4><br />
                <center><div style="width:80%;text-align:left;"><ul>
-                  <li class="fragment">Introduction to Freq. Analysis of Light Transport
-                  <ul class="fragment" style="font-size:0.8em;padding-top:0.5em;">
-                        <li>Application of Signal Processing in Graphics</li>
-                        <li>Analytical study of the Fourier Transform</li>
+                  <li class="fragment">About this course
+                  <ul>
+                        <li>Result of 11 years of research so far</li>
+                        <li>Started with Durand et al. [<a href="durand2005">2005</a>]</li>
                   </ul></li><br/>
-                  <li class="fragment">Applications in Physically Based Rendering
-                  <ul class="fragment" style="font-size:0.8em;padding-top:0.5em;">
-                        <li>Adaptive rendering</li>
-                        <li>Denoising</li>
-                        <li>Antialiasing</li>
+                  <li class="fragment">About the lecturer
+                  <ul>
+                        <li>Into frequency analysis since its Ph.D. (2009)</li>
+                        <li>Now applying it to real-time graphics @ Unity</li>
                   </ul></li>
+               </ul></div></center>
+            </section>
+            <section>
+               <h4>Noise: An Issue in Physically Based Rendering</h4><br />
+               <center><div style="width:80%;text-align:left;"><ul>
+                  <li class="fragment">PBR rely a lot on sampling
+                  <ul>
+                        <li>Plagued by noise</li>
+                        <li>Hard to know a stopping criterion</li>
+                  </ul></li><br/>
+                  <li class="fragment">Frequency Analysis can solve part of it!
+                  </li>
                </ul></div></center>
             </section>
             <section>
@@ -64,7 +75,7 @@
 
                   <ul style="padding-left:10%;">
                         <li>Adaptive sampling</li>
-                        <li>Upsampling</li>                        
+                        <li>Upsampling</li>
                         <li>Density estimation</li>
                         <li>Anti-aliasing</li>
                   </ul>
@@ -77,11 +88,16 @@
 
             <!-- Signal processing, what are its uses -->
             <section>
-               <h4>Signal Processing</h4><br />
+               <h4>Frequency Analysis</h4><br />
 
                <center><div style="width:80%;text-align:left;">
                <ul>
-                  <li>Study of signals and operations on those signals</li><br />
+                  <li>In the Signal Processing toolbox
+                        <ul>
+                              <li>Study of signals and their transformations</li>
+                              <li>Application to digitalization, sampling, numerical integration</li>
+                        </ul>
+                  </li><br />
                </ul>
                </div>
                <img src="http://ecx.images-amazon.com/images/I/51qtdIney4L._SX379_BO1,204,203,200_.jpg" width="20%"/>
@@ -115,18 +131,85 @@
             </section>
 
 
-            <!-- Back to Physically Based Rendering -->
-            <section data-transition="fade-in slide-out">
-               <h4>How to Apply it in Rendering?</h4>
-               <img src="../../data/images/dragon-01.png" width="512px" style="border-width: 1px;"/>
+            <!-- A lot of rendering has to do with blur -->
+            <section>
+               <h4>Rendering has a lot to do with Blur</h4>
+               <center style="margin-left:110px;">
+               <div style="height:512px;">
+               <div style="float:left;position:relative;width:512px;height:512px;margin:0;">
+               <img id="local-analysis-01-img" src="../../data/images/dragon-01.png" width="512" height="512" style="border-width:0px;position:absolute;z-index:-1;margin:0px;top:0;left:0;" />
+               <svg viewBox="0 0 512 512" style="width:512px;height:512px;position:absolute;z-index:1;top:0;left:0;" id="local-analysis-01"></svg>
+               <canvas id="local-analysis-01-fft1" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+               <canvas id="local-analysis-01-fft2" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+               </div>
+               <div style="float:right;position:relative;width:512;height:512px;margin:0;padding-right:120px">
+                  <svg id="rendering-equation-02" width="512px" style="border-width: 0px;margin: 0;"></svg>
+               </div>
+               </div>
+               </center>
+
+               <script type="text/javascript">
+                  function renderingEquation02Step00(snap) {
+                     var layer = snap.select("#svg2")
+                     layer.attr({width: 800, height: 512})
+                     snap.select("#lens").attr({ opacity: 0 })
+                  }
+                  loadSVG("data/svg/course-pbr02.svg", "#rendering-equation-02", renderingEquation02Step00);
+
+                  document.getElementById("local-analysis-01-img").onload = function() {
+                    var inset1 = {size:32, x:150, y:200, color: "#aa0000", canvas: "local-analysis-01-fft1"};
+                    var inset2 = {size:32, x:210, y:300, color: "#00aa00", canvas: "local-analysis-01-fft2"};
+                    var windw1 = {size: 150, x:-150, y:-10};
+                    var windw2 = {size: 150, x: 250, y:400};
+
+                    localAnalysisCreateInset("#local-analysis-01", "local-analysis-01-img", inset1, windw1);
+                    localAnalysisCreateInset("#local-analysis-01", "local-analysis-01-img", inset2, windw2);
+                  }
+               </script>
             </section>
+            <section>
+               <h4>For Example: Defocus Blur</h4>
+               <center style="margin-left:110px;">
+               <div style="height:512px;">
+               <div style="float:left;position:relative;width:512px;height:512px;margin:0;">
+               <img id="local-analysis-02-img" src="../../data/images/dragon-02.png" width="512" height="512" style="border-width:0px;position:absolute;z-index:-1;margin:0px;top:0;left:0;" />
+               <svg viewBox="0 0 512 512" style="width:512px;height:512px;position:absolute;z-index:1;top:0;left:0;" id="local-analysis-02"></svg>
+               <canvas id="local-analysis-02-fft1" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+               <canvas id="local-analysis-02-fft2" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+               </div>
+               <div style="float:right;position:relative;width:512;height:512px;margin:0;padding-right:120px">
+                  <svg id="rendering-equation-03" width="512px" style="border-width: 0px;margin: 0;"></svg>
+               </div>
+               </div>
+               </center>
+
+               <script type="text/javascript">
+                  function renderingEquation03Step00(snap) {
+                     var layer = snap.select("#svg2")
+                     layer.attr({width: 800, height: 512})
+                  }
+                  loadSVG("data/svg/course-pbr02.svg", "#rendering-equation-03", renderingEquation03Step00);
+
+                  document.getElementById("local-analysis-02-img").onload = function() {
+                    var inset1 = {size:32, x:150, y:200, color: "#aa0000", canvas: "local-analysis-02-fft1"};
+                    var inset2 = {size:32, x:210, y:300, color: "#00aa00", canvas: "local-analysis-02-fft2"};
+                    var windw1 = {size: 150, x:-150, y:-10};
+                    var windw2 = {size: 150, x: 250, y:400};
+
+                    localAnalysisCreateInset("#local-analysis-02", "local-analysis-02-img", inset1, windw1);
+                    localAnalysisCreateInset("#local-analysis-02", "local-analysis-02-img", inset2, windw2);
+                  }
+               </script>
+            </section>
+
+
+
             <section data-transition="slide-in fade-out">
                <!-- <h4>Physically Based Rendering</h4> -->
-
                <svg style="position:absolute;top:0;left:0;z-index:-1;" width="1280px" height="720px" id="rendering-equation-00"></svg>
 
                <script type="text/javascript">
-                  loadSVG("data/svg/course-pbr01.svg", "#rendering-equation-00", renderingEquation01Step00);
+                  loadSVG("data/svg/course-pbr01.svg", "#rendering-equation-00", renderingEquation00Step00);
                </script>
                <p class="fragment" data-call="renderingEquation00Step01"></p>
                <p class="fragment" data-call="renderingEquation00Step02"></p>
@@ -135,11 +218,10 @@
             </section>
             <section>
                <!-- <h4>Physically Based Rendering</h4> -->
-
                <svg style="position:absolute;top:0;left:0;z-index:-1;" width="1280px" height="720px" id="rendering-equation-01"></svg>
 
                <script type="text/javascript">
-                  loadSVG("data/svg/course-pbr01.svg", "#rendering-equation-01", renderingEquation01Step01);
+                  loadSVG("data/svg/course-pbr01.svg", "#rendering-equation-01", renderingEquation01Step00);
                </script>
                <p class="fragment" data-call="renderingEquation01Step02"></p>
                <p class="fragment" data-call="renderingEquation01Step03"></p>
@@ -161,7 +243,7 @@
                   snap.text(750, 220, "need to compute").attr({textAnchor: "start", fontSize: "0.7em"});
                </script>
             </section>
-            <section id="local-analysis-slide">
+            <!--<section id="local-analysis-slide">
                <h4>Local Analysis</h4>
                <center>
                <div style="position:relative;width:512px;height:512px;margin:0;">
@@ -184,7 +266,7 @@
                   }
 
                </script>
-            </section>
+            </section>-->
 
             <!-- The overview of the presentation -->
             <section>
