@@ -80,7 +80,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -125,7 +125,7 @@
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker5089)" />
     <text
        xml:space="preserve"
-       style="font-size:15px;text-anchor:end"
+       style="font-size:15px;text-anchor:end;-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
        x="504.65939"
        y="306.06506"
        id="text5459"><tspan
@@ -137,7 +137,7 @@
        id="text5463"
        y="212.41975"
        x="-5.8635588"
-       style="font-size:15px;text-anchor:end;fill:#000080;"
+       style="font-size:15px;text-anchor:end;fill:#000000;-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;fill-opacity:1;"
        xml:space="preserve"
        transform="matrix(0,-1,1,0,0,0)"><tspan
          y="212.41975"
