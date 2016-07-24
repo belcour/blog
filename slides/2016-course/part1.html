@@ -962,6 +962,8 @@ var volume02Step00 = function(snap) {
    var arrowB = snap.polyline([-110, 0, +110, 0]).attr({ id: "arrowB", strokeWidth: "2px", stroke: "#e69494", markerEnd: snap.select("#Arrow1Send"), markerStart: snap.select("#Arrow2Sstart") });
    frame.append(arrowA.transform(Snap.matrix().translate(0, -20)));
    frame.append(arrowB.transform(Snap.matrix().translate(0, +20)));
+
+   snap.select("#density02").attr({ opacity: 0 });
 }
 var volume02Step01 = function(val, start, end) {
    var snap = Snap("#volume-equation-02");
@@ -999,15 +1001,15 @@ Reveal.addEventListener( 'fragmenthidden', function( event ) {
 
             <!-- Summary of all the operators -->
             <section>
-               <h4>Summary: Frequency Operators</h4><br />
-               <svg id="operator-summary-01" width="900px" height="400px"></svg>
-               <script type="text/javascript">
+               <h4>Summary: Frequency Operators</h4>
+               <img src="../../data/svg/course-operators-summary.svg" id="operator-summary-01" width="1280" height="500px" style="border:none;box-shadow:none;"></svg>
+               <!--<script type="text/javascript">
                   loadSVG("data/svg/course-operators-summary.svg", "#operator-summary-01", null);
-               </script>
+               </script>-->
             </section>
             <section>
                <h4>Summary: A Unified Theory</h4>
-               <svg id="operator-bib-01" width="1200" height="400px"></svg>
+               <svg id="operator-bib-01" width="1200" height="400px" style="transform: scale(1.2);"></svg>
                <script type="text/javascript">
                   loadSVG("data/svg/course-bib-summary.svg", "#operator-bib-01", null);
                </script>
