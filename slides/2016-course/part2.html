@@ -115,11 +115,11 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                      <ul class="fragment" data-fragment-index="3"><li>Last example with Mathematica</li></ul>
                   </li>
                </ul></div></center>
-               <center class="fragment" data-fragment-index="3" style="padding-top:10px;"><div style="width:60%; background: #ffffff; text-align: left; padding: 25px 25px; box-shadow: 5px 5px 35px #dddddd;">
+               <center class="fragment" data-fragment-index="4" style="padding-top:10px;"><div style="width:60%; background: #ffffff; text-align: left; padding: 25px 25px; box-shadow: 5px 5px 35px #dddddd;">
                      <div><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px; margin-bottom: 10px;" src="../../data/images/course-2d-covariance-01.gif" /></div>
-                     <div class="fragment" data-fragment-index="4"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px; margin-bottom: -30px;" src="../../data/images/course-2d-covariance-02.gif" /></div>
-                     <div class="fragment" data-fragment-index="5"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px;" src="../../data/images/course-2d-covariance-03.png" /></div>
-                     <div class="fragment" data-fragment-index="5"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px;" src="../../data/images/course-2d-covariance-04.png" /></div>
+                     <div class="fragment" data-fragment-index="5"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px; margin-bottom: -30px;" src="../../data/images/course-2d-covariance-02.gif" /></div>
+                     <div class="fragment" data-fragment-index="6"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px;" src="../../data/images/course-2d-covariance-03.png" /></div>
+                     <div class="fragment" data-fragment-index="6"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px;" src="../../data/images/course-2d-covariance-04.png" /></div>
                </div></center>
             </section>
 
@@ -208,14 +208,23 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                 Reveal.addEventListener( 'fragmentshown', function( event ) {
                     if(event.fragment.id == "adaptiveSampling01Step01") { adaptiveSampling01Step01(1); }
                     if(event.fragment.id == "adaptiveSampling01Step02") { adaptiveSampling01Step02(1); }
+                    if(event.fragment.id == "adaptiveSampling01Step03") { adaptiveSampling01Step03(1); }
+                    if(event.fragment.id == "adaptiveSampling01Step04") { adaptiveSampling01Step02(0); }
+                    if(event.fragment.id == "adaptiveSampling01Step05") { adaptiveSampling01Step05(1); }
                 });
                 Reveal.addEventListener( 'fragmenthidden', function( event ) {
                     if(event.fragment.id == "adaptiveSampling01Step01") { adaptiveSampling01Step01(0); }
                     if(event.fragment.id == "adaptiveSampling01Step02") { adaptiveSampling01Step02(0); }
+                    if(event.fragment.id == "adaptiveSampling01Step03") { adaptiveSampling01Step03(0); }
+                    if(event.fragment.id == "adaptiveSampling01Step04") { adaptiveSampling01Step02(1); }
+                    if(event.fragment.id == "adaptiveSampling01Step05") { adaptiveSampling01Step05(0); }
                 });
                </script>
                <pre class="fragment" id="adaptiveSampling01Step01"></pre>
                <pre class="fragment" id="adaptiveSampling01Step02"></pre>
+               <pre class="fragment" id="adaptiveSampling01Step03"></pre>
+               <pre class="fragment" id="adaptiveSampling01Step04"></pre>
+               <pre class="fragment" id="adaptiveSampling01Step05"></pre>
 
 
             </section>

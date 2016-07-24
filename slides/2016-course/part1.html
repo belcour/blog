@@ -965,7 +965,7 @@ var volume02Step00 = function(snap) {
 }
 var volume02Step01 = function(val, start, end) {
    var snap = Snap("#volume-equation-02");
-   snap.select("#density02").animate({ opacity: val }, 500);
+   snap.select("#density02").animate({ opacity: val }, 1000);
    snap.select("#density01").animate({ opacity: 1-val }, 500);
 
    Snap.animate(start, end, function(x) {

@@ -355,8 +355,9 @@ const createExample01 = function(snap) {
 
    var fourier = snap.select("#fourierDomain").attr({ opacity: 0});
    fourier = CreateFrame(snap, 670, 109, 173, 173);
-   CreateCovariance(snap, fourier, Snap.matrix(0.1, -0.1, 0, 0.5, 0, 0));
-
+   var cov     = CreateCovariance(snap, fourier, Snap.matrix(0.5, -0.1, 0, 0.1, 0, 0));
+   cov.attr({ id: "covariance" });
+   var rect   = snap.rect(583.5, 106, 173, 5).attr({ id: "bwbox", opacity: 0.0, fill: "#ff0000" });
 
    // Generate the samples within the sample space
    const box1 = snap.select("#samplespace");
@@ -373,24 +374,75 @@ const createExample01 = function(snap) {
    adaptiveSamplingRandomSamples(snap);
    //adaptiveSamplingStructuredSamples(snap);
 
+   // Update the caption
+   console.log(snap.select("#fourierSpaceText").select("tspan").node.innerHTML = "Fourier Space (object)");
+
    setData("example01", "lastElem", undefined)
 }
 
 function adaptiveSampling01Step01(offset) {
+    var snap = Snap("#example01-svg");
+    var cov  = snap.select("#covariance");
+
+    if(offset > 0) {
+        var m1 = cov.transform().localMatrix;
+        Snap.animate(0, 1, function(val) {
+            var m2 = Snap.matrix(1,  val, 0, 1, 0, 0);
+            cov.transform(m2.add(m1));
+        }, 500);
+        // Update the caption
+        console.log(snap.select("#fourierSpaceText").select("tspan").node.innerHTML = "Fourier Space (lens)");
+    } else {
+        var m1 = cov.transform().localMatrix;
+        Snap.animate(0, -1, function(val) {
+            var m2 = Snap.matrix(1,  val, 0, 1, 0, 0);
+            cov.transform(m2.add(m1));
+        }, 500);
+        // Update the caption
+        console.log(snap.select("#fourierSpaceText").select("tspan").node.innerHTML = "Fourier Space (object)");
+    }
+}
+
+function adaptiveSampling01Step02(offset) {
+    var snap  = Snap("#example01-svg");
+    var cov   = snap.select("#covariance");
+    var shear = 0.5;
+    if(offset > 0) {
+        var m1 = cov.transform().localMatrix;
+        Snap.animate(0, shear, function(val) {
+            var m2 = Snap.matrix(1,  0, val, 1, 0, 0);
+            cov.transform(m2.add(m1));
+        }, 500);
+        // Update the caption
+        console.log(snap.select("#fourierSpaceText").select("tspan").node.innerHTML = "Fourier Space (image)");
+    } else {
+        var m1 = cov.transform().localMatrix;
+        Snap.animate(0, -shear, function(val) {
+            var m2 = Snap.matrix(1,  0, val, 1, 0, 0);
+            cov.transform(m2.add(m1));
+        }, 500);
+        // Update the caption
+        console.log(snap.select("#fourierSpaceText").select("tspan").node.innerHTML = "Fourier Space (lens)");
+    }
+}
+
+function adaptiveSampling01Step03(offset) {
     snap = Snap("#example01-svg");
 
     if(offset > 0) {
         snap.select("#samples").remove();
         snap.select("#integrationdomain").attr({ opacity: 0 });
+        snap.select("#bwbox").attr({ opacity: 0.5 });
         adaptiveSamplingStructuredSamples(snap);
     } else {
         snap.select("#totalsamples").remove();
         snap.select("#integrationdomain").attr({ opacity: 0.5 });
+        snap.select("#bwbox").attr({ opacity: 0.0 });
         adaptiveSamplingRandomSamples(snap);
     }
 }
 
-function adaptiveSampling01Step02(offset) {
+function adaptiveSampling01Step05(offset) {
     snap = Snap("#example01-svg");
 
     if(offset > 0) {
