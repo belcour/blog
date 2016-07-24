@@ -590,16 +590,13 @@ Spectrum RayTrace(Ray r, Covariance c){
             <section>
                <h4>Frequency Analysis Perspective</h4><br />
                <center><div style="width:80%;text-align:left;"><ul>
-                  <li>This kernel is a low-pass filter on the BRDF:</li>
+                  <li>This kernel is a low-pass filter on the SV-BRDF:</li>
                </ul></div></center><br />
                <svg id="antialiasing04" width="800px" height="450px" style="margin-top:-50px;"></svg>
                <script type="text/javascript">
                   var s = Snap("#antialiasing04");
                   createFilter(s, 0, 400, 790, 300, 400);
                </script>
-
-               <br />
-               <strong>TODO</strong>: Need to explain why this is an integral in Fourier as well!
             </section>
             <section>
                <h4>Antialiasing and Global Illumination</h4>
@@ -610,7 +607,7 @@ Spectrum RayTrace(Ray r, Covariance c){
                <script>
                   loadSVG("slides/2016-covariance-filtering/svg/multiscatter.svg", "#antialiasing05", null);
                </script>
-              <center><div style="width:80%;text-align:left;"><ul>
+              <center><div style="width:80%;text-align:left;margin-top:40px;"><ul>
                   <li>How can we estimate the kernel in that case?</li>
                </ul></div></center><br />
             </section>
@@ -669,6 +666,12 @@ Spectrum RayTrace(Ray r, Covariance c){
                s.drag(demo01move);
             </script>
             <small>Kernel after one bounce</small>
+            </section>
+            <!-- Results -->
+            <section>
+               <h4>Result: Snail Scene</h4>
+               <iframe volume="0" data-autoplay width="100%" height="600px" src="https://www.youtube.com/embed/_Sh8xcspWG8?start=127&end=166&rel=0" frameborder="0" allowfullscreen></iframe>
+               <!--<video data-autoplay src="covariance-filtering.m4v"></video>-->
             </section>
             <section><!-- Other antialiasing kernel things? -->
                 <h4>Alternative Methods</h4><br />

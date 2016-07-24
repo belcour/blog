@@ -24,7 +24,6 @@ const loadSVG = function(uri, elem, call) {
    Snap.load(base + uri, function (f) {
       var s = Snap(elem);
       s.append(f);
-
       if(call != undefined && call != null) { call(s); }
    });
 }

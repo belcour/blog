@@ -25,9 +25,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.47702207"
-     inkscape:cx="372.04724"
-     inkscape:cy="1029.3025"
+     inkscape:zoom="2.9318231"
+     inkscape:cx="347.99237"
+     inkscape:cy="874.19875"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -187,26 +187,26 @@
     </marker>
     <clipPath
        clipPathUnits="userSpaceOnUse"
-       id="clipPath23488">
-      <circle
-         style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-         id="circle23490"
-         cx="-42.737854"
-         cy="-56.938366"
-         r="8.8895531"
-         transform="matrix(0.99995657,-0.00931968,0.00931968,0.99995657,0,0)" />
+       id="clipPath9773">
+      <ellipse
+         style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5.04818773;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="circle9775"
+         cx="1815.2838"
+         cy="398.06531"
+         rx="133.32297"
+         ry="150.83379"
+         transform="matrix(0.93196411,-0.36255055,0.46048858,0.88766563,0,0)" />
     </clipPath>
     <clipPath
        clipPathUnits="userSpaceOnUse"
-       id="clipPath25105">
-      <ellipse
-         style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5.04818773;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-         id="circle25107"
-         cx="1815.2837"
-         cy="398.06528"
-         rx="133.32297"
-         ry="150.83379"
-         transform="matrix(0.9319641,-0.36255056,0.46048858,0.88766563,0,0)" />
+       id="clipPath9839">
+      <circle
+         style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.3164562;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="circle9841"
+         cx="-42.73785"
+         cy="-56.938366"
+         r="8.8895531"
+         transform="matrix(0.99995657,-0.00931968,0.00931968,0.99995657,0,0)" />
     </clipPath>
   </defs>
   <metadata
@@ -257,13 +257,13 @@
        height="381.30429"
        width="404.00488"
        transform="matrix(0.56329313,0.2033574,-0.29221595,0.52274585,-797.292,-43.824544)"
-       clip-path="url(#clipPath25105)" />
+       clip-path="url(#clipPath9773)" />
     <g
        id="zoomeduv"
        inkscape:label="WireframeSphere"
        transform="matrix(9.4618266,0.08818502,-0.08818502,9.4618266,752.38807,716.9278)"
        style="stroke-width:0.06329124;stroke-miterlimit:4;stroke-dasharray:none"
-       clip-path="url(#clipPath23488)">
+       clip-path="url(#clipPath9839)">
       <g
          id="g23146"
          inkscape:label="Lines of Longitude"
