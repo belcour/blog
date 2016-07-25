@@ -328,6 +328,24 @@ Cov = {sxx, sxu;
             <!--
                                   The different operators
               -->
+            <section>
+               <h4>First Step Operators</h4>
+               <center style="width: 100%;position:absolute;top:50px;left: 0;">
+               <svg id="rendering-equation-11" width="1080px" height=400px style="border-width: 0px;margin: 0;"></svg>
+               </center>
+
+               <script type="text/javascript">
+                  function renderingEquation11Step00(snap) {
+                     renderingEquation04Step00(snap);
+                     snap.select("#path1-00").attr({ opacity: 0 });
+                     snap.select("#path1-01").attr({ opacity: 0 });
+                     snap.select("#path2-00").attr({ opacity: 0 });
+                     snap.select("#image4489").attr({ opacity: 0 });
+                  }
+
+                  loadSVG("data/svg/course-pbr02.svg", "#rendering-equation-11", renderingEquation11Step00);
+               </script>
+            </section>
 
             <!-- Travel operator -->
             <section>
@@ -590,6 +608,29 @@ Cov = inverse(inverse(Cov) + B)
 
             <!-- Transmission operator -->
             <section>
+               <h4>BRDF is not All!</h4>
+               <center style="width: 100%;position:absolute;top:50px;left: 0;">
+               <svg id="rendering-equation-12" width="1080" style="border-width: 0px;margin: 0;"></svg>
+               </center>
+
+               <script type="text/javascript">
+               function photonMapping02Step00(snap) {
+                    snap.select("#variance").attr({ opacity: 0 });
+                    snap.select("#bias").attr({ opacity: 0 });
+                    snap.select("#adaptive").attr({ opacity: 0 });
+
+                    snap.select("#eye01a").attr({ opacity: 0 });
+                    snap.select("#hit01").attr({ opacity: 0 });
+                    snap.select("#eye02").attr({ opacity: 0 });
+                    snap.select("#eye03").attr({ opacity: 0 });
+
+                    snap.select("#photona").attr({ opacity: 0 });
+                    snap.select("#photonb").attr({ opacity: 0 });
+                }
+                  loadSVG("data/svg/course-photon-mapping-02.svg", "#rendering-equation-12", photonMapping02Step00);
+               </script>
+            </section>
+            <section>
               <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-10px;"><img src="../../data/images/thesis.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-7px;">&nbsp;<a href="#url(belcourThesis)">Belcour 2012</a></span>
                <h4>Refraction Operator</h4><br/>
                <center>
@@ -667,6 +708,15 @@ Cov = Tf' * Cov * Tf
 
 
             <!-- Lens operator -->
+            <section>
+               <h4>Adding Defocus!</h4>
+               <center style="width: 100%;position:absolute;top:50px;left: 0;">
+               <svg id="rendering-equation-13" width="1080" style="border-width: 0px;margin: 0;"></svg>
+               </center>
+               <script type="text/javascript">
+                  loadSVG("data/svg/course-pbr03.svg", "#rendering-equation-13", null);
+               </script>
+            </section>
             <section>
               <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-10px;"><img src="../../data/images/acm.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-5px;">&nbsp;<a href="#url(durand2005)">Soler et al. 2009</a></span>
                <h4>Lens Operator</h4><br/>
@@ -751,8 +801,16 @@ Cov = L' * Cov * L
                </pre>
             </section>
 
-
             <!-- Motion operator -->
+            <section>
+               <h4>Adding Moving-Blur</h4>
+               <center style="width: 100%;position:absolute;top:50px;left:0;">
+               <svg id="rendering-equation-14" width="1080px" style="border-width: 0px;margin: 0;"></svg>
+               </center>
+               <script type="text/javascript">
+                  loadSVG("data/svg/course-pbr04.svg", "#rendering-equation-14", null);
+               </script>
+            </section>
             <section>
                <h4>Adding Another Dimension for Motion-Blur</h4>
                <center>
@@ -887,8 +945,16 @@ Cov = M' * (M' * Cov * M + O) * M
                </pre>
             </section>
 
-
             <!-- Participating media operator -->
+            <section>
+               <h4>Adding Volumes</h4>
+               <center style="width: 100%;position:absolute;top:50px;left: 0;">
+               <svg id="rendering-equation-15" width="1080" style="border-width: 0px;margin: 0;"></svg>
+               </center>
+               <script type="text/javascript">
+                  loadSVG("data/svg/course-pbr05.svg", "#rendering-equation-15", null);
+               </script>
+            </section>
             <section>
               <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-10px;"><img src="../../data/images/acm.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-5px;">&nbsp;<a href="#url(belcour2014)">Belcour et al. 2014</a></span>
                <h4>Participating Media Operators</h4><br/>
@@ -964,6 +1030,7 @@ var volume02Step00 = function(snap) {
    frame.append(arrowB.transform(Snap.matrix().translate(0, +20)));
 
    snap.select("#density02").attr({ opacity: 0 });
+   snap.select("#density01").attr({ opacity: 1 });
 }
 var volume02Step01 = function(val, start, end) {
    var snap = Snap("#volume-equation-02");
@@ -1005,6 +1072,7 @@ Reveal.addEventListener( 'fragmenthidden', function( event ) {
                </ul></div></center>
             </section>
 
+
             <!-- Summary of all the operators -->
             <section>
                <h4>Summary: Frequency Operators</h4>
@@ -1025,7 +1093,7 @@ Reveal.addEventListener( 'fragmenthidden', function( event ) {
             <!-- Break before part2: applications -->
             <section class="title">
                <h4>Break: Questions?</h4><br />
-               <a style="font-size:0.7em;float:right;padding-top:25%" href="part2.html">> next part</a>
+               <a style="font-size:0.7em;float:right;padding-top:22%" href="part2.html">> next part</a>
             </section>
          <div>
       </div>

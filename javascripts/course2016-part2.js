@@ -374,6 +374,9 @@ const createExample01 = function(snap) {
    adaptiveSamplingRandomSamples(snap);
    //adaptiveSamplingStructuredSamples(snap);
 
+    // Update the caption
+    console.log(snap.select("#fourierSpaceText").select("tspan").node.innerHTML = "Fourier Space (object)");
+
    setData("example01", "lastElem", undefined)
 }
 
