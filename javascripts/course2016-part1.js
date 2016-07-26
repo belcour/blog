@@ -327,6 +327,111 @@ var showZonesFourierTransform01 = function(offset) {
       }
 }
 
+const createFourierTransform02 = function(snap) {
+      // Position of the input image
+      var bbox    = snap.select("#image").getBBox();
+      var img_cnv = document.getElementById("fourier-transform-02-img");
+      var img_ctx = img_cnv.getContext('2d');
+      img_cnv.style.width  = bbox.width + "px";
+      img_cnv.style.height = bbox.height + "px";
+      img_cnv.style.left   = bbox.x + "px";
+      img_cnv.style.top    = bbox.y + "px";
+      img_cnv.style.backgroundColor = "#F0F";
+
+      // Reconstructed image
+      var rec_cnv = document.getElementById("fourier-transform-02-rec");
+      var rec_ctx = rec_cnv.getContext('2d');
+      rec_cnv.style.width  = bbox.width + "px";
+      rec_cnv.style.height = bbox.height + "px";
+      rec_cnv.style.left   = bbox.x + "px";
+      rec_cnv.style.top    = bbox.y + "px";
+      rec_cnv.style.backgroundColor = "#F0F";
+      rec_ctx.fillStyle = '#ffffff';
+      rec_ctx.fillRect(0, 0, rec_ctx.canvas.width, rec_ctx.canvas.height);
+
+      // Position of the fourier spectrum
+      var bbox    = snap.select("#fourier").getBBox();
+      var fft_cnv = document.getElementById("fourier-transform-02-fft");
+      var fft_ctx = fft_cnv.getContext('2d');
+      fft_cnv.style.width  = bbox.width + "px";
+      fft_cnv.style.height = bbox.height + "px";
+      fft_cnv.style.left   = bbox.x + "px";
+      fft_cnv.style.top    = bbox.y + "px";
+      fft_cnv.style.backgroundColor = "#FFF";
+      fft_ctx.fillStyle = '#000';
+      fft_ctx.fillRect(0, 0, fft_ctx.canvas.width, fft_ctx.canvas.height);
+
+      // Load the image and display it
+      const h = 128, w = 128;
+      var image   = new Image(w, h);
+
+      var updateImage = function() {
+            // Compute the FFT of the image
+            FFT.init(w);
+            FrequencyFilter.init(w);
+            var src = fft_ctx.getImageData(0, 0, w, h);
+            var dat = src.data;
+            var re = [], im = [];
+            for(var y=0; y<h; y++) {
+                  var i = y*w;
+                  for(var x=0; x<w; x++) {
+                  var L = dat[(i << 2) + (x << 2) + 0]
+                        + dat[(i << 2) + (x << 2) + 1]
+                        + dat[(i << 2) + (x << 2) + 2];
+                  re[i + x] = 1.E4*L;
+                  im[i + x] = 0.0;
+                  }
+            }
+            FrequencyFilter.swap(re, im);
+            FFT.ifft2d(re, im);
+
+            for(var y=0; y<h; y++) {
+                  var i = y*w;
+                  for(var x=0; x<w; x++) {
+                        var val = re[i + x];
+                        val = val > 255 ? 255 : val < 0 ? 0 : val;
+                        var p   = (i << 2) + (x << 2);
+                        dat[p] = dat[p + 1] = dat[p + 2] = val;
+                  }
+            }
+            img_ctx.putImageData(src, 0, 0);
+            img_cnv.style.zIndex = "2";
+      }
+
+      fft_cnv.addEventListener("mousemove", function (e) {
+            // Compute positions
+            //var elem = $("fourier-transform-02-fft");
+            var offset = fft_cnv.getBoundingClientRect();
+            var winX = offset.left;
+            var winY = offset.top;
+            var mosX = e.clientX;
+            var mosY = e.clientY;
+            var currX = mosX - winX;
+            var currY = mosY - winY;
+
+            // Fills the image with blakc
+            fft_ctx.beginPath();
+            fft_ctx.fillStyle = "#000";
+            fft_ctx.fillRect(0, 0, 128, 128);
+            fft_ctx.fill();
+
+            // Add a dot
+            fft_ctx.beginPath();
+            fft_ctx.fillStyle = "#FFF";
+            // TODO remove fucking scale factor!!
+            fft_ctx.fillRect(Math.floor(currX/2.7), Math.floor(currY/2.7), 0.5, 0.5);
+            fft_ctx.fill();
+
+            console.log({winX: winX, winY: winY, mosX: mosX, mosY: mosY});
+            updateImage();
+      });
+
+      updateImage();
+      snap.select("#zone0").attr({opacity: 0});
+      snap.select("#zone1").attr({opacity: 0});
+      snap.select("#zone2").attr({opacity: 0});
+}
+
 
 /* Rendering Equation part */
 var renderingEquation00Step00 = function(snap) {

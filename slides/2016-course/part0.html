@@ -44,29 +44,51 @@
             <section>
                <h4>Welcome</h4><br />
                <center><div style="width:80%;text-align:left;"><ul>
-                  <li class="fragment">About this course
+                  <li class="fragment" data-fragment-index="1">About this course
                   <ul>
                         <li>Result of 11 years of research so far</li>
                         <li>Started with Durand et al. [<a href="durand2005">2005</a>]</li>
                   </ul></li><br/>
-                  <li class="fragment">About the lecturer
+                  <li class="fragment" data-fragment-index="2">About the lecturer
                   <ul>
                         <li>Into frequency analysis since its Ph.D. (2009)</li>
                         <li>Now applying it to real-time graphics @ Unity</li>
                   </ul></li>
                </ul></div></center>
+               <img class="fragment" style="margin-top:20px;" data-fragment-index="1" width="450px" src="http://people.csail.mit.edu/fredo/PUBLI/Fourier/stata.jpg" />
             </section>
             <section>
                <h4>Noise: An Issue in Physically Based Rendering</h4><br />
                <center><div style="width:80%;text-align:left;"><ul>
-                  <li class="fragment">PBR rely a lot on sampling
+                  <li>PBR rely a lot on sampling
                   <ul>
                         <li>Plagued by noise</li>
-                        <li>Hard to know a stopping criterion</li>
-                  </ul></li><br/>
-                  <li class="fragment">Frequency Analysis can solve part of it!
+                        <li>Hard to know a stopping criterion</li><br />
+                  </ul></li>
+                  <li class="fragment" id="courseExample01">Frequency Analysis can solve part of it!
                   </li>
                </ul></div></center>
+               <svg id="course-examples-01"  style="margin-top:20px;" width="1280" height="400px"></svg>
+               <script type="text/javascript" class="fragment">
+function courseExamples00(snap) {
+}
+
+function courseExamples01(offset) {
+      var snap = Snap("#course-examples-01");
+      snap.select("#fogPPB").animate({ opacity: offset}, 500);
+      snap.select("#blurMC").animate({ opacity: offset}, 500);
+      snap.select("#antialiasingMC").animate({ opacity: offset}, 500);
+}
+
+Reveal.addEventListener( 'fragmentshown', function( event ) {
+      if(event.fragment.id == "courseExample01") {  courseExamples01(0); }
+});
+Reveal.addEventListener( 'fragmenthidden', function( event ) {
+      if(event.fragment.id == "courseExample01") { courseExamples01(1); }
+});
+
+loadSVG('data/svg/course-examples.svg', '#course-examples-01', courseExamples00);
+               </script>
             </section>
             <section>
                <h4>Applications</h4><br />
@@ -81,7 +103,7 @@
                   </ul>
                   </li>
                </ul></div></center>
-               <img src="../../data/svg/course-introduction-01.svg" id="introduction-01" width="1080px" style="border:0;box-shadow:none;"></svg>
+               <img src="../../data/svg/course-introduction-01.svg" id="introduction-01" width="1080px" style="border:0;box-shadow:none;transform:scale(1.2);"></svg>
                <script type="text/javascript">
                </script>
             </section>
@@ -129,12 +151,27 @@
                loadSVG('data/svg/course-fourier01.svg', '#fourier-transform-01-svg', createFourierTransform01);
                </script>
             </section>
+            <section>
+               <h4>The Fourier Transform</h4>
+               <center style="transform:scale(1.5);padding-top:0.1em;">
+               <div style="position:relative;width:600px;height:300px;margin-top:100px;">
+               <canvas id="fourier-transform-02-fft" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:4;"></canvas>
+               <canvas id="fourier-transform-02-img" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:1;"></canvas>
+               <canvas id="fourier-transform-02-rec" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:0;"></canvas>
+               <svg id="fourier-transform-02-svg" width="600px" height="300px" style="position:relative;z-index:3;"></svg>
+               </div><br />
+               </center>
+               <script type="text/javascript">
+               loadSVG('data/svg/course-fourier01.svg', '#fourier-transform-02-svg', createFourierTransform02);
+               </script>
+            </section>
+
 
 
             <!-- A lot of rendering has to do with blur -->
             <section>
                <h4>Rendering has a lot to do with Blur</h4>
-               <center style="margin-left:110px;">
+               <center style="margin-left:110px;margin-top:50px;">
                <div style="height:512px;">
                <div style="float:left;position:relative;width:512px;height:512px;margin:0;">
                <img id="local-analysis-01-img" src="../../data/images/dragon-01.png" width="512" height="512" style="border-width:0px;position:absolute;z-index:-1;margin:0px;top:0;left:0;" />
@@ -169,7 +206,7 @@
             </section>
             <section  data-transition="fade-in slide-out">
                <h4>For Example: Defocus Blur</h4>
-               <center style="margin-left:110px;">
+               <center style="margin-left:110px;margin-top:50px;">
                <div style="height:512px;">
                <div style="float:left;position:relative;width:512px;height:512px;margin:0;">
                <img id="local-analysis-02-img" src="../../data/images/dragon-02.png" width="512" height="512" style="border-width:0px;position:absolute;z-index:-1;margin:0px;top:0;left:0;" />
@@ -202,10 +239,49 @@
                </script>
             </section>
 
+            <!-- Our goal -->
+            <section>
+               <h4>Our Goal</h4><br />
+               <center><div style="width:80%;text-align:left;"><ul>
+                  <li class="fragment">Use the Fourier Transform
+                        <ul>
+                              <li>Predict the smoothness in rendering</li>
+                              <li>Use it to adapt and optimize rendering</li>
+                        </ul>
+                  </li><br/>
+                  <li class="fragment">However
+                        <ul>
+                              <li>We cannot fully render the image</li>
+                              <li>We only need a conservative prediction</li>
+                        </ul>
+                  </li><br />
+                  <li class="fragment">But without limitations
+                        <ul>
+                              <li>Be able to treat defocus, motion blur, ...</li>
+                              <li>Work for offline and <em>real-time</em> contexts</li>
+                        </ul>
+                  </li>
+               </ul></div></center>
+            </section>
 
+            <!-- How can we compute / predict the Fourier transform in the image? -->
+            <section>
+               <h4>Fourier Transform of Radiance?</h4><br />
+               <svg width="800px" height="500px" id="rendering-apply-01"></svg>
+               <script type="text/javascript">
+                  var snap = Snap("#rendering-apply-01");
+                  var path = snap.path("m 120.74838,189.8229 c -11.67208,0 -144.278872,3.95905 -148.888519,-179.280271 -3.448933,-137.099489 92.96321,-165.402069 113.984864,-171.034809 l -0.09225,-15.759 34.45677,31.33809 -34.059428,42.66547 -0.370011,-18.24525 C 64.453299,-114.77845 -26.773106,-95.787872 -28.160431,10.232912 -29.696981,127.65749 91.026663,155.96416 120.21597,155.96416 Z");
+                  path.transform(Snap.matrix().translate(100, 200));
+                  path = path.clone();
+                  path.transform(Snap.matrix().translate(700, 230).add(Snap.matrix().rotate(180)));
+                  snap.text(400,  70, "Rendered image").attr({textAnchor: "middle"});
+                  snap.text(400, 390, "Fourier transform").attr({textAnchor: "middle"});
+                  snap.text( 50, 220, "need to optimize").attr({textAnchor: "end", fontSize: "0.7em"});
+                  snap.text(750, 220, "need to compute").attr({textAnchor: "start", fontSize: "0.7em"});
+               </script>
+            </section>
 
             <section data-transition="slide-in fade-out">
-               <!-- <h4>Physically Based Rendering</h4> -->
                <svg style="position:absolute;top:0;left:0;z-index:-1;" width="1280px" height="720px" id="rendering-equation-00"></svg>
 
                <script type="text/javascript">
@@ -227,21 +303,6 @@
                <p class="fragment" data-call="renderingEquation01Step03"></p>
                <p class="fragment" data-call="renderingEquation01Step04"></p>
                <p class="fragment" data-call="renderingEquation01Step05"></p>
-            </section>
-            <section>
-               <h4>Fourier Transform of Radiance?</h4><br />
-               <svg width="800px" height="500px" id="rendering-apply-01"></svg>
-               <script type="text/javascript">
-                  var snap = Snap("#rendering-apply-01");
-                  var path = snap.path("m 120.74838,189.8229 c -11.67208,0 -144.278872,3.95905 -148.888519,-179.280271 -3.448933,-137.099489 92.96321,-165.402069 113.984864,-171.034809 l -0.09225,-15.759 34.45677,31.33809 -34.059428,42.66547 -0.370011,-18.24525 C 64.453299,-114.77845 -26.773106,-95.787872 -28.160431,10.232912 -29.696981,127.65749 91.026663,155.96416 120.21597,155.96416 Z");
-                  path.transform(Snap.matrix().translate(100, 200));
-                  path = path.clone();
-                  path.transform(Snap.matrix().translate(700, 230).add(Snap.matrix().rotate(180)));
-                  snap.text(400,  70, "Rendered image").attr({textAnchor: "middle"});
-                  snap.text(400, 390, "Fourier transform").attr({textAnchor: "middle"});
-                  snap.text( 50, 220, "need to optimize").attr({textAnchor: "end", fontSize: "0.7em"});
-                  snap.text(750, 220, "need to compute").attr({textAnchor: "start", fontSize: "0.7em"});
-               </script>
             </section>
             <!--<section id="local-analysis-slide">
                <h4>Local Analysis</h4>

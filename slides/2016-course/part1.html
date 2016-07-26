@@ -61,7 +61,7 @@
             </section>
 
             <!-- Recap of the light transport integration method -->
-            <section>
+            <!--<section>
                <h4>Frequency Analysis of Light Transport</h4>
                <center style="margin-left:110px;">
                <div style="height:512px;">
@@ -129,7 +129,7 @@
                     localAnalysisCreateInset("#local-analysis-02", "local-analysis-02-img", inset2, windw2);
                   }
                </script>
-            </section>
+            </section>-->
             <section>
                <h4>How to Predict Spectrum?</h4><br />
                <ul style="width:80%;">
@@ -329,7 +329,7 @@ Cov = {sxx, sxu;
                                   The different operators
               -->
             <section>
-               <h4>First Step Operators</h4>
+               <h4>First Step Operators: Surface Shading</h4>
                <center style="width: 100%;position:absolute;top:50px;left: 0;">
                <svg id="rendering-equation-11" width="1080px" height=400px style="border-width: 0px;margin: 0;"></svg>
                </center>
@@ -344,6 +344,19 @@ Cov = {sxx, sxu;
                   }
 
                   loadSVG("data/svg/course-pbr02.svg", "#rendering-equation-11", renderingEquation11Step00);
+               </script>
+            </section>
+            <section>
+               <!-- <h4>Physically Based Rendering</h4> -->
+               <svg style="position:absolute;top:0;left:0;z-index:-1;" width="1280px" height="720px" id="rendering-equation-111"></svg>
+
+               <script type="text/javascript">
+                  function renderingEquation111Step01(snap) {
+                     //var snap = Snap("#rendering-equation-111");
+                     snap.rect(140, 310, 340, 100).attr({ stroke: "#ff0000", strokeWidth: "2px", fillOpacity: 0 });
+                     renderingEquation01Step00(snap)
+                  }
+                  loadSVG("data/svg/course-pbr01.svg", "#rendering-equation-111", renderingEquation111Step01);
                </script>
             </section>
 
@@ -409,6 +422,18 @@ Cov = Tr' * Cov * Tr
 
 
             <!-- Occlusion operator -->
+            <section>
+               <svg style="position:absolute;top:0;left:0;z-index:-1;" width="1280px" height="720px" id="rendering-equation-112"></svg>
+
+               <script type="text/javascript">
+                  function renderingEquation112Step01(snap) {
+                     //var snap = Snap("#rendering-equation-111");
+                     snap.rect(680, 310, 155, 100).attr({ stroke: "#ff0000", strokeWidth: "2px", fillOpacity: 0 });
+                     renderingEquation01Step00(snap)
+                  }
+                  loadSVG("data/svg/course-pbr01b.svg", "#rendering-equation-112", renderingEquation112Step01);
+               </script>
+            </section>
             <section>
               <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-10px;"><img src="../../data/images/acm.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-5px;">&nbsp;<a href="#url(durand2005)">Durand et al. 2005</a></span>
                <h4>Visibility Operator</h4><br/>
@@ -485,6 +510,19 @@ Cov = Cov + Occ
             </section>
 
             <!-- Local shading needs a further decomposition -->
+            <section>
+               <!-- <h4>Physically Based Rendering</h4> -->
+               <svg style="position:absolute;top:0;left:0;z-index:-1;" width="1280px" height="720px" id="rendering-equation-113"></svg>
+
+               <script type="text/javascript">
+                  function renderingEquation113Step01(snap) {
+                     snap.rect(520, 310, 240, 100).attr({ stroke: "#ff0000", strokeWidth: "2px", fillOpacity: 0 });
+                     snap.rect(940, 310, 125, 100).attr({ stroke: "#0000ff", strokeWidth: "2px", fillOpacity: 0 });
+                     renderingEquation01Step00(snap)
+                  }
+                  loadSVG("data/svg/course-pbr01.svg", "#rendering-equation-113", renderingEquation113Step01);
+               </script>
+            </section>
             <section>
                <h4>Shading Operator<strong>s</strong></h4><br/>
                <center><div style="width:80%;text-align:left;"><ul>
@@ -803,7 +841,7 @@ Cov = L' * Cov * L
 
             <!-- Motion operator -->
             <section>
-               <h4>Adding Moving-Blur</h4>
+               <h4>Adding Motion-Blur</h4>
                <center style="width: 100%;position:absolute;top:50px;left:0;">
                <svg id="rendering-equation-14" width="1080px" style="border-width: 0px;margin: 0;"></svg>
                </center>

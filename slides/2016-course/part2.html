@@ -125,6 +125,9 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
 
 
             <!-- Adaptive sampling and reconstruction -->
+            <section class="title">
+                <h4>Application to Adaptive Sampling & Reconstructiong</h4>
+            </section>
             <section>
                <h4>Adaptive Sampling and Reconstruction</h4><br />
                <center><div style="width:80%;text-align:left;"><ul>
@@ -277,7 +280,12 @@ loadSVG(uri, elem, adaptiveSampling03Step00);
                </div></center>
             </section>
 
+
+
             <!-- Upsampling -->
+            <section class="title">
+                <h4>Application to Upsampling</h4>
+            </section>
             <section>
                 <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-20px;"><img src="../../data/images/acm.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-5px;">&nbsp;<a href="#url(bagher2013)">Bagher et al. 2013</a></span>
                <h4>Upsampling</h4>
@@ -314,10 +322,9 @@ loadSVG(uri, elem, adaptiveSampling03Step00);
                 </div>
             </section>
             <section>
-            <h4>Results</h4><br />
-                <!--<iframe volume="0" data-autoplay width="100%" height="600px" src="https://hal.inria.fr/hal-00652066v4/file/Final_Video-11-Apr-2012_QT_5Mbps.mov" frameborder="0" allowfullscreen></iframe>-->
-                <video controls id="covariance-filtering-video">
-                    <source width="100%" height="600px" src="upsampling.m4v" ></source>
+                <video  height="700px" controls id="upsampling-video">
+                    <source src="upsampling.mp4#t=59" type="video/mp4" ></source>
+                    <source src="https://hal.inria.fr/hal-00652066v4/file/Final_Video-11-Apr-2012_QT_5Mbps.mov#t=59" type="video/mov"></video>
                 </video>
             </section>
              <section><!-- Integration sapce and reconstruction space -->
@@ -348,6 +355,9 @@ loadSVG(uri, elem, adaptiveSampling03Step00);
             </section>
 
             <!-- Tracing from the light ! -->
+            <section class="title">
+                <h4>Application to Photon Mapping</h4>
+            </section>
             <section>
                 <h4>"Online" Frequency Analysis</h4>
                <center><div style="width:80%;text-align:left;"><ul>
@@ -499,6 +509,22 @@ Spectrum RayTrace(Ray r, Covariance c){
                <pre class="fragment" id="photonMapping02Step03"></pre>
                <pre class="fragment" id="photonMapping02Step04"></pre>
             </section>
+            <section>
+                <h4>Density Estimation</h4>
+               <center><div style="width:80%;text-align:left;padding-top:15px;"><ul>
+                <li>Initial radius has a big impact
+                    <ul>
+                        <li>[<a href="kaplanyan2013">Kaplanyan and Daschacher 2013</a>]</li>
+                    </ul>
+               </li><br />
+               <li>At the core of some modern techniques:
+                   <ul>
+                        <li>Progressive Photon Mapping [Hachisuka et al. 2009]</li>
+                        <li>Vertex Connection and Merging [Georgiev et al. 2013][Hachisuka et al. 2013]</li>
+                   </ul>
+               </li>
+               </ul></div></center>
+            </section>
             <section data-transition="slide-in fade-out">
                <h4>Adaptive Density Estimation</h4><br />
                <center><div style="width:80%;text-align:left;padding-top:15px;"><ul>
@@ -555,7 +581,11 @@ Spectrum RayTrace(Ray r, Covariance c){
             </div></center>
             </section>
 
+
             <!-- Antialiasing -->
+            <section class="title">
+                <h4>Application to Antialiasing</h4>
+            </section>
             <section>
                <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-40px;"><img src="../../data/images/thesis.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-7px;">&nbsp;<a href="#url(belcour2015)">Belcour et al. 2015</a></span>
                <h4>Antialiasing Surface Appearance</h4><br />
@@ -580,6 +610,22 @@ Spectrum RayTrace(Ray r, Covariance c){
                <script>
                   loadSVG("slides/2016-covariance-filtering/svg/filtering01.svg", "#antialiasing02", antialiasingAppearance02Step00);
                </script>
+            </section>
+            <section>
+               <h4>Limitation of Decoupling & Pixel Footprint</h4><br />
+               <center><div style="width:80%;text-align:left;"><ul>
+                  <li class="fragment">Break with bidirectional path-tracing (BDPT, VCM)
+                      <ul>
+                          <li>Light variations must be accounted</li>
+                      </ul>
+                  </li><br />
+                  <li class="fragment">Assume the view and light directions are constant
+                  </li><br/>
+                  <li class="fragment">Using a 'binary'' footprint
+                      <ul><li>Doesn't account for the pixel filter</li>
+                      <li>Limited to single scattering</li></ul>
+                  </li>
+               </ul></div></center>
             </section>
             <section>
                <h4>Antialiasing Surface Appearance</h4><br />
@@ -673,26 +719,10 @@ Spectrum RayTrace(Ray r, Covariance c){
             </section>
             <!-- Results -->
             <section>
-               <h4>Result: Snail Scene</h4>
                <!--<iframe volume="0" data-autoplay width="100%" height="600px" src="https://www.youtube.com/embed/_Sh8xcspWG8?start=127&end=166&rel=0" frameborder="0" allowfullscreen></iframe>-->
                <video controls id="covariance-filtering-video">
                    <source width="100%" height="600px" src="covariance-filtering.m4v" ></source>
                 </video>
-               <!--<script>
-                   function filteringVideoFullScreen() {
-                        var video = dom.getElementById("covariance-filtering-video");
-                        video.play();
-                        video.requestFullscreen();
-                   }
-
-                   // Animation for the slide {forward and backward}
-                  Reveal.addEventListener( 'fragmentshown', function( event ) {
-                     if(event.fragment.id == "filterinVideo") { filteringVideoFullScreen(); }
-                  });
-                  Reveal.addEventListener( 'fragmenthidden', function( event ) {
-                  });
-                </script>
-                <pre class="fragment" id="filterinVideo" />-->
             </section>
             <section><!-- Other antialiasing kernel things? -->
                 <h4>Alternative Methods</h4>
