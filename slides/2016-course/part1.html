@@ -157,13 +157,6 @@
             <section>
                <h4>Fourier Analysis using Operators</h4><br />
                <ul style="width:80%;">
-                  <li>Operators decompose the Rendering Equation
-                     <ul style="font-size:0.8em;">
-                        <li>Travel in free space</li>
-                        <li>Reflection and Transmission</li>
-                        <li>Projection on surfaces</li>
-                     </ul>
-                  </li><br />
                   <li>We will use a <em>first-order expansion</em>
                      <ul style="font-size:0.8em;">
                         <li>Analytical forms</li>
@@ -172,7 +165,7 @@
                   </li><br />
                </ul>
 
-               <span style="position:absolute;top:500px;left:10%;width:40%;">
+               <span style="position:absolute;top:350px;left:10%;width:40%;">
                <svg>
                   <defs>
                         <marker style="overflow:visible;" id="arrow" refX="0.0" refY="0.0" orient="auto">
@@ -189,7 +182,7 @@
                </svg><br />
                $$L(\mathbf{x}, \boldsymbol{\omega})$$
                </span>
-               <span style="position:absolute;top:500px;left:50%;width:40%;">
+               <span style="position:absolute;top:350px;left:50%;width:40%;">
                <svg>
                   <defs>
                         <marker style="overflow:visible;" id="arrow" refX="0.0" refY="0.0" orient="auto">
@@ -238,6 +231,8 @@
                <center  style="transform:scale(1.5);padding-top:3em;">
                <object type="image/svg+xml" data="../../data/svg/cov_twoplanes.svg" width="604px" id="draw_cov_twoplanes"></object><br />
                <script src="../../javascripts/draw_cov_twoplanes.js" type="text/javascript">
+var snap = Snap("#draw_cov_twoplanes");
+console.log(snap);
                </script>
                </center>
             </section>

@@ -503,8 +503,9 @@ var renderingEquation01Step00 = function(snap) {
    snap.select("#background").attr({ opacity: 0.1});
 
    // Inset elements
-   snap.select("#inset").attr({opacity: 0});
-   snap.select("#indirect").attr({opacity: 0});
+   var inset = snap.select("#inset");    if(inset != null) { inset.attr({opacity: 0}); }
+   var indir = snap.select("#indirect"); if(indir != null) { indir.attr({opacity: 0}); }
+   //snap.select("#indirect").attr({opacity: 0});
 
    // Add labels
    var t1 = snap.text(125, 420, "outgoing radiance").attr({ fill: "#008000", fontSize: "0.6em"});
