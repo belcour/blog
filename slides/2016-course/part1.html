@@ -371,16 +371,14 @@ Cov = {sxx, sxu;
                </script>
             </section>
             <section>
-               <!-- <h4>Physically Based Rendering</h4> -->
-               <svg style="position:absolute;top:0;left:0;z-index:-1;" width="1280px" height="720px" id="rendering-equation-111"></svg>
-
+               <object type="image/svg+xml" data="../../data/svg/course-pbr01.svg" width="1280px" id="rendering-equation-111"></object>
                <script type="text/javascript">
-                  function renderingEquation111Step01(snap) {
-                     //var snap = Snap("#rendering-equation-111");
-                     snap.rect(140, 310, 340, 100).attr({ stroke: "#ff0000", strokeWidth: "2px", fillOpacity: 0 });
-                     renderingEquation01Step00(snap)
-                  }
-                  loadSVG("data/svg/course-pbr01.svg", "#rendering-equation-111", renderingEquation111Step01);
+var svg = document.getElementById("rendering-equation-111");
+svg.onload = function() {
+  var snap = Snap("#rendering-equation-111");
+  snap.rect(140, 310, 340, 100).attr({ stroke: "#ff0000", strokeWidth: "2px", fillOpacity: 0 });
+  renderingEquation01Step00(snap);
+}
                </script>
             </section>
 
@@ -447,15 +445,14 @@ Cov = Tr' * Cov * Tr
 
             <!-- Occlusion operator -->
             <section>
-               <svg style="position:absolute;top:0;left:0;z-index:-1;" width="1280px" height="720px" id="rendering-equation-112"></svg>
-
+               <object type="image/svg+xml" data="../../data/svg/course-pbr01b.svg" width="1280px" id="rendering-equation-112"></object>
                <script type="text/javascript">
-                  function renderingEquation112Step01(snap) {
-                     //var snap = Snap("#rendering-equation-111");
-                     snap.rect(680, 310, 155, 100).attr({ stroke: "#ff0000", strokeWidth: "2px", fillOpacity: 0 });
-                     renderingEquation01Step00(snap)
-                  }
-                  loadSVG("data/svg/course-pbr01b.svg", "#rendering-equation-112", renderingEquation112Step01);
+var svg = document.getElementById("rendering-equation-112");
+svg.onload = function() {
+  var snap = Snap("#rendering-equation-112");
+  snap.rect(680, 310, 155, 100).attr({ stroke: "#ff0000", strokeWidth: "2px", fillOpacity: 0 });
+  renderingEquation01Step00(snap);
+}
                </script>
             </section>
             <section>
@@ -534,16 +531,17 @@ Cov = Cov + Occ
             </section>
 
             <!-- Local shading needs a further decomposition -->
-            <section>
+            <section data-state="rendering-eq-113">
                <!-- <h4>Physically Based Rendering</h4> -->
-               <svg style="position:absolute;top:0;left:0" width="1280px" height="720px" id="rendering-equation-113"></svg>
+               <object type="image/svg+xml" data="../../data/svg/course-pbr01.svg" width="1280px" id="rendering-equation-113"></object>
                <script type="text/javascript">
-                  function renderingEquation113Step01(snap) {
-                     snap.rect(520, 310, 240, 100).attr({ stroke: "#ff0000", strokeWidth: "2px", fillOpacity: 0 });
-                     snap.rect(940, 310, 125, 100).attr({ stroke: "#0000ff", strokeWidth: "2px", fillOpacity: 0 });
-                     renderingEquation01Step00(snap)
-                  }
-                  loadSVG("data/svg/course-pbr01.svg", "#rendering-equation-113", renderingEquation113Step01);
+var svg = document.getElementById("rendering-equation-113");
+svg.onload = function() {
+  var snap = Snap("#rendering-equation-113");
+  snap.rect(520, 310, 240, 100).attr({ stroke: "#ff0000", strokeWidth: "2px", fillOpacity: 0 });
+  snap.rect(940, 310, 125, 100).attr({ stroke: "#0000ff", strokeWidth: "2px", fillOpacity: 0 });
+  renderingEquation01Step00(snap);
+}
                </script>
             </section>
             <section>
@@ -1078,8 +1076,8 @@ Reveal.addEventListener( 'fragmenthidden', function( event ) {
                     </ul>
                   </li>
                </ul></div></center>
-              <svg style="margin-top:150px; transform: scale(1.5);" width="700" height="400px" id="volume-equation-02"></svg>
-               <script>
+               <object type="image/svg+xml" data="../../data/svg/course-volume-02.svg" width="1050px" id="volume-equation-02"></object><br />
+               <script type="text/javascript">
 var volume02Step00 = function(snap) {
    cx = 700-180;
    cy = 150;
@@ -1106,15 +1104,19 @@ var volume02Step01 = function(val, start, end) {
    }, 500);
 }
 
-loadSVG("data/svg/course-volume-02.svg", "#volume-equation-02", volume02Step00);
+var svg = document.getElementById("volume-equation-02");
+svg.onload = function() {
+  var snap = Snap("#volume-equation-02");
+  volume02Step00(snap);
+}
 Reveal.addEventListener( 'fragmentshown', function( event ) {
-    if(event.fragment.id == "volume01Step01") { volume02Step01(1, 1, 0.5); }
+    if(event.fragment.id == "volume02Step01") { volume02Step01(1, 1, 0.5); }
 });
 Reveal.addEventListener( 'fragmenthidden', function( event ) {
-    if(event.fragment.id == "volume01Step01") { volume02Step01(0, 0.5, 1); }
+    if(event.fragment.id == "volume02Step01") { volume02Step01(0, 0.5, 1); }
 });
                </script>
-               <pre id="volume01Step01" class="fragment" />
+               <pre id="volume02Step01" class="fragment" />
             </section>
             <section>
                <h4>Scattering Operator</h4><br/>

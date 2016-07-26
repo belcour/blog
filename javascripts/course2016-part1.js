@@ -499,8 +499,9 @@ var renderingEquation01Step00 = function(snap) {
 
    // Change the filter and opacity
    //snap.select("filter7119").attr({ id: "fileRE01" });
+   var background = snap.select("#background");
    snap.select("feGaussianBlur").attr({ stdDeviation: 10 });
-   snap.select("#background").attr({ opacity: 0.1});
+   background.attr({ opacity: 0.1 });
 
    // Inset elements
    var inset = snap.select("#inset");    if(inset != null) { inset.attr({opacity: 0}); }
