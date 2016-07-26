@@ -29,7 +29,7 @@
          <div class="slides">
 
             <!-- Title screen -->
-            <section class="title"> <!-- data-background="./png/background.png" -->
+            <section class="title" data-background="../../data/images/slides-background.png" data-background-size="contain">
             <h3>A Practical Introduction to<br /> Frequency Analysis of Light Transport</h3>
             <p><small>
                <a href="http://belcour.github.io/blog">Laurent Belcour - Unity Technologies</a>
@@ -55,7 +55,8 @@
                         <li>Now applying it to real-time graphics @ Unity</li>
                   </ul></li>
                </ul></div></center>
-               <img class="fragment" style="margin-top:20px;" data-fragment-index="1" width="450px" src="http://people.csail.mit.edu/fredo/PUBLI/Fourier/stata.jpg" />
+               <div class="fragment"  data-fragment-index="1"><span><img style="margin-top:20px;" width="450px" src="http://people.csail.mit.edu/fredo/PUBLI/Fourier/stata.jpg" /></span>
+               <div style="font-size:0.5em;">[<a href="durand2005">Durand et al. 2005</a>]</div></div>
             </section>
             <section>
                <h4>Noise: An Issue in Physically Based Rendering</h4><br />
@@ -69,7 +70,7 @@
                   </li>
                </ul></div></center>
                <svg id="course-examples-01"  style="margin-top:20px;" width="1280" height="400px"></svg>
-               <script type="text/javascript" class="fragment">
+               <script type="text/javascript">
 function courseExamples00(snap) {
 }
 
@@ -169,7 +170,7 @@ loadSVG('data/svg/course-examples.svg', '#course-examples-01', courseExamples00)
 
 
             <!-- A lot of rendering has to do with blur -->
-            <section>
+            <section data-transition="slide-in fade-out">
                <h4>Rendering has a lot to do with Blur</h4>
                <center style="margin-left:110px;margin-top:50px;">
                <div style="height:512px;">
@@ -204,7 +205,7 @@ loadSVG('data/svg/course-examples.svg', '#course-examples-01', courseExamples00)
                   }
                </script>
             </section>
-            <section  data-transition="fade-in slide-out">
+            <section data-transition="fade-in slide-out">
                <h4>For Example: Defocus Blur</h4>
                <center style="margin-left:110px;margin-top:50px;">
                <div style="height:512px;">
@@ -266,7 +267,7 @@ loadSVG('data/svg/course-examples.svg', '#course-examples-01', courseExamples00)
 
             <!-- How can we compute / predict the Fourier transform in the image? -->
             <section>
-               <h4>Fourier Transform of Radiance?</h4><br />
+               <h4>Fourier Transform of Rendering?</h4><br />
                <svg width="800px" height="500px" id="rendering-apply-01"></svg>
                <script type="text/javascript">
                   var snap = Snap("#rendering-apply-01");
@@ -279,6 +280,22 @@ loadSVG('data/svg/course-examples.svg', '#course-examples-01', courseExamples00)
                   snap.text( 50, 220, "need to optimize").attr({textAnchor: "end", fontSize: "0.7em"});
                   snap.text(750, 220, "need to compute").attr({textAnchor: "start", fontSize: "0.7em"});
                </script>
+            </section>
+	      <section>
+               <h4>Fourier Transform of Rendering?</h4><br />
+               <center><div style="width:80%;text-align:left;"><ul>
+                  <li class="fragment">Need to go to the fundementals
+                        <ul>
+                              <li>Rendering Equation [<a href="kajiya1986">Kajiya 1986</a>]</li>
+                        </ul>
+                  </li><br/>
+                  <li class="fragment">Generic analysis
+                        <ul>
+                              <li>Break the RE into operators</li>
+                              <li>To perform and compose the analysis</li>
+                        </ul>
+                  </li><br />
+               </ul></div></center>
             </section>
 
             <section data-transition="slide-in fade-out">
