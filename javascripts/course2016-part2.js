@@ -487,10 +487,10 @@ var antialiasingAppearance02Step00 = function(s) {
 
 var antialiasingAppearance03Step00 = function (s) {
     // Add text
-    s.text( 25, 310, "pixel").attr({opacity: 0.5, fill: 'black', fontSize: '0.8em'});
-    s.text(300, 310, "kernel").attr({opacity: 0.5, fill: 'black', fontSize: '0.8em'});
-    s.text(460, 310, "material").attr({opacity: 0.5, fill: 'black', fontSize: '0.8em'});
-    s.text(680, 310, "light").attr({opacity: 0.5, fill: 'black', fontSize: '0.8em'});
+    s.text( 25, 310, "pixel").attr({opacity: 0.5, fill: 'black', fontSize: '0.6em'});
+    s.text(300, 310, "kernel").attr({opacity: 0.5, fill: 'black', fontSize: '0.6em'});
+    s.text(460, 310, "material").attr({opacity: 0.5, fill: 'black', fontSize: '0.6em'});
+    s.text(680, 310, "light").attr({opacity: 0.5, fill: 'black', fontSize: '0.6em'});
 };
 
 var createFilter = function(snap, x0, y0, w, h, sigma, orient, style) {

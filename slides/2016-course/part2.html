@@ -62,6 +62,29 @@
                </ol>
             </section>
 
+            <!-- The overview of the presentation -->
+            <section>
+               <h4>Overview</h4><br />
+               <ol style="color:#aaaaaa;text-align:left;display:block;padding-left:3em;">
+                  <li style="padding-bottom:0.5em;">Introduction</li>
+                  <li style="padding-bottom:0.5em;">Frequency Operators
+                     <ul style="font-size:0.6em;">
+                        <li>Travel & Occlusion</li>
+                        <li>Reflection & Refraction</li>
+                        <li>Scattering & Absorption</li>
+                     </ul>
+                  </li>
+                  <li style="color:#000000;padding-bottom:0.5em;">Applications
+                     <ul style="font-size:0.6em;">
+                        <li style="color:#5380E3;">Adaptive sampling & denoising</li>
+                        <li style="color:#5380E3;">Upsampling</li>
+                        <li style="color:#5E884C;">Density estimation</li>
+                        <li style="color:#5E884C;">Antialiasing</li>
+                     </ul>
+                  </li>
+                  <li style="padding-bottom:0.5em;">Conclusion</li>
+               </ol>
+            </section>
 
             <section>
                <h4>Working with Operators</h4>
@@ -108,7 +131,7 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                </script>
             </section>
             <section>
-               <h4>Working with Operators</h4>
+               <h4><span style="color:#5380E3;">'Deferred'</span> Frequency Analysis</h4>
                <center style="padding-top:10px;"><div style="width:80%;text-align:left;"><ul>
                    <li class="fragment" data-fragment-index="1">Static analysis: using closed forms</li><br />
                   <li  class="fragment" data-fragment-index="2">Compatible with you favorite math toolbox
@@ -121,6 +144,71 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                      <div class="fragment" data-fragment-index="6"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px;" src="../../data/images/course-2d-covariance-03.png" /></div>
                      <div class="fragment" data-fragment-index="6"><img style="border:0px; box-shadow: 0 0 0; margin: 0px 0px;" src="../../data/images/course-2d-covariance-04.png" /></div>
                </div></center>
+            </section>
+            <section>
+               <h4><span style="color:#5380E3;">'Deferred'</span> Frequency Analysis</h4>
+               <center style="padding-top:10px;"><div style="width:80%;text-align:left;"><ul>
+                   <li class="fragment" data-fragment-index="1">Need a pre-pass to compute the spectrum
+                       <ul>
+                           <li>During G-buffer creation for interactive</li>
+                           <li>During a sampling pre-pass for offline</li>
+                       </ul>
+                   </li><br />
+               </ul></div></center>
+            </section>
+
+            <section>
+                <h4><span style="color:#5E884C;">'Online'</span> Frequency Analysis</h4>
+               <center><div style="width:80%;text-align:left;"><ul>
+                  <li>When closed forms are not possible
+                      <ul>
+                          <li>Multiple scattering dominant</li>
+                          <li>Multiple scenarios but same code (reflexion and refraction)</li>
+                      </ul>
+                  </li><br />
+                  <li>Inline frequency analysis in raytracing
+                      <ul>
+                          <li>See source code on <a href="https://github.com/belcour/CovarianceTracing">github</a></li>
+                      </ul>
+                  </li>
+                </ul></div></center>
+                <pre style="width:47%;float:left;margin:5px;padding:0px;">
+                    <code>
+Spectrum RayTrace(Ray r){
+
+   // Check intersection
+   hit = Intersect(scene, r);
+   if(! hit) return Black;
+
+   // Interaction with material
+   Ray new_r = SampleBRDF(hit);
+   return RayTrace(new_r);
+}
+                    </code>
+                </pre><div style="float:left;padding-top:100px;padding-left:15px;width:2%;">></div>
+                <pre  style="width:47%;float:right;margin:5px;padding:0px;">
+                    <code>
+Spectrum RayTrace(Ray r, Covariance c){
+
+   // Check intersection
+   hit = Intersect(scene, r);
+   if(! hit) return Black;
+
+   // Evaluate covariance at the surface
+   c.Travel(hit);
+   c.Projection(hit);
+
+   // Interaction with material
+   Ray new_r = SampleBRDF(hit);
+
+   // Compute reflected covariance
+   c.Reflection(hit);
+   c.InverseProjection(hit);
+
+   return RayTrace(new_r, c);
+}
+                    </code>
+                </pre>
             </section>
 
 
@@ -364,59 +452,6 @@ loadSVG(uri, elem, adaptiveSampling03Step00);
             <section class="title">
                 <h4>Application to Photon Mapping</h4>
             </section>
-            <section>
-                <h4>"Online" Frequency Analysis</h4>
-               <center><div style="width:80%;text-align:left;"><ul>
-                  <li>When closed forms are not possible
-                      <ul>
-                          <li>Multiple scattering dominant</li>
-                          <li>Multiple scenarios but same code (reflexion and refraction)</li>
-                      </ul>
-                  </li><br />
-                  <li>Inline frequency analysis in raytracing
-                      <ul>
-                          <li>See source code on <a href="https://github.com/belcour/CovarianceTracing">github</a></li>
-                      </ul>
-                  </li>
-                </ul></div></center>
-                <pre style="width:47%;float:left;margin:5px;padding:0px;">
-                    <code>
-Spectrum RayTrace(Ray r){
-
-   // Check intersection
-   hit = Intersect(scene, r);
-   if(! hit) return Black;
-
-   // Interaction with material
-   Ray new_r = SampleBRDF(hit);
-   return RayTrace(new_r);
-}
-                    </code>
-                </pre><div style="float:left;padding-top:100px;padding-left:15px;width:2%;">></div>
-                <pre  style="width:47%;float:right;margin:5px;padding:0px;">
-                    <code>
-Spectrum RayTrace(Ray r, Covariance c){
-
-   // Check intersection
-   hit = Intersect(scene, r);
-   if(! hit) return Black;
-
-   // Evaluate covariance at the surface
-   c.Travel(hit);
-   c.Projection(hit);
-
-   // Interaction with material
-   Ray new_r = SampleBRDF(hit);
-
-   // Compute reflected covariance
-   c.Reflection(hit);
-   c.InverseProjection(hit);
-
-   return RayTrace(new_r, c);
-}
-                    </code>
-                </pre>
-            </section>
 
             <!-- Adaptive density estimation -->
             <section data-transition="slide-in slide-out">
@@ -645,7 +680,7 @@ Spectrum RayTrace(Ray r, Covariance c){
                <center><div style="width:80%;text-align:left;"><ul>
                   <li>Pixel filter is a kernel applied on the surface!</li>
                </ul></div></center><br />
-               <svg class="fragment" id="antialiasing03" width="800px" height="500px" style="margin-top:-70px;"></svg>
+               <svg class="fragment" id="antialiasing03" width="800px" height="500px" style="margin-top:-70px;transform:scale(1.2);"></svg>
                <script>
                   loadSVG("slides/2016-covariance-filtering/svg/filtering02.svg", "#antialiasing03", antialiasingAppearance03Step00);
                </script>
@@ -730,6 +765,66 @@ Spectrum RayTrace(Ray r, Covariance c){
             </script>
             <small>Kernel after one bounce</small>
             </section>
+            <!-- Bidirectionnal path tracing -->
+            <section>
+            <h4>Bidirectional Antialiasing</h4><br />
+            <svg id="bidir01" width="900px" height="600px" style="transform:scale(1.2);"></svg>
+            <script type="text/javascript">
+               Snap.load("../2016-covariance-filtering/svg/bidir-filter-example.svg", function (f) {
+                  var s = Snap("#bidir01");
+                  var layer= f.select("#layer1");
+                  var defs = f.select("#defs4");
+                  s.append(layer.transform(Snap.matrix(1, 0, 0, 1, -130, -40)));
+                  s.append(defs);
+                  var arrow = s.polygon([0,5, 4,5, 2,0, 0,5]).attr({fill: '#000'}).transform('r90');
+                  var marker = arrow.marker(0,0, 5,5, 0,2.5).attr({id: "marker"});
+
+                  var g0 = createGaussian(s, 800, 60, 100, 300, 100, "vertical", {stroke: "#00ff00"});
+                  var g1 = createGaussian(s, 800, 60, 100, 300, 500, "vertical", {stroke: "#0000ff"});
+                  var g2 = createGaussian(s, 220, 450, 300, 100, 300, "horizontal", {stroke: "#00ff00"});
+                  s.text(770, 380, "wrong eye kernel!").transform("r90").attr({fontSize: "0.7em", fill: "#ff0000", textAnchor: "middle"});
+               });
+            </script>
+            </section>
+
+            <section>
+            <h4>Bidirectional Antialiasing</h4>
+            <svg id="bidir02" width="900px" height="600px" style="transform:scale(1.2);"></svg>
+            <script type="text/javascript">
+               Snap.load("../2016-covariance-filtering/svg/filtering03.svg", function (f) {
+                  var s = Snap("#bidir02");
+                  var layer= f.select("#layer2");
+                  var defs = f.select("#defs4");
+                  s.select("defs").remove();
+                  s.append(defs);
+                  s.append(layer.transform(Snap.matrix(1, 0, 0, 1, 0, 70)));
+                  s.text(325, 360, "eye kernel").attr({fontSize: "0.6em", textAnchor: "middle"});
+                  s.text(660, 360, "light kernel").attr({fontSize: "0.6em", textAnchor: "middle"});
+                  s.text(490, 360, "material").attr({fontSize: "0.6em", textAnchor: "middle"});
+                  s.text(830, 360, "light").attr({fontSize: "0.6em", textAnchor: "middle"});
+               });
+            </script>
+            </section>
+
+            <section>
+            <h4>Bidirectional Antialiasing</h4>
+            <div class="fragment" style="position:absolute;padding-left:500px;padding-top:340px;">$$ \Sigma_e \; + \; \Sigma_l \; = \; \Sigma $$</div>
+            <svg id="bidir03" width="900px" height="600px" style="transform:scale(1.2);"></svg>
+            <script type="text/javascript">
+               Snap.load("../2016-covariance-filtering/svg/filtering03.svg", function (f) {
+                  var s = Snap("#bidir03");
+                  var layer= f.select("#layer3");
+                  var defs = f.select("#defs");
+                  s.append(layer.transform(Snap.matrix(1, 0, 0, 1, 0, -300)));
+                  s.select("defs").remove();
+                  s.append(defs);
+
+                  s.text(275, 280, "eye kernel").attr({fontSize: "0.6em", textAnchor: "middle"});
+                  s.text(650, 280, "bidir kernel").attr({fontSize: "0.6em", textAnchor: "middle"});
+                  s.text(450, 280, "light kernel").attr({fontSize: "0.6em", textAnchor: "middle"});
+               });
+            </script>
+            </section>
             <!-- Results -->
             <section>
                <!--<iframe volume="0" data-autoplay width="100%" height="600px" src="https://www.youtube.com/embed/_Sh8xcspWG8?start=127&end=166&rel=0" frameborder="0" allowfullscreen></iframe>-->
@@ -764,6 +859,59 @@ Spectrum RayTrace(Ray r, Covariance c){
                   </div>
                </div></center>
             </section>
+
+            <!-- Antialiasing -->
+            <section class="title">
+                <h4>Practical Considerations</h4>
+            </section>
+            <section>
+                <h4>Light Sources</h4><br />
+                <center><div style="width:80%;text-align:left;"><ul>
+                    <li>Need Fourier spectrum for each light type
+                      <ul>
+                          <li>Analytical forms for point, spot and area</li>
+                          <li>For envmaps, we need to numerically compute its FFT</li>
+                      </ul>
+                  </li><br />
+                  </ul></div></center>
+                  <object class="fragment" data="../../data/svg/course-lights.svg" type="image/svg+xml"></object>
+            </section>
+            <section>
+                <h4>Textures</h4><br />
+                <center><div style="width:80%;text-align:left;"><ul>
+                    <li class="fragment">Albedo texture
+                      <ul>
+                          <li>FFT Required for 'online' analysis</li>
+                          <li>For single scattering it is better to decouple from shading</li>
+                      </ul>
+                  </li><br />
+                    <li class="fragment">Roughness texture
+                      <ul>
+                          <li>Correlates spatial and angular frequencies</li>
+                          <li>In practice we only consider spatial</li>
+                      </ul>
+                  </li><br />
+                    <li class="fragment">Mip-level for different windows</li><br />
+                  </ul></div></center>
+            </section>
+            <section>
+                <h4>BRDFs/BSDFs</h4><br />
+                <center><div style="width:80%;text-align:left;"><ul>
+                    <li class="fragment">Need analytical forms in practice
+                        <ul>
+                            <li>Not always the case (microfacets)</li>
+                            <li>Use conversion to Phong (approximate is good enough)</li>
+                            <li>Get the Hessian is an alternative [<a href="belcour2014">Belcour et al. 2014</a>]</li>
+                        </ul>
+                    </li><br />
+                    <li class="fragment">Measured data (e.g. MERL)
+                        <ul>
+                            <li>Using wavelets hiearchy can help [<a href="bagher2011">Bagher et al. 2011</a>]</li>
+                        </ul>
+                    </li>
+                </ul></div></center>
+            </section>
+
 
             <!-- Break before part2: applications -->
             <section class="title">
