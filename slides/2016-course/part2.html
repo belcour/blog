@@ -573,7 +573,7 @@ loadSVG(uri, elem, adaptiveSampling03Step00);
                   <li>Mathematical insight:
                       <ul>
                           <li>Density estimation <em>blurs</em> the target result</li>
-                          <li>Theoretically: $ \mbox{bias} \propto \mbox{Hessian} \mbox{radius}^2 $</li>
+                          <li>Theoretically: $ \mbox{bias} \propto \mbox{Laplacian} \times \mbox{radius}^2 $</li>
                       </ul>
                   </li>
                </ul></div></center>
@@ -584,7 +584,7 @@ loadSVG(uri, elem, adaptiveSampling03Step00);
             <section>
                <h4>Adaptive Density Estimation</h4>
                <center><div style="width:80%;text-align:left;padding-top:15px;"><ul>
-                  <li>How to Estimate Hessian?
+                  <li>How to Estimate Laplacian?
                       <ul>
                           <li>Covariance in Fourier = Hessian!</li>
                           <li>Each photon computes its covariance</li>
