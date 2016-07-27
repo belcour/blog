@@ -587,8 +587,7 @@ loadSVG(uri, elem, adaptiveSampling03Step00);
                   <li>How to Estimate Laplacian?
                       <ul>
                           <li>Covariance in Fourier = Hessian!</li>
-                          <li>Each photon computes its covariance</li>
-                          <li>Covariance is averaged for each kernel</li>
+                          <li>Covariance from photons is averaged for each kernel</li>
                       </ul>
                   </li><br />
                   <li class="fragment">Works as well in volumes
@@ -639,12 +638,24 @@ loadSVG(uri, elem, adaptiveSampling03Step00);
                <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-40px;"><img src="../../data/images/thesis.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-7px;">&nbsp;<a href="#url(belcour2015)">Belcour et al. 2015</a></span>
                <h4>Antialiasing Surface Appearance</h4><br />
                <center><div style="width:80%;text-align:left;"><ul>
-                  <li>Idea: bound the outgoing radiance frequencies
+                  <li>Idea: bound the reflectance frequencies
                       <ul>
-                          <li>Adapt its variation to the screen resolution</li>
+                          <li>Adapt variation to screen resolution</li>
                       </ul>
                   </li>
                </ul></div></center><br />
+
+               <table style="font-size:0.7em;">
+                    <tr>
+                        <th><img src="../../data/images/course-antialiasing-gt.jpg" /></th>
+                        <th><img src="../../data/images/course-antialiasing-near.jpg" /></th>
+                    </tr>
+                    <tr>
+                        <th>Ground truth</th>
+                        <th>Nearest evaluation</th>
+                    </tr>
+               </table><br />
+                <div style="float:right;font-size:0.5em;">Image from Mitsuba [Wenzel Jakob]</div>
             </section>
             <section>
                <h4>Antialiasing Surface Appearance</h4>
@@ -769,23 +780,49 @@ loadSVG(uri, elem, adaptiveSampling03Step00);
             <!-- Bidirectionnal path tracing -->
             <section>
             <h4>Bidirectional Antialiasing</h4><br />
-            <svg id="bidir01" width="900px" height="600px" style="transform:scale(1.2);"></svg>
+            <svg id="bidir01" width="1000px" height="600px" style="transform:scale(1.2);"></svg>
             <script type="text/javascript">
                Snap.load("../2016-covariance-filtering/svg/bidir-filter-example.svg", function (f) {
                   var s = Snap("#bidir01");
                   var layer= f.select("#layer1");
                   var defs = f.select("#defs4");
+
                   s.append(layer.transform(Snap.matrix(1, 0, 0, 1, -130, -40)));
                   s.append(defs);
                   var arrow = s.polygon([0,5, 4,5, 2,0, 0,5]).attr({fill: '#000'}).transform('r90');
                   var marker = arrow.marker(0,0, 5,5, 0,2.5).attr({id: "marker"});
 
+                  s.select("#lightFootprint").attr({ opacity: 0 });
+
                   var g0 = createGaussian(s, 800, 60, 100, 300, 100, "vertical", {stroke: "#00ff00"});
-                  var g1 = createGaussian(s, 800, 60, 100, 300, 500, "vertical", {stroke: "#0000ff"});
+                  var g1 = createGaussian(s, 800, 60, 100, 300, 500, "vertical", {id: "lightGaussian", opacity: 0, stroke: "#0000ff"});
                   var g2 = createGaussian(s, 220, 450, 300, 100, 300, "horizontal", {stroke: "#00ff00"});
-                  s.text(770, 380, "wrong eye kernel!").transform("r90").attr({fontSize: "0.7em", fill: "#ff0000", textAnchor: "middle"});
+                  s.text(770, 380, "wrong eye kernel!").transform("r90").attr({id: "text", opacity:0, fontSize: "0.7em", fill: "#ff0000", textAnchor: "middle"});
                });
+
+               function BidirStep01(offset){
+                   var snap = Snap("#bidir01");
+                   if(offset > 0) {
+                     snap.select("#text").attr({ opacity: 1 });
+                     snap.select("#lightGaussian").attr({ opacity: 1 });
+                     snap.select("#lightFootprint").attr({ opacity: 1 });
+                   } else {
+                     snap.select("#text").attr({ opacity: 0 });
+                     snap.select("#lightGaussian").attr({ opacity: 0 });
+                     snap.select("#lightFootprint").attr({ opacity: 0 });
+                   }
+               }
+                  // Animation for the slide {forward and backward}
+                  Reveal.addEventListener( 'fragmentshown', function( event ) {
+                     if(event.fragment.id == "bidir-step01") { BidirStep01(1); return; }
+                  });
+                  Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                     if(event.fragment.id == "bidir-step01") { BidirStep01(-1); return; }
+                  });
             </script>
+
+               <p class="fragment" id="bidir-step01"></p>
+               <p class="fragment" id="bidir-step01"></p>
             </section>
 
             <section>
@@ -868,7 +905,7 @@ loadSVG(uri, elem, adaptiveSampling03Step00);
             <section>
                 <h4>Light Sources</h4><br />
                 <center><div style="width:80%;text-align:left;"><ul>
-                    <li>Need Fourier spectrum for each light type
+                    <li class="fragment">Need Fourier spectrum for each light type
                       <ul>
                           <li>Analytical forms for point, spot and area</li>
                           <li>For envmaps, we need to numerically compute its FFT</li>
@@ -907,7 +944,7 @@ loadSVG(uri, elem, adaptiveSampling03Step00);
                     </li><br />
                     <li class="fragment">Measured data (e.g. MERL)
                         <ul>
-                            <li>Using wavelets hiearchy can help [<a href="bagher2011">Bagher et al. 2011</a>]</li>
+                            <li>Store a 2D texture of FFT slices [<a href="bagher2011">Bagher et al. 2012</a>]</li>
                         </ul>
                     </li>
                 </ul></div></center>
