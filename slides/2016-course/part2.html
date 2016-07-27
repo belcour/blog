@@ -155,24 +155,25 @@ loadSVG("data/svg/course-pbr02.svg", "#working-operators-01", workingOperator01S
                        </ul>
                    </li><br />
                </ul></div></center>
+               <object class="fragment" data-fragment-index="2" data="../../data/svg/course-gbuffer.svg" width="1280px"></object>
             </section>
 
             <section>
                 <h4><span style="color:#5E884C;">'Online'</span> Frequency Analysis</h4>
                <center><div style="width:80%;text-align:left;"><ul>
-                  <li>When closed forms are not possible
+                  <li class="fragment" data-fragment-index="1">When closed forms are not possible
                       <ul>
                           <li>Multiple scattering dominant</li>
                           <li>Multiple scenarios but same code (reflexion and refraction)</li>
                       </ul>
                   </li><br />
-                  <li>Inline frequency analysis in raytracing
+                  <li class="fragment" data-fragment-index="2">Inline frequency analysis in raytracing
                       <ul>
                           <li>See source code on <a href="https://github.com/belcour/CovarianceTracing">github</a></li>
                       </ul>
                   </li>
                 </ul></div></center>
-                <pre style="width:47%;float:left;margin:5px;padding:0px;">
+                <pre class="fragment" data-fragment-index="2" style="width:47%;float:left;margin:5px;padding:0px;">
                     <code>
 Spectrum RayTrace(Ray r){
 
@@ -185,8 +186,8 @@ Spectrum RayTrace(Ray r){
    return RayTrace(new_r);
 }
                     </code>
-                </pre><div style="float:left;padding-top:100px;padding-left:15px;width:2%;">></div>
-                <pre  style="width:47%;float:right;margin:5px;padding:0px;">
+                </pre><div  class="fragment" data-fragment-index="2" style="float:left;padding-top:100px;padding-left:15px;width:2%;">></div>
+                <pre  class="fragment" data-fragment-index="2" style="width:47%;float:right;margin:5px;padding:0px;">
                     <code>
 Spectrum RayTrace(Ray r, Covariance c){
 
@@ -214,12 +215,12 @@ Spectrum RayTrace(Ray r, Covariance c){
 
             <!-- Adaptive sampling and reconstruction -->
             <section class="title">
-                <h4>Application to Adaptive Sampling & Reconstructiong</h4>
+                <h4>Application to Adaptive Sampling & Reconstruction</h4>
             </section>
             <section>
                <h4>Adaptive Sampling and Reconstruction</h4><br />
                <center><div style="width:80%;text-align:left;"><ul>
-                  <li>Direct application of Nyquist/Shannon:
+                  <li>Direct application of Nyquist:
                     <ul>
                         <li>Adapt the sampling rate w/r $ B_W $</li>
                         <li>Reconstruct using a kernel (usualy Gaussian)</li>
@@ -265,7 +266,7 @@ Spectrum RayTrace(Ray r, Covariance c){
                       <ol type="I">
                           <li>Compute bandwidth per pixel</li>
                           <li>Sample XYUVT space</li>
-                          <li>Integrate in UVT space & reconstruct in XY sapce</li>
+                          <li>Integrate in UVT space & reconstruct in XY space</li>
                       </ol>
                   </li>
                </ul></div></center><br />

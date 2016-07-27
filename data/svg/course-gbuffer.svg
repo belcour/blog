@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="237.40053mm"
+   height="70.515869mm"
+   viewBox="0 0 841.18297 249.85938"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="course-gbuffer.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.9712512"
+     inkscape:cx="503.98908"
+     inkscape:cy="124.92969"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="703"
+     inkscape:window-x="0"
+     inkscape:window-y="1"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-109.57812,-131.76953)">
+    <path
+       style="opacity:1;fill:#e2e2e2;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 118.30078,131.76953 c -4.83158,0 -8.72266,3.89108 -8.72266,8.72266 l 0,232.41601 c 0,4.83158 3.89108,8.72071 8.72266,8.72071 l 414.43945,0 c 4.83159,0 8.72071,-3.88913 8.72071,-8.72071 l 0,-99.46484 37.53906,0 c -0.0529,8.03566 -0.13358,14.09659 -0.25586,13.99805 -0.4307,-0.34711 43.07031,-35.40516 43.07031,-34.71094 0,0.69422 -43.50101,-34.36383 -43.07031,-34.71094 0.12227,-0.0985 0.20301,5.9632 0.25586,13.99805 l -37.53906,0 0,-91.52539 c 0,-4.83158 -3.88912,-8.72266 -8.72071,-8.72266 l -414.43945,0 z"
+       id="rect4654"
+       inkscape:connector-curvature="0" />
+    <image
+       sodipodi:absref="/Users/laurent/Research/Projects/frequency_animation/paper_TOG_2014/figures/img/car_objID.png"
+       y="258.69965"
+       x="327.52045"
+       id="image4505"
+       xlink:href="file:///Users/laurent/Research/Projects/frequency_animation/paper_TOG_2014/figures/img/car_objID.png"
+       style="image-rendering:optimizeQuality"
+       preserveAspectRatio="none"
+       height="113.24622"
+       width="201.3266" />
+    <image
+       sodipodi:absref="/Users/laurent/Research/Projects/frequency_animation/paper_TOG_2014/figures/img/car_normal.png"
+       y="141.45341"
+       x="327.52045"
+       id="image4516"
+       xlink:href="file:///Users/laurent/Research/Projects/frequency_animation/paper_TOG_2014/figures/img/car_normal.png"
+       style="image-rendering:optimizeQuality"
+       preserveAspectRatio="none"
+       height="113.24622"
+       width="201.3266" />
+    <image
+       sodipodi:absref="/Users/laurent/Research/Projects/frequency_animation/paper_TOG_2014/figures/img/car_depth.png"
+       y="258.69965"
+       x="122.19385"
+       id="image4527"
+       xlink:href="file:///Users/laurent/Research/Projects/frequency_animation/paper_TOG_2014/figures/img/car_depth.png"
+       style="image-rendering:optimizeQuality"
+       preserveAspectRatio="none"
+       height="113.24622"
+       width="201.3266" />
+    <image
+       sodipodi:absref="/Users/laurent/Research/Projects/frequency_animation/paper_TOG_2014/figures/img/car_curvature.png"
+       y="141.45341"
+       x="122.19383"
+       id="image4538"
+       xlink:href="file:///Users/laurent/Research/Projects/frequency_animation/paper_TOG_2014/figures/img/car_curvature.png"
+       style="image-rendering:optimizeQuality"
+       preserveAspectRatio="none"
+       height="113.24622"
+       width="201.3266" />
+    <image
+       sodipodi:absref="/Users/laurent/Research/Projects/frequency_animation/paper_TOG_2014/figures/img/car_predicted_density.png"
+       y="162.97755"
+       x="636.18829"
+       id="image4651"
+       xlink:href="file:///Users/laurent/Research/Projects/frequency_animation/paper_TOG_2014/figures/img/car_predicted_density.png"
+       style="image-rendering:optimizeQuality"
+       preserveAspectRatio="none"
+       height="176.9472"
+       width="314.57281" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.72844887px;line-height:125%;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman,';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="222.2818"
+       y="248.2448"
+       id="text4661"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4663"
+         x="222.2818"
+         y="248.2448"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Comfortaa;-inkscape-font-specification:Comfortaa;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1">Curvature map</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4667"
+       y="248.2448"
+       x="384.60251"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.72844887px;line-height:125%;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman,';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Comfortaa;-inkscape-font-specification:Comfortaa;fill:#ffffff;fill-opacity:1"
+         y="248.2448"
+         x="384.60251"
+         id="tspan4669"
+         sodipodi:role="line">Normal map</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text4671"
+       y="364.58957"
+       x="222.2818"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.72844887px;line-height:125%;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman,';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Comfortaa;-inkscape-font-specification:Comfortaa;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1"
+         y="364.58957"
+         x="222.2818"
+         id="tspan4673"
+         sodipodi:role="line">Depth map</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.72844887px;line-height:125%;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman,';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="428.18375"
+       y="364.58957"
+       id="text4675"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4677"
+         x="428.18375"
+         y="364.58957"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Comfortaa;-inkscape-font-specification:Comfortaa;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1">ID map</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16.57828331px;line-height:125%;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman,';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="732.11566"
+       y="360.06375"
+       id="text4679"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4681"
+         x="732.11566"
+         y="360.06375"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Comfortaa;-inkscape-font-specification:Comfortaa;fill:#000000;fill-opacity:1">Bandwidth map</tspan></text>
+  </g>
+</svg>

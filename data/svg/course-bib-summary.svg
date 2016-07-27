@@ -605,17 +605,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.3316667"
-     inkscape:cx="573.34837"
-     inkscape:cy="189.33455"
+     inkscape:zoom="0.61583333"
+     inkscape:cx="600"
+     inkscape:cy="250"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      units="px"
-     inkscape:window-width="2560"
-     inkscape:window-height="1403"
+     inkscape:window-width="1280"
+     inkscape:window-height="703"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="1"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata5035">
@@ -1009,7 +1009,7 @@
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-size:25px;text-anchor:middle"
+       style="font-size:25px;text-anchor:middle;-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
        x="936.78473"
        y="1070.7582"
        id="text27420"><tspan
@@ -1021,7 +1021,7 @@
        id="text27444"
        y="1070.7582"
        x="764.06885"
-       style="font-size:25px;text-anchor:middle"
+       style="font-size:25px;text-anchor:middle;-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
        xml:space="preserve"><tspan
          y="1070.7582"
          x="764.06885"
@@ -1029,7 +1029,7 @@
          sodipodi:role="line">shadow</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:25px;text-anchor:middle"
+       style="font-size:25px;text-anchor:middle;-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
        x="594.35669"
        y="1070.7582"
        id="text27448"><tspan
@@ -1041,7 +1041,7 @@
        id="text27452"
        y="1070.7582"
        x="424.64456"
-       style="font-size:25px;text-anchor:middle"
+       style="font-size:25px;text-anchor:middle;-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
        xml:space="preserve"><tspan
          y="1070.7582"
          x="424.64456"
@@ -1049,7 +1049,7 @@
          sodipodi:role="line">motion</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:25px;text-anchor:middle"
+       style="font-size:25px;text-anchor:middle;-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
        x="250.4268"
        y="1070.7582"
        id="text27456"><tspan
@@ -1058,7 +1058,8 @@
          x="250.4268"
          y="1070.7582">lens</tspan></text>
     <g
-       id="durand">
+       id="durand"
+       style="">
       <rect
          ry="4.5056319"
          y="598.27692"
@@ -1076,20 +1077,22 @@
            sodipodi:role="line"
            id="tspan3467"
            x="686.36285"
-           y="624.67218">[Durand et al. 2005]</tspan></text>
+           y="624.67218"
+           style="-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">[Durand et al. 2005]</tspan></text>
     </g>
     <text
        id="soler"
        y="680.43719"
        x="250.06252"
-       style="font-size:16.20000076px;text-anchor:middle;fill:#4a8ba7;fill-opacity:0.98611109"
+       style="font-size:16.20000076px;text-anchor:middle;fill:#4a8ba7;fill-opacity:0.98611109;-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;"
        xml:space="preserve"><tspan
          y="680.43719"
          x="250.06252"
          id="tspan4473"
          sodipodi:role="line">[Soler et al. 2009]</tspan></text>
     <g
-       id="egan">
+       id="egan"
+       style="">
       <text
          id="text4465"
          y="679.82025"
@@ -1099,7 +1102,8 @@
            y="679.82025"
            x="421.95013"
            id="tspan4467"
-           sodipodi:role="line">[Egan et al. 2009]</tspan></text>
+           sodipodi:role="line"
+           style="-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">[Egan et al. 2009]</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:16.20000076px;text-anchor:middle;fill:#a74a8b;fill-opacity:0.98611109"
@@ -1109,10 +1113,12 @@
            sodipodi:role="line"
            id="tspan4477"
            x="762.651"
-           y="691.91034">[Egan et al. 2011]</tspan></text>
+           y="691.91034"
+           style="-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">[Egan et al. 2011]</tspan></text>
     </g>
     <g
-       id="belcour">
+       id="belcour"
+       style="">
       <text
          xml:space="preserve"
          style="font-size:18px;text-anchor:middle;fill:#2b9dba;fill-opacity:1"
@@ -1122,7 +1128,8 @@
            sodipodi:role="line"
            id="tspan4485"
            x="504.98965"
-           y="750.61395">[Belcour et al. 2013]</tspan></text>
+           y="750.61395"
+           style="-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">[Belcour et al. 2013]</tspan></text>
       <text
          id="text4487"
          y="786.78577"
@@ -1132,7 +1139,8 @@
            y="786.78577"
            x="931.78766"
            id="tspan4489"
-           sodipodi:role="line">[Belcour et al. 2014]</tspan></text>
+           sodipodi:role="line"
+           style="-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">[Belcour et al. 2014]</tspan></text>
       <path
          inkscape:connector-curvature="0"
          id="path4509"
@@ -1155,7 +1163,8 @@
            y="792.69537"
            x="336.02802"
            id="tspan4493"
-           sodipodi:role="line">[Munkberg et al. 2014]</tspan></text>
+           sodipodi:role="line"
+           style="-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">[Munkberg et al. 2014]</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:16.20000076px;text-anchor:middle;fill:#ba332b;fill-opacity:1"
@@ -1165,7 +1174,8 @@
            sodipodi:role="line"
            id="tspan4499"
            x="336.02802"
-           y="816.38751">[Hasselgren et al. 2015]</tspan></text>
+           y="816.38751"
+           style="-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">[Hasselgren et al. 2015]</tspan></text>
       <text
          id="text4501"
          y="840.07959"
@@ -1175,7 +1185,8 @@
            y="840.07959"
            x="336.02802"
            id="tspan4503"
-           sodipodi:role="line">[Vaidyanathan et al. 2015]</tspan></text>
+           sodipodi:role="line"
+           style="-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">[Vaidyanathan et al. 2015]</tspan></text>
       <path
          sodipodi:nodetypes="cc"
          style="fill:#ba332b;fill-opacity:1;fill-rule:evenodd;stroke:#ba332b;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker5779)"
@@ -1190,7 +1201,8 @@
          style="fill:#ba332b;fill-opacity:1;fill-rule:evenodd;stroke:#ba332b;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker6695)" />
     </g>
     <g
-       id="mehta">
+       id="mehta"
+       style="">
       <text
          id="text4505"
          y="713.51031"
@@ -1200,7 +1212,8 @@
            y="713.51031"
            x="762.651"
            id="tspan4507"
-           sodipodi:role="line">[Mehta et al. 2012]</tspan></text>
+           sodipodi:role="line"
+           style="-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">[Mehta et al. 2012]</tspan></text>
       <text
          id="text7391"
          y="895.63037"
@@ -1210,7 +1223,8 @@
            y="895.63037"
            x="595.72394"
            id="tspan7393"
-           sodipodi:role="line">[Yan et al. 2015]</tspan></text>
+           sodipodi:role="line"
+           style="-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">[Yan et al. 2015]</tspan></text>
       <path
          inkscape:connector-curvature="0"
          id="path7395"
@@ -1226,7 +1240,8 @@
            sodipodi:role="line"
            id="tspan10665"
            x="595.72394"
-           y="876.10596">[Mehta et al. 2014]</tspan></text>
+           y="876.10596"
+           style="-inkscape-font-specification:Comfortaa;font-family:Comfortaa;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">[Mehta et al. 2014]</tspan></text>
     </g>
   </g>
 </svg>

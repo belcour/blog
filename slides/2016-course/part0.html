@@ -35,13 +35,13 @@
             <p><small>
                <a href="http://belcour.github.io/blog">Laurent Belcour - Unity Technologies</a>
             </small></p>
-            <p style="margin:16% 0 0 0;"><small style="color:#770000;">
-                  // Warning: some animations are not compatible with Chrome \\<br />
-                  Slides are not tested on Internet Explorer or Edge
-            </small></p>
             </section>
             <section class="title" data-transition="slide-in slide-out">
                   <a href="http://belcour.github.io/blog/siggraph-2016-course.html">http://belcour.github.io/blog/siggraph-2016-course.html</a>
+                  <p style="margin:16% 0 0 0;"><small style="color:#770000;">
+                  // Warning: some animations are not compatible with Chrome \\<br />
+                  Slides are not tested on Internet Explorer or Edge
+            </small></p>
             </section>
             </section>
 
@@ -54,10 +54,10 @@
                         <li>Result of 11 years of research so far</li>
                         <li>Started with Durand et al. [<a href="durand2005">2005</a>]</li>
                   </ul></li><br/>
-                  <li class="fragment" data-fragment-index="2">About the lecturer
+                  <li class="fragment" data-fragment-index="2">About the lecture
                   <ul>
-                        <li>Into frequency analysis since its Ph.D. (2009)</li>
-                        <li>Now applying it to real-time graphics @ Unity</li>
+                        <li>Not targetting completness or details</li>
+                        <li>Give a taste of different possibilities</li>
                   </ul></li>
                </ul></div></center>
                <div class="fragment"  data-fragment-index="1"><span><img style="margin-top:20px;" width="450px" src="http://people.csail.mit.edu/fredo/PUBLI/Fourier/stata.jpg" /></span>
@@ -133,7 +133,7 @@ loadSVG('data/svg/course-examples.svg', '#course-examples-01', courseExamples00)
             </section>
             <section>
                <h4>Example: Nyquist Rate</h4>
-               Distance between samples $ d = \dfrac{1}{2 B_w} $
+               Distance between samples $ d < \dfrac{1}{2 B_w} $
                <svg id="fourier-nyquist-01" width="800px", height="500px"></svg>
                <script>
                var snap = Snap("#fourier-nyquist-01");
@@ -295,6 +295,14 @@ loadSVG('data/svg/course-examples.svg', '#course-examples-01', courseExamples00)
                               <li>Even a little step further ...</li>
                         </ul>
                   </li><br/>
+                  <li class="fragment">Break the Rendering Equation into pieces
+                        <ul>
+                              <li>Decompose shading, defocus, motion, ...</li>
+                              <li>To perform and compose the analysis</li>
+                        </ul>
+                  </li><br />
+                  <li class="fragment">First a quick recap of the Rendering Equation
+                  </li>
                </ul></div></center>
             </section>
 
@@ -321,7 +329,7 @@ loadSVG('data/svg/course-examples.svg', '#course-examples-01', courseExamples00)
                <p class="fragment" data-call="renderingEquation01Step04"></p>
                <p class="fragment" data-call="renderingEquation01Step05"></p>
             </section>
-	      <section data-transition="slide-in fade-out">
+	      <!--<section data-transition="slide-in fade-out">
                <h4>Fourier Transform of Rendering?</h4><br />
                <center><div style="width:80%;text-align:left;"><ul>
                   <li>Need to go to the fundementals
@@ -337,7 +345,7 @@ loadSVG('data/svg/course-examples.svg', '#course-examples-01', courseExamples00)
                         </ul>
                   </li><br />
                </ul></div></center>
-            </section>
+            </section>-->
             <!--<section id="local-analysis-slide">
                <h4>Local Analysis</h4>
                <center>

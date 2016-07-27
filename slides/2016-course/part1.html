@@ -163,7 +163,6 @@
                   <li>Interesting properties:
                      <ul style="font-size:0.8em;">
                         <li>Makes the Fourier Transform well defined</li>
-                        <li>We can use paraxial optics</li>
                         <li>The window increase the min frequency</li>
                      </ul>
                   </li>
@@ -173,10 +172,10 @@
             <section>
                <h4>Local Fourier Transform of Radiance</h4><br />
                <center><div style="width:80%;text-align:left;"><ul>
-                  <li>We need to change the concept of radiance a bit
+                  <li>We aren't looking at point-wise radiance anymore
                       <ul>
-                        <li class="fragment" data-fragment-index="1">The Rendering Equation is defined pointwise :(</li>
-                        <li class="fragment" data-fragment-index="2">Solution: introduce the local radiance (a lightfield)</li>
+                        <li class="fragment" data-fragment-index="1">Local radiance around a main ray</li>
+                        <li class="fragment" data-fragment-index="2">Requires a parametrization</li>
                       </ul>
                   </li>
                </ul></div></center>
@@ -197,7 +196,7 @@
                </svg><br />
                $$L(\mathbf{x}, \boldsymbol{\omega})$$
                </span>
-               <span style="position:absolute;top:400px;left:45%;width:40%;" class="fragment" data-fragment-index="2">
+               <span style="position:absolute;top:400px;left:45%;width:40%;" class="fragment" data-fragment-index="1">
                <svg>
                   <defs>
                         <marker style="overflow:visible;" id="arrow" refX="0.0" refY="0.0" orient="auto">
@@ -243,10 +242,10 @@
                            to a plane. -->
                <h4>Local Fourier Transform of Radiance</h4><br />
                <center><div style="width:80%;text-align:left;"><ul>
-                  <li>We need to change the concept of radiance a bit
+                  <li>We aren't looking at point-wise radiance anymore
                       <ul>
-                        <li>The Rendering Equation is defined pointwise :(</li>
-                        <li>Solution: introduce the local radiance (a lightfield)</li>
+                        <li>Local radiance around a main ray</li>
+                        <li>Requires a parametrization</li>
                       </ul>
                   </li>
                </ul></div></center>
@@ -261,10 +260,10 @@ console.log(snap);
             <section>
                <h4>Local Fourier Transform of Radiance</h4><br />
                <center><div style="width:80%;text-align:left;"><ul>
-                  <li>We need to change the concept of radiance a bit
+                  <li>We aren't looking at point-wise radiance anymore
                       <ul>
-                        <li>The Rendering Equation is defined pointwise :(</li>
-                        <li>Solution: introduce the local radiance (a lightfield)</li>
+                        <li>Local radiance around a main ray</li>
+                        <li>Requires a parametrization</li>
                       </ul>
                   </li><br />
                   <li>Constraint: analytical forms
@@ -456,7 +455,8 @@ svg.onload = function() {
                </script>
             </section>
             <section>
-              <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-10px;"><img src="../../data/images/acm.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-5px;">&nbsp;<a href="#url(durand2005)">Durand et al. 2005</a></span>
+              <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-50px;"><img src="../../data/images/acm.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-5px;">&nbsp;<a href="#url(durand2005)">Durand et al. 2005</a></span>
+              <span style="position:absolute;font-size:0.7em;text-align:right;width:100%;left:0px;top:-10px;"><img src="../../data/images/acm.png"  height="32px" style="border:0px;box-shadow:none;margin:0px;vertical-align:-5px;">&nbsp;<a href="#url(egan2011)">Egan et al. 2011</a></span>
                <h4>Visibility Operator</h4><br/>
                <center>
                   <div style="position:relative;width:900px;height:500px;">
@@ -518,9 +518,10 @@ Cov = Cov + Occ
                  <li>Same as ajusting the local window
                    <ul>
                      <li>Compute the largest unoccluded disk along the ray</li>
+                     <li>We will treat <em>near misses</em> the same way as <em>near hit</em>
                    </ul>
                  </li><br />
-                 <li>Requires a special treatment/data-structure
+                 <li class="fragment">Requires a special treatment/data-structure
                     <ul>
                       <li>Voxel grid</li>
                       <li>Distance field</li>
@@ -528,6 +529,7 @@ Cov = Cov + Occ
                     </ul>
                  </li>
                </ul></div></center>
+               <object type="image/svg+xml" data="../../data/svg/course-hitmiss.svg" width="750px"></object>
             </section>
 
             <!-- Local shading needs a further decomposition -->
@@ -999,7 +1001,7 @@ Cov = {sxx, sxu, sxt;
 % Occlusion with moving object of speed 'vx'
 M   = [1, 0, vx; 0, 1, 0; 0, 0, 1]
 O   = [o, 0, 0; 0, 0, 0; 0, 0, 0]
-Cov = M' * (M' * Cov * M + O) * M
+Cov = M * (M' * Cov * M + O) * M'
                </code>
                </pre>
             </section>
@@ -1020,13 +1022,13 @@ Cov = M' * (M' * Cov * M + O) * M
                <center style="padding-top:0px;"><div style="width:80%;text-align:left;"><ul>
                   <li>Using a different <em>rendering equation</em>:
                     <ul>
-                        <li>Radiative Transfert Equation [<a href="#url(ishimaru1986)">Ishimaru 1986</a>]</li>
+                        <li>Radiative Transfert Equation [<a href="#url(ishimaru1978)">Ishimaru 1978</a>]</li>
                         <li>Still defined on the radiance $ L(\mathbf{x}, \omega) $</li>
                     </ul>
                   </li>
                </ul></div></center>
                <!--<img style="border:0px;box-shadow:0px 0px;" src="../../data/svg/course-volume-01.svg" width="900px" />-->
-               <svg style="margin-top:50px;" width="900px" height="400px" id="volume-equation-01"></svg>
+               <svg class="fragment" style="margin-top:50px;" width="900px" height="400px" id="volume-equation-01"></svg>
                <script>
 var volume01Step00 = function(snap) {
    snap.select("#Eq01").attr({ opacity: 0 });
