@@ -378,7 +378,7 @@ const createFourierTransform02 = function(snap) {
                   var L = dat[(i << 2) + (x << 2) + 0]
                         + dat[(i << 2) + (x << 2) + 1]
                         + dat[(i << 2) + (x << 2) + 2];
-                  re[i + x] = 1.E4*L;
+                  re[i + x] = 4.E4*L;
                   im[i + x] = 0.0;
                   }
             }
@@ -419,7 +419,8 @@ const createFourierTransform02 = function(snap) {
             fft_ctx.beginPath();
             fft_ctx.fillStyle = "#FFF";
             // TODO remove fucking scale factor!!
-            fft_ctx.fillRect(Math.floor(currX/2.7), Math.floor(currY/2.7), 0.5, 0.5);
+            var scale = 2.7;
+            fft_ctx.fillRect(Math.floor(currX/scale), Math.floor(currY/scale), 0.5, 0.5);
             fft_ctx.fill();
 
             console.log({winX: winX, winY: winY, mosX: mosX, mosY: mosY});
