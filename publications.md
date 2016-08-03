@@ -22,6 +22,14 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
+  <td><a href="{{ site.url | append: site.baseurl }}/siggraph-2016-course.html"><img src="{{ site.url | append: site.baseurl }}/data/images/dragon-01.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></a></td>
+  <td style="vertical-align:top;"><b><a style="color:black;" href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">A Practical Introduction to Frequency Analysis of Light Transport</a></b> <br />
+      Laurent Belcour<br />
+      ACM SIGGRAPH 2016 Courses
+      <a href="{{ site.url | append: site.baseurl }}/siggraph-2016-course.html">webpage</a>
+  </td>
+</tr>
+<tr>
   <td><a href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_CovFiltering.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></a></td>
   <td style="vertical-align:top;"><b><a style="color:black;" href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">Antialiasing Complex Global Illumination Effects in Path-space</a></b> <br />
       Laurent Belcour, Ling-Qi Yan, Ravi Ramamoorthi, and Derek Nowrouzezahrai <br />
