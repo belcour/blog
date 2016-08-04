@@ -1410,32 +1410,101 @@ function curvOperator01Step00(snap) {
    });
    snap.select("#layer1").append(g);
 
+   var slider = document.getElementById("curvature-slider");
 
+   sphere.attr({r: init+1.0E6, cy: initcy+1.0E6});
+   scene.objects[0].c.y = -1.0E6;
+   scene.objects[0].r   =  1.0E6;
 
+   //const initcy = parseFloat(sphere.attr("cy"));
 
-   function dragInset(dx, dy, x, y, event) {
-      var dr = 10*(dx-dy);
-      var r  = init + dr;
-      if(r > 140) {
-         sphere.attr({r: r, cy: initcy+dr});
+   
+   slider.onchange = function(event) {
+         var curvature = slider.valueAsNumber
+         var value     = 1.0/curvature;
+         var sval      = value - curvature*1000;
 
-         scene.objects[0].c.y = -r / 100;
-         scene.objects[0].r   =  r / 100;
+         sphere.attr({r: init+sval, cy: initcy+sval});
+
+         scene.objects[0].c.y = -value;
+         scene.objects[0].r   =  value;
          //scene.camera.r = r / 100.0;
          render(canvas, scene, 0);
          if(fourier_bt_press) {
             render_fourier_curv();
          }
-      }
-   }
-   function dragStart(x, y, event) {
-     init   = parseFloat(sphere.attr("r"));
-     initcy = parseFloat(sphere.attr("cy"));
-   }
-   function dragEnd(x, y, event) {
-   }
-   snap.drag(dragInset, dragStart, dragEnd);
+   };
 
+   // function dragInset(dx, dy, x, y, event) {
+   //    var dr = 10*(dx-dy);
+   //    var r  = init + dr;
+   //    if(r > 140) {
+   //       sphere.attr({r: r, cy: initcy+dr});
+
+   //       scene.objects[0].c.y = -r / 100;
+   //       scene.objects[0].r   =  r / 100;
+   //       //scene.camera.r = r / 100.0;
+   //       render(canvas, scene, 0);
+   //       if(fourier_bt_press) {
+   //          render_fourier_curv();
+   //       }
+   //    }
+   // }
+   // function dragStart(x, y, event) {
+   //   init   = parseFloat(sphere.attr("r"));
+   //   initcy = parseFloat(sphere.attr("cy"));
+   // }
+   // function dragEnd(x, y, event) {
+   // }
+   // snap.drag(dragInset, dragStart, dragEnd);
+
+   // var isDown = false;
+   // var currentX = 0, currentY = 0;
+   // var svg   = document.getElementById("cov_curv");
+   // svg.addEventListener('mousedown', function(evt) {
+   //    console.log([currentX, currentY]);
+   //    isDown = true;
+   //    currentX = evt.clientX;
+   //    currentY = evt.clientY;
+   // }, true);
+   // svg.addEventListener('mouseup', function(evt) {
+   //    console.log([currentX, currentY]);
+   //    isDown = false;
+   // }, true);
+   // svg.addEventListener('mouseout', function(evt) {
+   //    console.log([currentX, currentY]);
+   //    isDown = false;
+   // }, true);
+   // svg.addEventListener('mousemove', function(evt) {
+   //    if(isDown) {
+   //       var deltaX = evt.clientX - currentX;
+   //       var deltaY = evt.clientY - currentY;
+   //       currentX = evt.clientX;
+   //       currentY = evt.clientY;
+   //       console.log([currentX, currentY]);
+
+   //       var planeStart = cursor.pathSegList.getItem(0);
+   //       var planeEnd   = cursor.pathSegList.getItem(1);
+   //       var dotProd  = deltaX*dirX + deltaY*dirY;
+
+   //       var temp = distToLight - dotProd/50;
+   //       var dx = dotProd*dirX;
+   //       var dy = dotProd*dirY;
+   //       var dr = 10*(dx-dy);
+   //       var r  = init + dr;
+   //       if(r > 140) {
+   //          sphere.attr({r: r, cy: initcy+dr});
+
+   //          scene.objects[0].c.y = -r / 100;
+   //          scene.objects[0].r   =  r / 100;
+   //          //scene.camera.r = r / 100.0;
+   //          render(canvas, scene, 0);
+   //          if(fourier_bt_press) {
+   //                render_fourier_curv();
+   //          }
+   //       }
+   //    }
+   // }, true);
 }
 
 

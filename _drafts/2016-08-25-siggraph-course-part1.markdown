@@ -295,23 +295,7 @@ A Matlab implementation of the operator is the following:
          cov = op' * cov * op;
       }
 
-
-<h4>The curvature operator</h4>
-<center>
-<div style="position:relative;width:100%;height:400px;">
-<canvas id="draw_cov_curv-cv" style="position:absolute;background-color:#FFF;border:0px"></canvas>
-<object type="image/svg+xml"  data="{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg" width="100%" height="400px" id="draw_cov_curv-01" style="position:absolute;top:0px;left:0px;"></object>
-<!--<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:270px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>-->
-</div>
-</center>
-<script type="text/javascript">
-var elem = document.getElementById("draw_cov_curv-01");
-elem.onload = function() {
-      var snap = Snap("#draw_cov_curv-01");
-      curvOperator01Step00(snap);
-};
-//loadSVG("{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg", "#draw_cov_curv-01", curvOperator01Step00);
-</script>
+<br />
 
 <h4>The projection operator</h4>
 <strong>The projection operator</strong> enables to express the local radiance and the covariance in the tangent plane of objects. This is necessary to express the reflection or refraction of light on a planar surface. When the surface is non-planar, the <strong>curvature operator</strong> is applied after this operator.
@@ -333,6 +317,30 @@ A Matlab implementation of the operator is the following:
                  0, 1};
          cov = op' * cov * op;
       }
+
+
+
+
+<h4>The curvature operator</h4>
+<strong>The curvature operator</strong> expresses the local radiance at the surface of an object. We need it to later apply the shading operator. Since shading is defined at a point on the surface, the incoming radiance must be expressed there. Unfortunately, when the object is bumpy or not planar, the local radiance after forshortenning is not defined on the surface except at central point of our local domain. We need to account for the extra travel. This is done by the curvature operator. For this operator we assume that the local geometry is correctly defined by the curvature.
+
+<center>
+<div id="cov_curv" style="position:relative;width:100%;height:400px;">
+<canvas id="draw_cov_curv-cv" style="position:absolute;background-color:#FFF;border:0px"></canvas>
+<object type="image/svg+xml"  data="{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg" width="100%" height="400px" id="draw_cov_curv-01" style="position:absolute;top:0px;left:0px;"></object>
+<!--<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:270px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>-->
+<div style="position:absolute;top:370px;left:380px;">Curvature: 0 <input id="curvature-slider" style="vertical-align: middle;" type="range" min="1.0E-6" max="1" value="0" step="1.0E-3" /> max</div></div>
+</center>
+<script type="text/javascript">
+var elem = document.getElementById("draw_cov_curv-01");
+elem.onload = function() {
+      var snap = Snap("#draw_cov_curv-01");
+      curvOperator01Step00(snap);
+};
+//loadSVG("{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg", "#draw_cov_curv-01", curvOperator01Step00);
+</script>
+
+<br />
 
 <h4>The BRDF operator</h4>
 <strong>The BRDF operator</strong> describes how the roughness reduces the bandwidth of the reflected local radiance. This is well known that the BRDF can be thought as being a blurring filter (think of pre-filtered envmaps).
