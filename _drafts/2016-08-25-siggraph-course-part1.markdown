@@ -295,6 +295,39 @@ A Matlab implementation of the operator is the following:
          cov = op' * cov * op;
       }
 
+
+<br />
+
+<h4>The visibility operator</h4>
+Since we are studying local radiance, we need to account for the fact that part light might be occluded or that part of the light will not interact with an object. We account for those two effects by reducing the local window used for our frequency analysis until there is no more *near-hit* or *near-miss* rays. Applying a window to a signal means that we will convolve its Fourier spectrum by the window Fourier spectrum:
+
+$$\mbox{V}[L](\delta x, \delta u) = L(\delta x, \delta u) \times V(\delta x, \delta u)$$
+
+This translate into a convolution in the Fourier domain:
+
+$$\mbox{V}[\hat{l}](\Omega_x, \Omega_u) = \hat{l}(\Omega_x, \Omega_u) \star \hat{V}(\Omega_x, \Omega_u)$$
+
+<center>
+<div style="position:relative;width:600px;height:280px;">
+<canvas id="draw_cov_occl-gl" style="position:absolute;left:352px;top:18px;width:229px;height:229px;background-color:#FFF;border:0px"></canvas>
+<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_occlusion.svg" width="600px" id="draw_cov_occl-cv" style="position:absolute;top:0px;left:0px;"></object>
+<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:270px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>
+</div><br />
+<div style="width:700px;"><em>The occlusion operator. A square occluder lit by a uniform infinite light source cast a shadow that will result in a wedge shape spectrum. In the primal, we can see the two discontinuity clearly. The wedge is sheared as we move away the senor from the occluder.</em></div>
+</center><br />
+
+<script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_occl.js" type="text/javascript">
+</script>
+
+We usually assumes that occluders are planar. In such case, we can perform the windowing on the spatial component only. If an occluder has non negligible depth, then we can slice it along its depth and apply multiple times the occlusion operator. In terms of covariance, this boils down to summing the covariance matrices.
+
+      function occlusion(w) {
+         occ = {w, 0;
+                0, 0};
+         cov = cov + occ;
+      }
+
+
 <br />
 
 <h4>The projection operator</h4>
@@ -317,31 +350,6 @@ A Matlab implementation of the operator is the following:
                  0, 1};
          cov = op' * cov * op;
       }
-
-
-
-
-<h4>The curvature operator</h4>
-<strong>The curvature operator</strong> expresses the local radiance at the surface of an object. We need it to later apply the shading operator. Since shading is defined at a point on the surface, the incoming radiance must be expressed there. Unfortunately, when the object is bumpy or not planar, the local radiance after forshortenning is not defined on the surface except at central point of our local domain. We need to account for the extra travel. This is done by the curvature operator. For this operator we assume that the local geometry is correctly defined by the curvature.
-
-<center>
-<div id="cov_curv" style="position:relative;width:100%;height:400px;">
-<canvas id="draw_cov_curv-cv" style="position:absolute;background-color:#FFF;border:0px"></canvas>
-<object type="image/svg+xml"  data="{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg" width="100%" height="400px" id="draw_cov_curv-01" style="position:absolute;top:0px;left:0px;"></object>
-<!--<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:270px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>-->
-</div>
-<br />
-Curvature: 0 <input id="curvature-slider" style="vertical-align: middle;" type="range" min="1.0E-6" max="1" value="0" step="1.0E-3" /> max
-</center>
-
-<script type="text/javascript">
-var elem = document.getElementById("draw_cov_curv-01");
-elem.onload = function() {
-      var snap = Snap("#draw_cov_curv-01");
-      curvOperator01Step00(snap);
-};
-//loadSVG("{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg", "#draw_cov_curv-01", curvOperator01Step00);
-</script>
 
 <br />
 
@@ -376,9 +384,30 @@ where `B` describe the angular blur of the BRDF. It is defined using the inverse
      B = { 0, 0;
            0, 4*pi^2/e};
 
+<br />
 
 <h4>The curvature operator</h4>
 So far we have expressed how to trace the covariance of local radiance when light is reflected by planar objects. To incorporate the local variation of the object's surface into covariance tracing, we will enable to project the local radiance from the tangent plane to a first order approximation of the surface using its curvature.
+
+<center>
+<div id="cov_curv" style="position:relative;width:100%;height:400px;">
+<canvas id="draw_cov_curv-cv" style="position:absolute;background-color:#FFF;border:0px"></canvas>
+<object type="image/svg+xml"  data="{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg" width="100%" height="400px" id="draw_cov_curv-01" style="position:absolute;top:0px;left:0px;"></object>
+<!--<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:270px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>-->
+</div>
+<br />
+Curvature: 0 <input id="curvature-slider" style="vertical-align: middle;" type="range" min="1.0E-6" max="1" value="0" step="1.0E-3" /> max
+</center>
+
+<script type="text/javascript">
+var elem = document.getElementById("draw_cov_curv-01");
+elem.onload = function() {
+      var snap = Snap("#draw_cov_curv-01");
+      curvOperator01Step00(snap);
+};
+//loadSVG("{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg", "#draw_cov_curv-01", curvOperator01Step00);
+</script><br />
+
 
 Mathematically, the first order approximation of the projected local radiance on a sphere of curvature $$k$$ is expressed as:
 
@@ -396,35 +425,7 @@ In terms of covariance, the operator is expressed similarly to the travel operat
          cov = op' * cov * op;
       }
 
-
-<h4>The visibility operator</h4>
-Since we are studying local radiance, we need to account for the fact that part light might be occluded or that part of the light will not interact with an object. We account for those two effects by reducing the local window used for our frequency analysis until there is no more *near-hit* or *near-miss* rays. Applying a window to a signal means that we will convolve its Fourier spectrum by the window Fourier spectrum:
-
-$$\mbox{V}[L](\delta x, \delta u) = L(\delta x, \delta u) \times V(\delta x, \delta u)$$
-
-This translate into a convolution in the Fourier domain:
-
-$$\mbox{V}[\hat{l}](\Omega_x, \Omega_u) = \hat{l}(\Omega_x, \Omega_u) \star \hat{V}(\Omega_x, \Omega_u)$$
-
-<center>
-<div style="position:relative;width:600px;height:280px;">
-<canvas id="draw_cov_occl-gl" style="position:absolute;left:352px;top:18px;width:229px;height:229px;background-color:#FFF;border:0px"></canvas>
-<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_occlusion.svg" width="600px" id="draw_cov_occl-cv" style="position:absolute;top:0px;left:0px;"></object>
-<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:270px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>
-</div><br />
-<div style="width:700px;"><em>The occlusion operator. A square occluder lit by a uniform infinite light source cast a shadow that will result in a wedge shape spectrum. In the primal, we can see the two discontinuity clearly. The wedge is sheared as we move away the senor from the occluder.</em></div>
-</center><br />
-
-<script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_occl.js" type="text/javascript">
-</script>
-
-We usually assumes that occluders are planar. In such case, we can perform the windowing on the spatial component only. If an occluder has non negligible depth, then we can slice it along its depth and apply multiple times the occlusion operator. In terms of covariance, this boils down to summing the covariance matrices.
-
-      function occlusion(w) {
-         occ = {w, 0;
-                0, 0};
-         cov = cov + occ;
-      }
+<br />
 
 In the [next section][course-part2], we will see how to pratically use the knowledge of the Fourer spectrum extents.
 <br />
