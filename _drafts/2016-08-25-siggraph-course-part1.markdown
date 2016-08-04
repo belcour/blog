@@ -5,10 +5,11 @@ date:   2016-08-25
 categories: course
 published: true
 javascripts:
-  - utils
   - raytracer
-  - fft
+  - utils
   - snap.svg
+  - fft
+  - course2016-part1
 ---
 
 <div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-2016-course.html">&larr; Intro</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
@@ -168,10 +169,36 @@ For simplicity, we will illustrate the different concepts using 2D light transpo
 
 However, using the Fourier transform defined previously, it would be hard to develop a fine analysis. For example, if we look for the bandwidth of the rendering image of the dragon above, we will find that the bandwidth if infinite due to the hard edges. Instead, we will use a local frequency analysis defined with respect to a central point.
 
+<!--
 <center>
 <img src="{{ site.url | append: site.baseurl }}/data/images/cover_course_2016.jpg" height="300px" ><br />
 <div style="width:80%"><em>Using a local windowed Fourier transform, we can perform a finer analysis and differentiate between low frequency regions (green inset) and high frequency regions (red inset). It requires a different formulation of the Fourier transform.</em></div>
 </center><br />
+-->
+
+<br />
+<center style="font-size:2em;">
+<div style="position:relative;width:512px;height:600px;margin:0;">
+<img id="local-analysis-01-img" src="{{ site.url | append: site.baseurl }}/data/images/dragon-01.png" width="512" height="512" style="border-width:0px;position:absolute;z-index:-1;margin:0px;top:0;left:0;" />
+<svg viewBox="0 0 512 512" style="width:512px;height:512px;position:absolute;z-index:1;top:0;left:0;overflow:visible;" id="local-analysis-01"></svg>
+<canvas id="local-analysis-01-fft1" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+<canvas id="local-analysis-01-fft2" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+</div>
+<div style="font-size:0.5em;width:80%"><em>Using a local windowed Fourier transform, we can perform a finer analysis and differentiate between low frequency regions (green inset) and high frequency regions (red inset). It requires a different formulation of the Fourier transform.</em></div>
+</center><br />
+
+<script type="text/javascript">
+document.getElementById("local-analysis-01-img").onload = function() {
+   var inset1 = {size:32, x:150, y:200, color: "#aa0000", canvas: "local-analysis-01-fft1"};
+   var inset2 = {size:32, x:220, y:340, color: "#00aa00", canvas: "local-analysis-01-fft2"};
+   var windw1 = {size: 150, x:-150, y:-10};
+   var windw2 = {size: 150, x: 350, y:400};
+
+   localAnalysisCreateInset("#local-analysis-01", "local-analysis-01-img", inset1, windw1);
+   localAnalysisCreateInset("#local-analysis-01", "local-analysis-01-img", inset2, windw2);
+}
+
+</script>
 
 Mathematically, we will incorporate this notion of windowing into the definition of the Fourier transform:
 
@@ -220,12 +247,12 @@ The next step is to express radiance transport equations in this space and to co
 
 #### Radiance Operators in Local Space
 
-Expressing the [rendering equation][kajiya1986] or the [radiative transfer equation][ishimaru1997] in local coordinates is not possible since they rely on global coordinates. Instead, we look at solutions of those equations for simple cases (operators) that correspond to transport evaluated during path tracing. We will need to describe several transport operators such as *travel in free space, reflection, refraction, etc.*.
+Expressing the [Rendering Equation][kajiya1986] or the [Radiative Transfer Equation][ishimaru1997] in local coordinates is not possible since they rely on global coordinates. Instead, we look at solutions of those equations for simple cases (operators) that correspond to transport evaluated during path tracing. We will need to describe several transport operators such as *travel in free space, reflection, refraction, etc.*.
 
 <center>
 <div style="position:relative;width:600px;height:300px;">
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_path.svg" width="600px" id="draw_cov_path-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
-<div style="width:600px;"><em><a name="figure2">Fig.2 -</a> Frequency analysis of light transport builds from light to sensor (left to right) by concatenating atomic operators.
+<div style="width:600px;"><em>Frequency analysis of light transport builds from light to sensor (left to right) by concatenating atomic operators.
 Those atomic operators correspond to specific elements of light transport such as transport \(T_d\), scattering \(B_\rho\), etc. For our implementation, we are interested on the
 effect those operators have on the covariance matrix \(\Sigma\).</em></div>
 </center><br />
@@ -243,7 +270,7 @@ Remember that we are not interested in the resulting radiance, but to its Fourie
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_travel.svg" width="600px" id="draw_cov_travel-cv" style="position:absolute;top:0px;left:0px;"></object>
 <button id="draw_cov_travel_bt" type="button" style="position:absolute;left:400px;top:290px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>
 </div><br />
-<div style="width:600px;"><em><a name="figure3">Fig.3 -</a> The travel operator. Given a diffuse light source with in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</em></div>
+<div style="width:600px;"><em>The travel operator. Given a diffuse light source with in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</em></div>
 </center><br />
 
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_travel.js" type="text/javascript">
@@ -268,6 +295,23 @@ A Matlab implementation of the operator is the following:
          cov = op' * cov * op;
       }
 
+
+<h4>The curvature operator</h4>
+<center>
+<div style="position:relative;width:100%;height:400px;">
+<canvas id="draw_cov_curv-cv" style="position:absolute;background-color:#FFF;border:0px"></canvas>
+<object type="image/svg+xml"  data="{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg" width="100%" height="400px" id="draw_cov_curv-01" style="position:absolute;top:0px;left:0px;"></object>
+<!--<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:270px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>-->
+</div>
+</center>
+<script type="text/javascript">
+var elem = document.getElementById("draw_cov_curv-01");
+elem.onload = function() {
+      var snap = Snap("#draw_cov_curv-01");
+      curvOperator01Step00(snap);
+};
+//loadSVG("{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg", "#draw_cov_curv-01", curvOperator01Step00);
+</script>
 
 <h4>The projection operator</h4>
 <strong>The projection operator</strong> enables to express the local radiance and the covariance in the tangent plane of objects. This is necessary to express the reflection or refraction of light on a planar surface. When the surface is non-planar, the <strong>curvature operator</strong> is applied after this operator.
@@ -298,7 +342,7 @@ A Matlab implementation of the operator is the following:
 <canvas id="draw_cov_brdf-gl" style="position:absolute;left:335px;top:26px;width:243px;height:243px;background-color:#FFF;border:0px"></canvas>
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_brdf.svg" width="600px" id="draw_cov_brdf-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
 <div>BRDF exponent: 100 <input style="vertical-align: middle;" type="range" min="100" max="1000" value="1000" step="5" onchange="drawBRDF(this.value)" /> 1000</div>
-<div style="width:600px;"><em><a name="figure4">Fig.4 -</a> The BRDF operator. In this case, we use as input a tight Gaussian cone light. The light's cone is blurred by the BRDF. Using the cursor, you can vary the phong exponent from 100 to 1000 and see the blurring effect.</em></div>
+<div style="width:600px;"><em>The BRDF operator. In this case, we use as input a tight Gaussian cone light. The light's cone is blurred by the BRDF. Using the cursor, you can vary the phong exponent from 100 to 1000 and see the blurring effect.</em></div>
 </center><br />
 
 This operator describes the integral product of the incoming local radiance with the BRDF. For an isotropic BRDF model, it is possible to express the outgoing radiance using a convolutive form:
