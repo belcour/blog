@@ -329,8 +329,11 @@ A Matlab implementation of the operator is the following:
 <canvas id="draw_cov_curv-cv" style="position:absolute;background-color:#FFF;border:0px"></canvas>
 <object type="image/svg+xml"  data="{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg" width="100%" height="400px" id="draw_cov_curv-01" style="position:absolute;top:0px;left:0px;"></object>
 <!--<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:270px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>-->
-<div style="position:absolute;top:370px;left:380px;">Curvature: 0 <input id="curvature-slider" style="vertical-align: middle;" type="range" min="1.0E-6" max="1" value="0" step="1.0E-3" /> max</div></div>
+</div>
+<br />
+Curvature: 0 <input id="curvature-slider" style="vertical-align: middle;" type="range" min="1.0E-6" max="1" value="0" step="1.0E-3" /> max
 </center>
+
 <script type="text/javascript">
 var elem = document.getElementById("draw_cov_curv-01");
 elem.onload = function() {

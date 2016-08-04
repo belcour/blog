@@ -854,6 +854,21 @@ function renderingEquation04Step00(snap) {
 
 /* Operators */
 
+function AlignCanvasWithSVGAlongX(canvas, svg, offset) {
+   var bbox   = svg.getBBox()
+   var split  = svg.transform().diffMatrix.split();
+   var width  = split.scalex * bbox.width;
+   var height = split.scaley * bbox.height;
+   var top    = svg.transform().diffMatrix.y(bbox.x, bbox.y);
+   var left   = svg.transform().diffMatrix.x(bbox.x, bbox.y);
+   if(offset) {
+      top  += offset.x;
+      left += offset.y;
+   }
+
+   canvas.style.left   = left   + "px";
+}
+
 function AlignCanvasWithSVG(canvas, svg, offset) {
    var bbox   = svg.getBBox()
    var split  = svg.transform().diffMatrix.split();
@@ -1523,6 +1538,11 @@ function bsdfOperator01Step00(snap) {
    // Align the rendering canvas with the axis-rectangle
    var box = snap.select("#rect4136");
    AlignCanvasWithSVG(canvas, box, {x: .5, y: -.5});
+
+   // Align the slider
+   var sphere = snap.select("#sphere");
+   var sldiv  = document.getElementById("curvature-slider-div");
+   AlignCanvasWithSVGAlongX(sldiv, sphere);
 
    // Fix the resolution of the image
    var h = 128, w = 128;
