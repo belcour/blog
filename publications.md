@@ -42,7 +42,7 @@ simulation or to adapt the sampling budget locally.
   <td style="vertical-align:top;"><b>5D Covariance Tracing for Efficient Defocus and Motion Blur</b> <br />
       Laurent Belcour, Cyril Soler, Kartic Subr, Nicolas Holzschuch, Frédo Durand <br />
       <em>ACM Transactions on Graphics</em>, 2013, 32 (3)
-      <a href="https://hal.archives-ouvertes.fr/hal-00814164/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-00814164v1/bibtex">bib</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-00814164/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-00814164v1/bibtex">bib</a> <a href="https://hal.inria.fr/hal-00814164/file/Sig13CovTr.pdf">presentation</a>
   </td>
 </tr>
 <tr>
