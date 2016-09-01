@@ -13,9 +13,13 @@
       <link rel="stylesheet" href="../css/reveal.css">
       <link rel="stylesheet" href="../css/theme/beige.css" id="theme">
 
+      <script src="../js/head.min.js"></script>
       <script src="../js/snap.svg.js"></script>
       <script src="../js/reveal.js"></script>
-      <script src="../js/mathjax.js"></script>
+      <script src="../../javascripts/fft.js"></script>
+      <script src="../../javascripts/raytracer.js"></script>
+      <script src="../../javascripts/course2016-part1.js"></script>
+      <script src="../../javascripts/course2016-part2.js"></script>
    </head>
    <body>
       <div class="reveal">
@@ -25,6 +29,7 @@
             <!-- Title screen -->
             <section class="title"> <!-- data-background="./png/background.png" -->
             <h3>Part IV - Conclusion</h3>
+            <a style="font-size:0.7em;float:left;padding-top:25%" href="part2.html">< previous part</a>
             </section>
 
             <!-- The overview of the presentation -->
@@ -49,6 +54,66 @@
                   </li>
                   <li style="color:#000000;padding-bottom:0.5em;">Conclusion</li>
                </ol>
+            </section>
+
+            <!-- Time for a little summary -->
+            <section>
+               <h4>Summary</h4><br />
+               <center><div style="width:80%;text-align:left;"><ul>
+                  <li class="fragment">Freq. Analysis can help
+                    <ul>
+                        <li>Improve existing methods</li>
+                        <li>Help understand why things work</li>
+                        <li>Theory valid across techniques (PPM, BDPT, rasterization, ...</li>
+                    </ul>
+                  </li><br />
+                  <li class="fragment">Thanks to a proper formulation
+                      <ul>
+                          <li>Decomposition of light transport</li>
+                      </ul>
+                </li><br />
+               </ul></div></center><br />
+            </section>
+
+
+            <!-- What is next? -->
+            <section>
+                <h4>What else?</h4>
+                <object data="../../data/svg/course-bib-summary.svg" width="1200" height="550px" style="transform: scale(1.2);"></object>
+            </section>
+            <section>
+               <h4>What else?</h4><br />
+               <center><div style="width:80%;text-align:left;"><ul>
+                  <li class="fragment">Incomplete framework
+                    <ul>
+                        <li>Subsurface scattering</li>
+                        <li>Anisotropic RTE</li>
+                    </ul>
+                  </li><br />
+                  <li class="fragment">More application possible!
+                      <ul>
+                          <li>Sampling/Mutation for MC Light Transport</li>
+                          <li>Temporal Antialiasing</li>
+                          <li>...</li>
+                      </ul>
+                </li><br />
+               </ul></div></center><br />
+            </section>
+
+            <!-- What is next? -->
+            <section>
+                <h4>Call for Action</h4><br />
+                <img src="../../data/images/keepcalm.png" style="border:none;" height="500px"/>
+            </section>
+
+
+            <!-- End screen -->
+            <section class="title"> <!-- data-background="./png/background.png" -->
+            <h4><strong>Thank you for your attention!</strong></h4><br />
+
+            <center><div style="padding-top:20%;font-size:0.6em;width:80%;text-align:left;">
+                Feedbacks/comments: <a href="mailto:laurent@unity3d.com">laurent@unity3d.com</a>
+            </div></center>
             </section>
 
          <div>

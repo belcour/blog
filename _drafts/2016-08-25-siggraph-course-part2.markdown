@@ -7,8 +7,13 @@ published: true
 javascripts:
   - utils
   - snap.svg
+  - course2016-part1
   - course2016-part2
 ---
+
+<script type="text/javascript">
+  setData("general", "baseurl", "{{site.url | append: site.baseurl }}");
+</script>
 
 <div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part1.html">&larr; Part 1</a></div><br />
 
@@ -77,7 +82,7 @@ First, our setup is the following (and shown in the figure below), we have a sen
 <svg id="example01-svg" width="800px" height="235px"></svg>
 </center>
 <script type="text/javascript" >
-var uri  = "{{ site.url | append: site.baseurl }}/data/svg/course-integration01.svg";
+var uri  = "/data/svg/course-integration01.svg";
 var elem = "#example01-svg";
 loadSVG(uri, elem, createExample01);
 </script>

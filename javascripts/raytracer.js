@@ -41,17 +41,27 @@ function createScene() {
 //
 //    object:
 //    {
+//       t: [int]   // 1='sphere', 0='plane'
+//       i: [int]   // 1='transmission', 0='reflection'
+//       n: [float] // index
+//
+//       /* for planes */
 //       p1: { x: [float], y: [float] }
 //       p2: { x: [float], y: [float] }
+//
+//       /* for spheres */
+//       c:  {x: [float], y: [float]}
+//       r: [float]
+//
 //       L:  [float] // Emission [optional]
 //       E:  [float] // Exponent [optional]
 //    }
 //
 function addObject(scene, object) {
-   if(object.p1 == null || object.p2 == null) {
-      console.log("Error: object is incorrect");
-      return;
-   }
+   // if(object.p1 == null || object.p2 == null) {
+   //    console.log("Error: object is incorrect");
+   //    return;
+   // }
    if(object.L == null && object.E == null) {
       console.log("Error: object is incorrect: no emission or exponent.");
       return;
@@ -68,13 +78,29 @@ function addObject(scene, object) {
 //    camera:
 //    {
 //       o:  { x: [float], y: [float] }
+//       n:  { x: [float], y: [float] } // normal of sensor, set to 'up' by default
+//       t:  { x: [float], y: [float] } // tangent of sensor, ortho to 'n
 //       d:  { x: [float], y: [float] }
 //       up: { x: [float], y: [float] }
+//       k:  [float] curvature for the position
 //    }
 function addCamera(scene, camera) {
    if(!camera.o || !camera.d || !camera.up) {
       console.log("Error: object camera is incorrect: " + camera);
       return;
+   }
+
+   // Update the sensor surface if unset
+   if(camera.t == undefined) {
+      camera.t = camera.up;
+   }
+   camera.n = { x: camera.t.y, y: - camera.t.x };
+   if(camera.r == undefined) {
+      camera.r = 1.0E10;
+   }
+
+   if(camera.scale == undefined) {
+      camera.scale = 1.0;
    }
 
    scene.camera = camera;
@@ -91,7 +117,7 @@ function addCamera(scene, camera) {
  *       n: { x: [float], y: [float] }
  *    }
  */
-function intersect(ray, object) {
+function intersectPlane(ray, object) {
    var hit = {};
    hit.hit = false;
 
@@ -127,6 +153,42 @@ function intersect(ray, object) {
    return hit;
 }
 
+/* Intersection function with a sphere. Returns a 'hit' objects
+ * containing the principal informatiopn regarding the intersection
+ * (if it exists).
+ */
+function intersectSphere(ray, object) {
+   var hit = {}
+   hit.hit = false;
+
+   // Solve the quadratic form
+   var OC = sub(ray.o,object.c);
+   var a = dot(ray.d, ray.d);
+   var b = 2*dot(ray.d, OC);
+   var c = dot(OC, OC) - object.r*object.r;
+   var D = b*b - 4*a*c;
+
+   var t1 = (-b - Math.sqrt(D)) / (2*a); 
+   var t2 = (-b + Math.sqrt(D)) / (2*a); 
+
+   if(D >= 0.0 && (t1 > 0.0 || t2 > 0)) { // Got a hit!
+      hit.hit = true;
+
+      if(t1 > 0.0 && t2 > 0.0) {
+         hit.t = Math.min(t1, t2);
+      } else if(t1 <= 0.0) {
+         hit.t = t2;
+      } else {
+         hit.t = t1;
+      }
+      hit.p = add(ray.o, mul(hit.t,ray.d));
+      hit.n = normalize(sub(hit.p, object.c));
+      //hit.n = normalize(sub(object.c, hit.p));
+   }
+
+   return hit;
+}
+
 /* Sample a 'Phong lobe from the incident direction 'wi', the normal 'n'
  * and the exponent 'exp'. This samples exactly the BRDF so there is no
  * need to multiply by it afterwards.
@@ -153,7 +215,12 @@ function raytrace(ray, scene, depth) {
 
    for(var k=0; k<scene.objects.length; k++) {
       var object = scene.objects[k];
-      var tHit = intersect(ray, object);
+      var tHit;
+      if(object.t == 1) {
+         tHit = intersectSphere(ray, object);
+      } else {
+         tHit = intersectPlane(ray, object);
+      }
 
       if(tHit.hit && tHit.t < hit.t) {
          hit = tHit;
@@ -171,9 +238,24 @@ function raytrace(ray, scene, depth) {
          if(object.E != null) {
             var wi = revert(ray.d);
 
-            if(dot(wi, hit.n) <= 0) { return 0; }
+            if(dot(wi, hit.n) <= 0) { return 0.0; }
 
-            var wo = sample(wi, hit.n, object.E);
+            var wo;
+            if(object.i == 1) {
+
+               var eta  = 1.0/object.n;
+               var dNI  = dot(hit.n, ray.d);
+              
+               var k    = 1.0 - eta*eta*(1.0 - dNI*dNI);
+
+               if(k < 0) { return 0.0; }
+
+               var zeta = eta*dNI + Math.sqrt(k);
+               wo = sub(mul(eta, ray.d), mul(zeta, hit.n));
+
+            } else {
+               wo = sample(wi, hit.n, object.E);
+            }
             var rray = { o: add(hit.p, mul(0.001, wo)), d: wo };
             return raytrace(rray, scene, depth+1);
          } else {
@@ -217,14 +299,22 @@ function render(target, scene, pass) {
          for (var ei=0; ei<spp; ei++) {
             for (var ej=0; ej<spp; ej++) {
 
-               var x = 2.0*((i + (ei + 0.5)/spp) / I - 0.5);
+               var x = scene.camera.scale * 2.0*((i + (ei + 0.5)/spp) / I - 0.5);
                var y = 2.0*((j + (ej + 0.5)/spp) / J - 0.5);
-               var ray = {
-                  o: add(scene.camera.o, mul(x, scene.camera.up)),
-                  d: normalize(add(scene.camera.d, mul(y, scene.camera.up)))
-               };
 
-               radiance += raytrace(ray, scene, 0) / (spp*spp);
+               // Resolve the position of the sample on the surface of a sphere
+               // using the position 'x'.
+               var Dt = scene.camera.r*scene.camera.r - x*x;
+               if(Dt >= 0.0) {
+                  var dy = - scene.camera.r + Math.sqrt(Dt);
+
+                  var ray = {
+                     o: add(add(scene.camera.o, mul(x, scene.camera.t)), mul(dy, scene.camera.n)),
+                     d: normalize(add(scene.camera.d, mul(y, scene.camera.up)))
+                  };
+
+                  radiance += raytrace(ray, scene, 0) / (spp*spp);
+               }
             }
          }
 

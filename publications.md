@@ -22,6 +22,14 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
+  <td><a href="{{ site.url | append: site.baseurl }}/siggraph-2016-course.html"><img src="{{ site.url | append: site.baseurl }}/data/images/dragon-01.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></a></td>
+  <td style="vertical-align:top;"><b><a style="color:black;" href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">A Practical Introduction to Frequency Analysis of Light Transport</a></b> <br />
+      Laurent Belcour<br />
+      ACM SIGGRAPH 2016 Courses
+      <a href="{{ site.url | append: site.baseurl }}/siggraph-2016-course.html">webpage</a>
+  </td>
+</tr>
+<tr>
   <td><a href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_CovFiltering.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></a></td>
   <td style="vertical-align:top;"><b><a style="color:black;" href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">Antialiasing Complex Global Illumination Effects in Path-space</a></b> <br />
       Laurent Belcour, Ling-Qi Yan, Ravi Ramamoorthi, and Derek Nowrouzezahrai <br />
@@ -50,7 +58,7 @@ simulation or to adapt the sampling budget locally.
   <td style="vertical-align:top;"><b>Interactive Rendering of Acquired Materials on Dynamic Geometry Using Frequency Analysis</b> <br />
       Mahdi Bagher, Cyril Soler, Kartic Subr, Laurent Belcour, Nicolas Holzschuch<br />
       <em>IEEE Transactions on Visualization and Computer Graphics</em><em>, 2013, 19(5),
-      <a href="https://hal.archives-ouvertes.fr/hal-00814104v1/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-00814104v1/bibtex">bib</a> <a href="https://hal.archives-ouvertes.fr/hal-00652066v4">I3D paper</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-00814104v1/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-00814104v1/bibtex">bib</a> <a href="https://hal.archives-ouvertes.fr/hal-00652066v4">I3D paper</a> <a href="https://hal.archives-ouvertes.fr/hal-00652066v4/file/Final_Video-11-Apr-2012_QT_5Mbps.mov">video</a>
   </em></td>
 </tr>
 </table>
@@ -107,5 +115,30 @@ simulation or to adapt the sampling budget locally.
       <a href="https://hal.archives-ouvertes.fr/hal-01083366/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01083366/bibtex">bib</a>
   </td>
 </tr>
+</table><br />
+
+
+### *Co-supervised* master theses
+
+I helped (unofficially) the following master students:
+<table>
+<tr>
+  <td><a href="http://hdl.handle.net/1866/13443"><img src="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/13443/Milaenen_David_2015_memoire.pdf.jpg?sequence=4&isAllowed=y" alt="DavidMilaenen" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></a></td>
+  <td style="vertical-align:top;"><b>Theory and numerical integration of subsurface light transport </b> <br />
+      David Milaenen  <br />
+      <em>Université de Montréal</em>, March 2016 
+      <a href="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/13443/Milaenen_David_2015_memoire.pdf?sequence=2&isAllowed=y
+">pdf</a>
+  </td>
+</tr>
+<tr>
+  <td><a href="http://hdl.handle.net/1866/12834"><img src="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/12834/Dubouchet_Renaud_2014_memoire.pdf.jpg?sequence=4&isAllowed=y" alt="AdrienDubouchet" width="90" height="90" style="padding-bottom:10px;padding-right:10px;border:1px;" /></a></td>
+  <td style="vertical-align:top;"><b>Theory and numerical integration of subsurface light transport </b> <br />
+      Adrien Dubouchet <br />
+      <em>Université de Montréal</em>, February 2015 
+      <a href="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/12834/Dubouchet_Renaud_2014_memoire.pdf?sequence=2&isAllowed=y">pdf</a>
+  </td>
+</tr>
 </table>
+
 <br />
