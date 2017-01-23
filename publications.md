@@ -22,7 +22,7 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
-  <td><a href="{{ site.url | append: site.baseurl }}/siggraph-2016-course.html"><img src="{{ site.url | append: site.baseurl }}/data/images/dragon-01.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></a></td>
+  <td><a href="{{ site.url | append: site.baseurl }}/siggraph-2016-course.html"><img src="{{ site.url | append: site.baseurl }}/data/images/dragon-01.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></a></td>
   <td style="vertical-align:top;"><b><a style="color:black;" href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">A Practical Introduction to Frequency Analysis of Light Transport</a></b> <br />
       Laurent Belcour<br />
       ACM SIGGRAPH 2016 Courses
@@ -30,7 +30,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><a href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_CovFiltering.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></a></td>
+  <td><a href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_CovFiltering.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></a></td>
   <td style="vertical-align:top;"><b><a style="color:black;" href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">Antialiasing Complex Global Illumination Effects in Path-space</a></b> <br />
       Laurent Belcour, Ling-Qi Yan, Ravi Ramamoorthi, and Derek Nowrouzezahrai <br />
       University of Montréal Technical Report #1375
@@ -38,7 +38,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_CovVolume.png" alt="covariance-volume" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_CovVolume.png" alt="covariance-volume" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></td>
   <td style="vertical-align:top;"><b>A Local Frequency Analysis of Light Scattering and Absorption</b> <br />
       Laurent Belcour, Kavita Bala, Cyril Soler <br />
       <em>ACM Transactions on Graphics</em>, 2014, 33 (5)
@@ -46,7 +46,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_CovTracing.png" alt="chopper_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_CovTracing.png" alt="chopper_cov" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
   <td style="vertical-align:top;"><b>5D Covariance Tracing for Efficient Defocus and Motion Blur</b> <br />
       Laurent Belcour, Cyril Soler, Kartic Subr, Nicolas Holzschuch, Frédo Durand <br />
       <em>ACM Transactions on Graphics</em>, 2013, 32 (3)
@@ -54,7 +54,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_BwdBuffer.png" alt="fourier-materials" width="90" height="90" style="padding-bottom:10px;padding-right:10px"/></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_BwdBuffer.png" alt="fourier-materials" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></td>
   <td style="vertical-align:top;"><b>Interactive Rendering of Acquired Materials on Dynamic Geometry Using Frequency Analysis</b> <br />
       Mahdi Bagher, Cyril Soler, Kartic Subr, Laurent Belcour, Nicolas Holzschuch<br />
       <em>IEEE Transactions on Visualization and Computer Graphics</em><em>, 2013, 19(5),
@@ -69,7 +69,7 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
-  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_MatCaps.png" alt="chopper_cov" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_MatCaps.png" alt="chopper_cov" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
   <td style="vertical-align:top;"><b>MatCap Decomposition for Dynamic Appearance Manipulation</b> <br />
       Carlos Jorge Zubiaga, Adolfo Muñoz, Laurent Belcour, Carles Bosch and Pascal Barla <br />
       <em>Proceedings of  the Euroographics Symposium on Rendering (EI&I track)</em>, 2015
@@ -92,7 +92,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_BrdfStats.png" alt="BRDF-param" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_BrdfStats.png" alt="BRDF-param" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
   <td style="vertical-align:top;"><b>Statistical Analysis of Bidirectional Reflectance Distribution Functions</b> <br />
       Carlos Zubiaga, Laurent Belcour, Carles Bosch, Adolfo Muñoz, Pascal Barla  <br />
       <em>SPIE Measuring, Modeling, and Reproducing Material Appearance</em>, February 2015
@@ -108,7 +108,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Retro.png" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Retro.png" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
   <td style="vertical-align:top;"><b>BRDF Measurements and Analysis of Retroreflective Materials </b> <br />
        Laurent Belcour, Romain Pacanowski, Marion Delahaie, Aude Laville-Geay, Laure Eupherte  <br />
       <em>Journal of the Optical Society of America, Optical Society of America</em>, 2014, JOSA A, 31 (12)
@@ -123,7 +123,7 @@ simulation or to adapt the sampling budget locally.
 I helped (unofficially) the following master students:
 <table>
 <tr>
-  <td><a href="http://hdl.handle.net/1866/13443"><img src="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/13443/Milaenen_David_2015_memoire.pdf.jpg?sequence=4&isAllowed=y" alt="DavidMilaenen" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></a></td>
+  <td><a href="http://hdl.handle.net/1866/13443"><img src="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/13443/Milaenen_David_2015_memoire.pdf.jpg?sequence=4&isAllowed=y" alt="DavidMilaenen" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
   <td style="vertical-align:top;"><b>Theory and numerical integration of subsurface light transport </b> <br />
       David Milaenen  <br />
       <em>Université de Montréal</em>, March 2016 
@@ -132,7 +132,7 @@ I helped (unofficially) the following master students:
   </td>
 </tr>
 <tr>
-  <td><a href="http://hdl.handle.net/1866/12834"><img src="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/12834/Dubouchet_Renaud_2014_memoire.pdf.jpg?sequence=4&isAllowed=y" alt="AdrienDubouchet" width="90" height="90" style="padding-bottom:10px;padding-right:10px;border:1px;" /></a></td>
+  <td><a href="http://hdl.handle.net/1866/12834"><img src="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/12834/Dubouchet_Renaud_2014_memoire.pdf.jpg?sequence=4&isAllowed=y" alt="AdrienDubouchet" width="90" height="90" style="margin-bottom:10px;spacing-right:10px;border:1px solid black;" /></a></td>
   <td style="vertical-align:top;"><b>Theory and numerical integration of subsurface light transport </b> <br />
       Adrien Dubouchet <br />
       <em>Université de Montréal</em>, February 2015 
