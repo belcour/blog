@@ -2,7 +2,7 @@
 layout: post
 title:  "Antialasing Appearance in Global Illumination Renderers"
 author: "Laurent Belcour, Ling-Qi Yan, Ravi Ramamoorthi, and Derek Nowrouzezahrai"
-journal: "University of Montréal Technical Report #1375"
+journal: "ACM Transactions on Graphics"
 date:   2015-12-09
 categories: research
 published: true
