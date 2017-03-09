@@ -17,8 +17,8 @@ function translateVertexNumber(path, idx, dX, dY) {
 
 var two_planes_canvas = document.getElementById('draw_cov_twoplanes');
 two_planes_canvas.addEventListener("load", function(){
-   var svg    = two_planes_canvas.contentDocument;
-   if(!svg){ alert("Unable to access SVG element from 'draw_cov_twoplanes'"); }
+//    var svg    = two_planes_canvas.contentDocument;
+//    if(!svg){ alert("Unable to access SVG element from 'draw_cov_twoplanes'"); }
 
    var snap   = Snap("#draw_cov_twoplanes");
    var ray    = snap.select("#ray");
