@@ -206,7 +206,6 @@ const createNyquist01 = function(snap) {
 }
 
 /* Fourier Transform part */
-
 const createFourierTransform01 = function(snap) {
       // Position of the input image
       var bbox    = snap.select("#image").getBBox();
@@ -240,6 +239,9 @@ const createFourierTransform01 = function(snap) {
       fft_cnv.style.backgroundColor = "#FFF";
       fft_ctx.fillStyle = '#ffffff';
       fft_ctx.fillRect(0, 0, fft_ctx.canvas.width, fft_ctx.canvas.height);
+
+      // Do not show the elements
+      showZonesFourierTransform01(-1);
 
       // Load the image and display it
       const h = 128, w = 128;
@@ -289,28 +291,32 @@ const createFourierTransform01 = function(snap) {
             }
 
             updateFilter(200);
-            snap.select("#zone0").attr({opacity: 0, fillOpacity: 0, stroke: "#ffffff", strokeWidth: "1px", strokeDasharray: "1,2", strokeLinecap: "round"});
-            snap.select("#zone1").attr({opacity: 0, fillOpacity: 0, stroke: "#ffffff", strokeWidth: "1px", strokeDasharray: "1,2", strokeLinecap: "round"});
-            snap.select("#zone2").attr({opacity: 0, fillOpacity: 0, stroke: "#ffffff", strokeWidth: "1px", strokeDasharray: "1,2", strokeLinecap: "round"});
+            snap.select("#zone0").attr({stroke: "#ffffff", strokeWidth: "1px", strokeDasharray: "1,2", strokeLinecap: "round"});
+            snap.select("#zone1").attr({stroke: "#ffffff", strokeWidth: "1px", strokeDasharray: "1,2", strokeLinecap: "round"});
+            snap.select("#zone2").attr({stroke: "#ffffff", strokeWidth: "1px", strokeDasharray: "1,2", strokeLinecap: "round"});
 
-            snap.select("#zone0").node.onclick = function() {
+            // snap.select("#zone0").attr({opacity: 0, fillOpacity: 0, stroke: "#ffffff", strokeWidth: "1px", strokeDasharray: "1,2", strokeLinecap: "round"});
+            // snap.select("#zone1").attr({opacity: 0, fillOpacity: 0, stroke: "#ffffff", strokeWidth: "1px", strokeDasharray: "1,2", strokeLinecap: "round"});
+            // snap.select("#zone2").attr({opacity: 0, fillOpacity: 0, stroke: "#ffffff", strokeWidth: "1px", strokeDasharray: "1,2", strokeLinecap: "round"});
+
+            snap.select("#zone0").mouseover(function() {
                   updateFilter(4);
                   snap.select("#zone0").attr({stroke: "#ff0000"});
                   snap.select("#zone1").attr({stroke: "#ffffff"});
                   snap.select("#zone2").attr({stroke: "#ffffff"});
-            };
-            snap.select("#zone1").node.onclick = function() {
+            });
+            snap.select("#zone1").mouseover(function() {
                   updateFilter(40);
                   snap.select("#zone0").attr({stroke: "#ffffff"});
                   snap.select("#zone1").attr({stroke: "#ff0000"});
                   snap.select("#zone2").attr({stroke: "#ffffff"});
-            };
-            snap.select("#zone2").node.onclick = function() {
+            });
+            snap.select("#zone2").mousemove(function() {
                   updateFilter(128);
                   snap.select("#zone0").attr({stroke: "#ffffff"});
                   snap.select("#zone1").attr({stroke: "#ffffff"});
                   snap.select("#zone2").attr({stroke: "#ff0000"});
-            };
+            });
       });
 }
 

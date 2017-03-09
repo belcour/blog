@@ -1,46 +1,72 @@
-var two_planes_canvas = document.getElementById('draw_cov_twoplanes');
+function translateVertexNumber(path, idx, dX, dY) {
+    var re = /([a-zA-Z ]+)([\-0-9\.]+),([\-0-9\.]+)/mg
+    var result;
+    for(var i=-1; i<idx; ++i) {
+        result = re.exec(path);
+    }
 
+    if(result == null) {return path;}
+
+    var x = parseFloat(result[2]) + dX;
+    var y = parseFloat(result[3]) + dY;
+    var rpl = result[1] + x.toString() + ',' + y.toString();
+    var tmp = path.replace(result[0], rpl);
+    return tmp;
+}
+
+
+var two_planes_canvas = document.getElementById('draw_cov_twoplanes');
 two_planes_canvas.addEventListener("load", function(){
    var svg    = two_planes_canvas.contentDocument;
    if(!svg){ alert("Unable to access SVG element from 'draw_cov_twoplanes'"); }
-   
-   var cursor = svg.getElementById("cursor");
-   var rect   = svg.getElementById("rectangle");
-   var ray    = svg.getElementById("ray");
+
+   var snap   = Snap("#draw_cov_twoplanes");
+   var ray    = snap.select("#ray");
+   var rect   = snap.select("#rectangle");
+   var cursor = snap.select("#cursor");
 
    var currentX = 0;
    var currentY = 0;
-   var curT = cursor.transform.baseVal.getItem(0);
    var isDown = false;
 
-   rect.addEventListener('mousedown', function(evt) {
+   rect.node.addEventListener('mousedown', function(evt) {
       isDown = true;
       currentX = evt.clientX;
       currentY = evt.clientY;
    }, false);
-   rect.addEventListener('mouseup', function(evt) {
+   rect.node.addEventListener('mouseup', function(evt) {
       isDown = false;
    }, false);
-   rect.addEventListener('mouseout', function(evt) {
+   rect.node.addEventListener('mouseout', function(evt) {
       isDown = false;
    }, false);
-   rect.addEventListener('mousemove', function(evt) {
+   rect.node.addEventListener('mousemove', function(evt) {
       if(isDown) {
-         var transf = cursor.transform.baseVal.getItem(0);
-         var matrix = transf.matrix;
+
+        var snap   = Snap("#draw_cov_twoplanes");
+        var ray    = snap.select("#ray");
+        var rect   = snap.select("#rectangle");
+        var cursor = snap.select("#cursor");
+
+         var transf = cursor.transform();
+         var matrix = transf.localMatrix;
 
          var deltaX = evt.clientX - currentX;
          var deltaY = evt.clientY - currentY;
          currentX = evt.clientX;
          currentY = evt.clientY;
 
-         matrix = matrix.translate(deltaX, deltaY);
-         transf.setMatrix(matrix);
+         // Translate the cursor
+         matrix.translate(deltaX, deltaY);
+         cursor.transform(matrix.toTransformString());
 
-         var rayStart = ray.pathSegList.getItem(0);
-         var rayEnd   = ray.pathSegList.getItem(1);
-         rayStart.y -= deltaX;
-         rayEnd.y   += deltaY;
+         // Change the position and orientation of the ray
+         var pts = ray.attr('d');
+         pts = translateVertexNumber(pts, 0, 0, deltaX);
+         pts = translateVertexNumber(pts, 1, 0, deltaY);
+         if(pts != '') {
+            ray.attr({'d': pts});
+         }
       }
    }, false);
 }, false);

@@ -12,12 +12,17 @@ javascripts:
   - course2016-part1
 ---
 
+<!-- Update the relative url -->
+<script type="text/javascript">
+      setData("general", "baseurl", "../../../../");
+</script>
+
 <div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-2016-course.html">&larr; Intro</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
 
-<!--
-<center style="color:#EE0000;"><span>This webpage does not correctly render on Chrome yet. It has been tested on Firefox and Safari.</span><br /><span> If you have trouble with it, please send me a note!</span>
+
+<center style="color:#EE0000;"><span>This webpage does not correctly render on Chrome yet. It has been tested on Firefox and Safari.</span><br /><span> If you have trouble with it, please <a href="mailto:laurent@unity3d.com">send me a note!</a></span>
 </center><br />
--->
+
 
 This course note is the first part of the [2016 SIGGRAPH course][course-main] on Frequency Analysis of Light Transport. Additional material such as slides and source code are available in the [main page][course-main]. **Note:** most of the diagrams and figure are *interactive* (but not all of them). Please feel unashamed to click on them!
 
@@ -29,112 +34,21 @@ The idea of Frequency Analysis of Light Transport as sketched by [Durand and col
 **Signal processing** uses an alternative representation of a signal which: its **Fourier transform**. A Fourier transform describes a signal in terms of amplitude with respect to frequency instead of the traditional view (we call *the primal*) that describes a signal in terms of amplitude with respect to coordinates.
 
 <center>
-<div style="position:relative;width:600px;height:300px;">
-<canvas id="fourier-transform-01-fft" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:1;"></canvas>
-<canvas id="fourier-transform-01-img" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:1;"></canvas>
-<canvas id="fourier-transform-01-rec" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:0;"></canvas>
-<svg id="fourier-transform-01-svg" width="600px" height="300px" style="position:relative;z-index:3;"></svg>
-</div><br />
-<div style="width:600px;"><em>The Fourier transform of a signal describes its content with respect to variations and not positions. A fourier spectrum restricted to the center of the Fourier domain smooth. As we incorporate more elements far away from the center, the image becomes sharper. Click on areas to remove frequency content above a level.</em></div>
+      <div style="position:relative;width:600px;height:300px;">
+      <canvas id="fourier-transform-01-fft" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:1;"></canvas>
+      <canvas id="fourier-transform-01-img" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:1;"></canvas>
+      <canvas id="fourier-transform-01-rec" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:0;"></canvas>
+      <svg id="fourier-transform-01-svg" width="600px" height="300px" style="position:relative;z-index:3;"></svg>
+      </div><br />
+      <div class="caption"><em>The Fourier transform of a signal describes its content with respect to variations and not positions. A fourier spectrum restricted to the center of the Fourier domain smooth. As we incorporate more elements far away from the center, the image becomes sharper. Move over areas to remove frequency content above a level.</em></div>
 </center>
 <script type="text/javascript" >
-var s = Snap('#fourier-transform-01-svg');
-Snap.load("{{ site.url | append: site.baseurl }}/data/svg/course-fourier01.svg", function (f) {
-      s.append(f);
-
-      // Position of the input image
-      var bbox    = Snap("#image").getBBox();
-      var img_cnv = document.getElementById("fourier-transform-01-img");
-      var img_ctx = img_cnv.getContext('2d');
-      img_cnv.style.width  = bbox.width + "px";
-      img_cnv.style.height = bbox.height + "px";
-      img_cnv.style.left   = bbox.x + "px";
-      img_cnv.style.top    = bbox.y + "px";
-      img_cnv.style.backgroundColor = "#F0F";
-
-      // Reconstructed image
-      var rec_cnv = document.getElementById("fourier-transform-01-rec");
-      var rec_ctx = rec_cnv.getContext('2d');
-      rec_cnv.style.width  = bbox.width + "px";
-      rec_cnv.style.height = bbox.height + "px";
-      rec_cnv.style.left   = bbox.x + "px";
-      rec_cnv.style.top    = bbox.y + "px";
-      rec_cnv.style.backgroundColor = "#F0F";
-      rec_ctx.fillStyle = '#ffffff';
-      rec_ctx.fillRect(0, 0, rec_ctx.canvas.width, rec_ctx.canvas.height);
-
-      // Position of the fourier spectrum
-      var bbox    = Snap("#fourier").getBBox();
-      var fft_cnv = document.getElementById("fourier-transform-01-fft");
-      var fft_ctx = fft_cnv.getContext('2d');
-      fft_cnv.style.width  = bbox.width + "px";
-      fft_cnv.style.height = bbox.height + "px";
-      fft_cnv.style.left   = bbox.x + "px";
-      fft_cnv.style.top    = bbox.y + "px";
-      fft_cnv.style.backgroundColor = "#FFF";
-      fft_ctx.fillStyle = '#ffffff';
-      fft_ctx.fillRect(0, 0, fft_ctx.canvas.width, fft_ctx.canvas.height);
-
-      // Load the image and display it
-      const h = 128, w = 128;
-      var image   = new Image(w, h);
-      image.src = "{{ site.url | append: site.baseurl }}/data/images/lena.jpg";
-      image.addEventListener('load', function() {
-            img_ctx.drawImage(image, 0, 0, w, h);
-
-            var updateFilter = function(radius) {
-                  // Compute the FFT of the image
-                  FFT.init(w);
-                  FrequencyFilter.init(w);
-                  SpectrumViewer.init(fft_ctx);
-                  var src = img_ctx.getImageData(0, 0, w, h);
-                  var dat = src.data;
-                  var re = [], im = [];
-                  for(var y=0; y<h; y++) {
-                        var i = y*w;
-                        for(var x=0; x<w; x++) {
-                        var L = dat[(i << 2) + (x << 2) + 0]
-                              + dat[(i << 2) + (x << 2) + 1]
-                              + dat[(i << 2) + (x << 2) + 2];
-                        re[i + x] = L / 3.0;
-                        im[i + x] = 0.0;
-                        }
-                  }
-                  FFT.fft2d(re, im);
-                  FrequencyFilter.swap(re, im);
-
-                  // Draw spectrum
-                  SpectrumViewer.render(re, im, true);
-
-                  FrequencyFilter.LPF(re, im, radius);
-                  FrequencyFilter.swap(re, im);
-                  FFT.ifft2d(re, im);
-                  for(var y=0; y<h; y++) {
-                        var i = y*w;
-                        for(var x=0; x<w; x++) {
-                              var val = re[i + x];
-                              val = val > 255 ? 255 : val < 0 ? 0 : val;
-                              var p   = (i << 2) + (x << 2);
-                              dat[p] = dat[p + 1] = dat[p + 2] = val;
-                        }
-                  }
-                  rec_ctx.putImageData(src, 0, 0);
-                  rec_cnv.style.zIndex = "2";
-            }
-
-            updateFilter(200);
-
-            Snap("#zone0").node.onclick = function() {
-                  updateFilter(4);
-            };
-            Snap("#zone1").node.onclick = function() {
-                  updateFilter(40);
-            };
-            Snap("#zone2").node.onclick = function() {
-                  updateFilter(128);
-            };
-      });
-});
+setData("fft01", "img-url", "data/images/lena.jpg");
+function createFourierTransform00(snap) {
+      createFourierTransform01(snap);
+      showZonesFourierTransform01(1);
+}
+loadSVG('data/svg/course-fourier01.svg', '#fourier-transform-01-svg', createFourierTransform00);
 </script><br />
 
 Mathematically, the Fourier transform of a signal $$f(\mathbf{x})$$ where $$\mathbf{x} = [x_1, \cdots, x_N] \in \mathbb{R}^N$$ is:
@@ -169,22 +83,15 @@ For simplicity, we will illustrate the different concepts using 2D light transpo
 
 However, using the Fourier transform defined previously, it would be hard to develop a fine analysis. For example, if we look for the bandwidth of the rendering image of the dragon above, we will find that the bandwidth if infinite due to the hard edges. Instead, we will use a local frequency analysis defined with respect to a central point.
 
-<!--
-<center>
-<img src="{{ site.url | append: site.baseurl }}/data/images/cover_course_2016.jpg" height="300px" ><br />
-<div style="width:80%"><em>Using a local windowed Fourier transform, we can perform a finer analysis and differentiate between low frequency regions (green inset) and high frequency regions (red inset). It requires a different formulation of the Fourier transform.</em></div>
-</center><br />
--->
-
 <br />
-<center style="font-size:2em;">
-<div style="position:relative;width:512px;height:600px;margin:0;">
-<img id="local-analysis-01-img" src="{{ site.url | append: site.baseurl }}/data/images/dragon-01.png" width="512" height="512" style="border-width:0px;position:absolute;z-index:-1;margin:0px;top:0;left:0;" />
-<svg viewBox="0 0 512 512" style="width:512px;height:512px;position:absolute;z-index:1;top:0;left:0;overflow:visible;" id="local-analysis-01"></svg>
-<canvas id="local-analysis-01-fft1" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
-<canvas id="local-analysis-01-fft2" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
-</div>
-<div style="font-size:0.5em;width:80%"><em>Using a local windowed Fourier transform, we can perform a finer analysis and differentiate between low frequency regions (green inset) and high frequency regions (red inset). It requires a different formulation of the Fourier transform.</em></div>
+<center>
+      <div style="position:relative;width:512px;height:600px;margin:0;font-size:2em;">
+      <img id="local-analysis-01-img" src="{{ site.url | append: site.baseurl }}/data/images/dragon-01.png" width="512" height="512" style="border-width:0px;position:absolute;z-index:-1;margin:0px;top:0;left:0;" />
+      <svg viewBox="0 0 512 512" style="width:512px;height:512px;position:absolute;z-index:1;top:0;left:0;overflow:visible;" id="local-analysis-01"></svg>
+      <canvas id="local-analysis-01-fft1" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+      <canvas id="local-analysis-01-fft2" width="128" height="128" style="background-color:#FFF;border-width:0px;position:absolute;z-index:3;margin:0px;top:0;left:0;"></canvas>
+      </div>
+      <div class="caption">Using a local windowed Fourier transform, we can perform a finer analysis and differentiate between low frequency regions (green inset) and high frequency regions (red inset). It requires a different formulation of the Fourier transform. You can move the local window in the frame.</div>
 </center><br />
 
 <script type="text/javascript">
@@ -227,8 +134,8 @@ where `sxx` and `syy` are the variance (or squared standard deviation) of the si
 In order to describe the radiance for small perturbation of a given ray, we need a parametrization of this local space. We will use the tangential space defined by the ray. This space can be defined using a two plane parametrization.
 
 <center>
-<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_twoplanes.svg" width="604px" id="draw_cov_twoplanes"></object><br />
-<div style="width:600px;"><em>The local tangent frame of a 2D ray is described by a two plane parametrization. The first plane describes the relative position and the second plane the relative direction. Click over the \((\delta x, \delta u)\) space to change the ray.</em></div>
+<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_twoplanes.svg" width="604px" height="275px" id="draw_cov_twoplanes"></object><br />
+<div class="caption">The local tangent frame of a 2D ray is described by a two plane parametrization. The first plane describes the relative position and the second plane the relative direction. Click over the \((\delta x, \delta u)\) space to change the ray.</div>
 </center><br />
 
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_twoplanes.js" type="text/javascript">
