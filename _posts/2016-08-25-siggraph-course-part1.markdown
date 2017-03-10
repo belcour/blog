@@ -17,8 +17,9 @@ javascripts:
       setData("general", "baseurl", "../../../../");
 </script>
 
-<div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-2016-course.html">&larr; Intro</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
+<div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-2016-course.html">&larr; Table of content</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
 
+<center style="color:#EE0000;"><span>This course note is still a work in progress!</span></center><br />
 
 <center style="color:#EE0000;"><span>This webpage does not correctly render on Chrome yet. It has been tested on Firefox and Safari.</span><br /><span> If you have trouble with it, please <a href="mailto:laurent@unity3d.com">send me a note!</a></span>
 </center><br />
@@ -171,15 +172,19 @@ Remember that we are not interested in the resulting radiance, but to its Fourie
 **The travel operator** is the simplest of all. It describes the local radiance given that we now the local radiance from a previous position along the ray. Using the tangent plane formulation described earlier, we can update the local position of a ray after a travel of length `d`. Only the spatial component of the ray will be updated since the ray's direction remains fixed.
 
 <center>
-<div style="position:relative;width:600px;height:300px;">
+<div style="position:relative;width:600px;height:350px;">
 <canvas id="draw_cov_travel-gl" style="position:absolute;left:335px;top:28px;width:241px;height:241px;background-color:#FFF;border:0px"></canvas>
-<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_travel.svg" width="600px" id="draw_cov_travel-cv" style="position:absolute;top:0px;left:0px;"></object>
-<button id="draw_cov_travel_bt" type="button" style="position:absolute;left:400px;top:290px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>
+<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_travel.svg" width="600px" height="350px" id="draw_cov_travel-cv" style="position:absolute;top:0px;left:0px;"></object>
+<!--<button id="draw_cov_travel_bt" type="button" style="position:absolute;left:400px;top:290px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>-->
 </div><br />
 <div class="caption">The travel operator. Given a diffuse light source with in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</div>
 </center><br />
 
-<script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_travel.js" type="text/javascript">
+<script>
+    addLoadEvent(function() {
+        var svg_travel = Snap('#draw_cov_travel-cv');
+        travelOperator01Step00(svg_travel, false);
+    });
 </script>
 
 This operator shears the local radiance by the amount of traveled distance. The equivalent operator on the covariance matrix is also a shear which parameter is the traveled distance in meters. However, in the Fourier domain, the shear transfers spatial content to the angular domain. This is the opposite behaviour for radiance. It can be understood in the limit case where the travel distance is infinite. There, locally around the central direction of the ray, only radiance along the same direction remains. Thus the angular content is locally a dirac (a single direction) and the spatial content is locally a constant (same radiance for neighboring positions).

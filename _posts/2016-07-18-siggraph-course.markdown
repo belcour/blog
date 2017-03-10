@@ -43,8 +43,8 @@ Frequency Analysis of Light Transport expresses Physically Based Rendering (PBR)
 **Wednesday, 27 August 9am - 10:30am, Room 303 A-C**
 
  + ` 9:00` - Introduction ([slides][slides-part0])
- + ` 9:10` - Concepts and Implementation ([slides][slides-part1])
- + ` 9:40` - Applications of Frequency Analysis ([slides][slides-part2])
+ + ` 9:10` - Concepts and Implementation ([slides][slides-part1],[notes][notes-part1])
+ + ` 9:40` - Applications of Frequency Analysis ([slides][slides-part2], [notes][notes-part2])
  + `10:25` - Conclusion ([slides][slides-part3])
 
 <!--

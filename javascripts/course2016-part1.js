@@ -893,10 +893,12 @@ function AlignCanvasWithSVG(canvas, svg, offset) {
    canvas.style.height = height + "px";
 }
 
-var travelOperator01Step00 = function(snap) {
+var travelOperator01Step00 = function(snap, slide=true) {
 
    var svg2 = snap.select("#layer1")
-   svg2.transform(Snap.matrix().scale(1.5).add(svg2.transform().localMatrix))
+   if(slide) {
+      svg2.transform(Snap.matrix().scale(1.5).add(svg2.transform().localMatrix))
+   }
 
    // WebGL code
    var tr_canvas = document.getElementById("draw_cov_travel-gl");
@@ -956,6 +958,9 @@ var travelOperator01Step00 = function(snap) {
 
    //CreateFourierButton(snap, box);
    var text = snap.text(0, 0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
+   if(!slide) {
+         text.attr({fontSize: '0.6em'});
+   }
    var tbb  = text.getBBox();
    tbb.x      = -100;
    tbb.y      = -15;
@@ -980,62 +985,48 @@ var travelOperator01Step00 = function(snap) {
    g.transform(Snap.matrix(1, 0, 0, 1, px, py));
    snap.select("#layer1").append(g);
 
-   // SVG drawing code
-   var tr_svg = document.getElementById('draw_cov_travel-cv');
-   var svg    = tr_svg;
-   var cursor = svg.getElementById("cursor");
-   var ray    = svg.getElementById("ray");
+    // SVG drawing code
+    var svg      = Snap('#draw_cov_travel-cv');
+    var ray      = svg.select('#ray');
+    var rayNorm  = ray.getTotalLength();
+    var rayStart = ray.getPointAtLength(0);
+    var rayEnd   = ray.getPointAtLength(rayNorm);
+    var dirX     = (rayEnd.x - rayStart.x) / rayNorm;
+    var dirY     = (rayEnd.y - rayStart.y) / rayNorm;
 
-   var rayStart = ray.pathSegList.getItem(0);
-   var rayEnd   = ray.pathSegList.getItem(1);
-   var dirX = rayEnd.x - rayStart.x;
-   var dirY = rayEnd.y - rayStart.y;
-   var rayDirNorm = Math.sqrt(dirX*dirX + dirY*dirY);
-   dirX /= rayDirNorm;
-   dirY /= rayDirNorm;
+    // Current position in the SVG element
+    var currentX = 0;
+    var currentY = 0;
 
-   var currentX = 0;
-   var currentY = 0;
-   var isDown = false;
+    // Add a mousemove handler to animate the SVG element
+    svg.mousemove(function (evt) {
+        // If the main button is pressed, translate the cursor handle and
+        // refresh the raytracer.
+        if (evt.buttons == 1 || evt.button == 1) {
+            var deltaX = evt.clientX - currentX;
+            var deltaY = evt.clientY - currentY;
 
-   svg.addEventListener('mousedown', function(evt) {
-      isDown = true;
-      currentX = evt.clientX;
-      currentY = evt.clientY;
-   }, false);
-   svg.addEventListener('mouseup', function(evt) {
-      isDown = false;
-   }, false);
-   svg.addEventListener('mouseout', function(evt) {
-      isDown = false;
-   }, false);
-   svg.addEventListener('mousemove', function(evt) {
-      if(isDown) {
-         var deltaX = evt.clientX - currentX;
-         var deltaY = evt.clientY - currentY;
-         currentX = evt.clientX;
-         currentY = evt.clientY;
+            var cursor = svg.select('#cursor');
+            var dotProd  = deltaX * dirX + deltaY * dirY;
 
-         var rayStart = cursor.pathSegList.getItem(0);
-         var rayEnd   = cursor.pathSegList.getItem(1);
-         var dotProd  = deltaX*dirX + deltaY*dirY;
+            var temp = distToLight + dotProd / 200;
+            if (temp > 0 && temp < 1.0) {
+                distToLight = temp;
+                var matrix = cursor.transform().localMatrix.translate(dotProd*dirX, dotProd*dirY);
+                cursor.transform(matrix);
+            }
 
-         var temp = distToLight + dotProd/200;
-         if(temp > 0.00001 && temp < 1.0) {
-            distToLight = temp;
-            rayStart.x += dotProd*dirX;
-            rayStart.y += dotProd*dirY;
-            rayEnd.x += dotProd*dirX;
-            rayEnd.y += dotProd*dirY;
-         }
+            scene.camera.o.x = -5 * distToLight;
+            render(tr_canvas, scene, 0);
+            if (fourier_bt_press) {
+                render_fourier_travel();
+            }
+        }
 
-         scene.camera.o.x = -5*distToLight;
-         render(tr_canvas, scene, 0);
-         if(fourier_bt_press) {
-            render_fourier_travel();
-         }
-      }
-   }, false);
+        // Update current position
+        currentX = evt.clientX;
+        currentY = evt.clientY;
+    });
 }
 
 var brdfOperator01Step00 = function(snap) {

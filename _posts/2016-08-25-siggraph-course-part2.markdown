@@ -17,15 +17,15 @@ javascripts:
 
 <div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part1.html">&larr; Part 1</a></div><br />
 
-This course note is the second set of the [2016 SIGGRAPH course][course-main] on Frequency Analysis of Light Transport. If you haven't check the [previous part][course-part1], I recommand you do so.
+This course note is the second set of the [2016 SIGGRAPH course][course-main] on Frequency Analysis of Light Transport. If you haven't checked the [previous part][course-part1], I recommand you do so.
 
 ### Representations of the Fourier Spectrum
 
 Most of the application we will review here rely on different representation of the spectrum. Since it is not possible to compute it exactly, we always rely on approximation. The covariance is one of many representation that we can use.
 
-<center>
-<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/course-representation01.svg" width="100%" id="course-representation01"></object><br />
-</center><br />
+<center><div style="position:relative;width:100%">
+<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/course-representation01.svg" width="100%" id="course-representation01"></object>
+</div></center><br />
 
 For example it is possible to extract the **axis aligned bounding box** of the spectrum $$[B_x, B_u]$$ as done by Metha et al. [[2012][mehta2012],[2013][metha2013],[2014][metha2014]] and Yan et al. [[2015][yan2015]]. Note that this correspond to the bandwidth of the spectrum. It is possible to be less conservative when the spectrum has an infinite bandwidth but not much energy in the tail of the distribution using a percentile of the spectrum as done by Bagher et al. [[2011][bagher2011]].
 
@@ -40,11 +40,9 @@ I all those case, two methods are possible to determine the spectrum during rend
 
 Adaptive sampling & reconstruction algorithms adapt the Nyquist-Shannong sampling theorem to predict, from the Fourier analysis, a per pixel sampling rate and an associated reconstruction filter (for example in Durand et al. [[2005][durand2005]], Soler et al. [[2009][soler2009]]). In some other cases, we adapt the required sampling rate for integration (to integrate motion for example, see Egan et al. [[2009][egan2009]] or Belcour et al. [[2013][belcour2013]]).
 
-<center>
-<div style="position:relative;width:100%">
+<center><div style="position:relative;width:100%">
 <object width="100%" data="{{ site.url | append: site.baseurl }}/data/svg/course-applications01.svg" type="image/svg+xml"></object>
-</div>
-</center>
+</div></center>
 
 The sampling rate in image space is directly extracted from the bandwidth of the Fourier spectrum using the Nyquist rate: $$N = \frac{1}{2 B_i}$$.
 
