@@ -40,7 +40,7 @@ The idea of Frequency Analysis of Light Transport as sketched by [Durand and col
       <canvas id="fourier-transform-01-rec" width="128px" height="128px" style="position:absolute;background-color:#FFF;z-index:0;"></canvas>
       <svg id="fourier-transform-01-svg" width="600px" height="300px" style="position:relative;z-index:3;"></svg>
       </div><br />
-      <div class="caption"><em>The Fourier transform of a signal describes its content with respect to variations and not positions. A fourier spectrum restricted to the center of the Fourier domain smooth. As we incorporate more elements far away from the center, the image becomes sharper. Move over areas to remove frequency content above a level.</em></div>
+      <div class="caption">The Fourier transform of a signal describes its content with respect to variations and not positions. A fourier spectrum restricted to the center of the Fourier domain smooth. As we incorporate more elements far away from the center, the image becomes sharper. Move over areas to remove frequency content above a level.</div>
 </center>
 <script type="text/javascript" >
 setData("fft01", "img-url", "data/images/lena.jpg");
@@ -159,9 +159,8 @@ Expressing the [Rendering Equation][kajiya1986] or the [Radiative Transfer Equat
 <center>
 <div style="position:relative;width:600px;height:300px;">
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_path.svg" width="600px" id="draw_cov_path-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
-<div style="width:600px;"><em>Frequency analysis of light transport builds from light to sensor (left to right) by concatenating atomic operators.
-Those atomic operators correspond to specific elements of light transport such as transport \(T_d\), scattering \(B_\rho\), etc. For our implementation, we are interested on the
-effect those operators have on the covariance matrix \(\Sigma\).</em></div>
+<div class="caption">Frequency analysis of light transport builds from light to sensor (left to right) by concatenating atomic operators. Those atomic operators correspond to specific elements of light transport such as transport \(T_d\), scattering \(B_\rho\), etc. For our implementation, we are interested on the
+effect those operators have on the covariance matrix \(\Sigma\).</div>
 </center><br />
 
 Remember that we are not interested in the resulting radiance, but to its Fourier transform. What we really want is **how an operator affects the Fourier spectrum**. Fortunately, under a first order assumption (equivalent to paraxial optics), we can formulate analytically how operators modify it. Furthermore, we will have the same analytical formulation for the covariance matrix.
@@ -177,7 +176,7 @@ Remember that we are not interested in the resulting radiance, but to its Fourie
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_travel.svg" width="600px" id="draw_cov_travel-cv" style="position:absolute;top:0px;left:0px;"></object>
 <button id="draw_cov_travel_bt" type="button" style="position:absolute;left:400px;top:290px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>
 </div><br />
-<div style="width:600px;"><em>The travel operator. Given a diffuse light source with in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</em></div>
+<div class="caption">The travel operator. Given a diffuse light source with in the tangent plane of the ray, the local radiance at any point along the ray is the initial local radiance sheared by the distance to the source. Use the mouse to move the plane.</div>
 </center><br />
 
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_travel.js" type="text/javascript">

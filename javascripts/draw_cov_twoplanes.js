@@ -29,19 +29,8 @@ two_planes_canvas.addEventListener("load", function(){
    var currentY = 0;
    var isDown = false;
 
-   rect.node.addEventListener('mousedown', function(evt) {
-      isDown = true;
-      currentX = evt.clientX;
-      currentY = evt.clientY;
-   }, false);
-   rect.node.addEventListener('mouseup', function(evt) {
-      isDown = false;
-   }, false);
-   rect.node.addEventListener('mouseout', function(evt) {
-      isDown = false;
-   }, false);
    rect.node.addEventListener('mousemove', function(evt) {
-      if(isDown) {
+      if(evt.buttons == 1 || evt.button == 1) {
 
         var snap   = Snap("#draw_cov_twoplanes");
         var ray    = snap.select("#ray");
@@ -67,6 +56,9 @@ two_planes_canvas.addEventListener("load", function(){
          if(pts != '') {
             ray.attr({'d': pts});
          }
+      } else {
+        currentX = evt.clientX;
+        currentY = evt.clientY;
       }
    }, false);
 }, false);
