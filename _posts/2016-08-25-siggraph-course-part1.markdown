@@ -219,7 +219,7 @@ $$\mbox{V}[\hat{l}](\Omega_x, \Omega_u) = \hat{l}(\Omega_x, \Omega_u) \star \hat
 <object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_occlusion.svg" width="600px" id="draw_cov_occl-cv" style="position:absolute;top:0px;left:0px;"></object>
 <button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:270px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>
 </div><br />
-<div style="width:700px;"><em>The occlusion operator. A square occluder lit by a uniform infinite light source cast a shadow that will result in a wedge shape spectrum. In the primal, we can see the two discontinuity clearly. The wedge is sheared as we move away the senor from the occluder.</em></div>
+<div class="caption">The occlusion operator. A square occluder lit by a uniform infinite light source cast a shadow that will result in a wedge shape spectrum. In the primal, we can see the two discontinuity clearly. The wedge is sheared as we move away the senor from the occluder.</div>
 </center><br />
 
 <script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_occl.js" type="text/javascript">

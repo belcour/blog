@@ -63,13 +63,11 @@ loadFunctionTravel = function () {
     // SVG drawing code
     var svg      = Snap('#draw_cov_travel-cv');
     var ray      = svg.select('#ray');
+    var rayNorm  = ray.getTotalLength();
     var rayStart = ray.getPointAtLength(0);
-    var rayEnd   = ray.getPointAtLength(ray.getTotalLength());
-    var dirX = rayEnd.x - rayStart.x;
-    var dirY = rayEnd.y - rayStart.y;
-    var rayDirNorm = Math.sqrt(dirX * dirX + dirY * dirY);
-    dirX /= rayDirNorm;
-    dirY /= rayDirNorm;
+    var rayEnd   = ray.getPointAtLength(rayNorm);
+    var dirX     = (rayEnd.x - rayStart.x) / rayNorm;
+    var dirY     = (rayEnd.y - rayStart.y) / rayNorm;
 
     // Current position in the SVG element
     var currentX = 0;
