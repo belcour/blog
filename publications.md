@@ -22,7 +22,7 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
-  <td><a href="{{ site.url | append: site.baseurl }}/siggraph-2016-course.html"><img src="{{ site.url | append: site.baseurl }}/data/images/dragon-01.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></a></td>
+  <td><a href="{{ site.url | append: site.baseurl }}/siggraph-2016-course.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Course2016.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></a></td>
   <td style="vertical-align:top;"><b><a style="color:black;" href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">A Practical Introduction to Frequency Analysis of Light Transport</a></b> <br />
       Laurent Belcour<br />
       ACM SIGGRAPH 2016 Courses
