@@ -1298,7 +1298,7 @@ var occlOperator01Step00 = function(snap) {
 
 
 /* Curvature operators */
-function curvOperator01Step00(snap) {
+function curvOperator01Step00(snap, slide) {
    var layer  = snap.select("#layer1");
    var r = 1000;
    var sphere = snap.circle(233, 480+r, 170+r).attr({fillOpacity: 0, stroke: "#333", strokeWidth: "4px", id: "sphere"});//snap.select("#sphere");
@@ -1376,7 +1376,10 @@ function curvOperator01Step00(snap) {
 
    // Create the clickable button
    //var bbox = box.getBBox();
-   var text = snap.text(0, 0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.6em"});
+   var text = snap.text(0, 0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "1.0em"});
+   if(slide) {
+         text.attr({fontSize: "0.6em"});
+   }
    var tbb  = text.getBBox();
    tbb.x      = -150;
    tbb.y      = -15;

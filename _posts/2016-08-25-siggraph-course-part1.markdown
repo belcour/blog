@@ -317,9 +317,9 @@ where `B` describe the angular blur of the BRDF. It is defined using the inverse
 So far we have expressed how to trace the covariance of local radiance when light is reflected by planar objects. To incorporate the local variation of the object's surface into covariance tracing, we will enable to project the local radiance from the tangent plane to a first order approximation of the surface using its curvature.
 
 <center>
-<div id="cov_curv" style="position:relative;width:100%;height:400px;">
+<div id="cov_curv" style="position:relative;width:600px;height:350px;">
 <canvas id="draw_cov_curv-cv" style="position:absolute;background-color:#FFF;border:0px"></canvas>
-<object type="image/svg+xml"  data="{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg" width="100%" height="400px" id="draw_cov_curv-01" style="position:absolute;top:0px;left:0px;"></object>
+<object type="image/svg+xml"  data="{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg" width="600px" height="350px" id="draw_cov_curv-01" style="position:absolute;top:0px;left:0px;"></object>
 <!--<button id="draw_cov_occl_bt" type="button" style="position:absolute;left:400px;top:270px;margin-left:auto;margin-right:auto;">Fourier Transform!</button>-->
 </div>
 <br />
@@ -330,7 +330,7 @@ Curvature: 0 <input id="curvature-slider" style="vertical-align: middle;" type="
 var elem = document.getElementById("draw_cov_curv-01");
 elem.onload = function() {
       var snap = Snap("#draw_cov_curv-01");
-      curvOperator01Step00(snap);
+      curvOperator01Step00(snap, false);
 };
 //loadSVG("{{ site.url | append: site.baseurl }}/data/svg/cov_curv.svg", "#draw_cov_curv-01", curvOperator01Step00);
 </script><br />
