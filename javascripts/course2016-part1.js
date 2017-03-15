@@ -1298,7 +1298,7 @@ var occlOperator01Step00 = function(snap) {
 
 
 /* Curvature operators */
-function curvOperator01Step00(snap, slide) {
+function curvOperator01Step00(snap, slide=true) {
    var layer  = snap.select("#layer1");
    var r = 1000;
    var sphere = snap.circle(233, 480+r, 170+r).attr({fillOpacity: 0, stroke: "#333", strokeWidth: "4px", id: "sphere"});//snap.select("#sphere");
