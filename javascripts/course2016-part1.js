@@ -1029,9 +1029,11 @@ var travelOperator01Step00 = function(snap, slide=true) {
     });
 }
 
-var brdfOperator01Step00 = function(snap) {
+var brdfOperator01Step00 = function(snap, slide=true) {
    var svg2 = snap.select("#layer1")
-   svg2.transform(Snap.matrix().scale(1.5).add(svg2.transform().localMatrix))
+   if(slide) {
+      svg2.transform(Snap.matrix().scale(1.5).add(svg2.transform().localMatrix))
+   }
 
    // WebGL code
    var canvas = document.getElementById("draw_cov_brdf-gl");
@@ -1099,7 +1101,10 @@ var brdfOperator01Step00 = function(snap) {
    render_scene_brdf(canvas, scene);
 
    var bbox = box.getBBox();
-   var text = snap.text(0,0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
+   var text = snap.text(0,0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.7em"});
+   if(slide) {
+         text.attr({fontSize: "0.4em"});
+   }
    var tbb  = text.getBBox();
    tbb.x      = -100;
    tbb.y      = -15;
@@ -1123,7 +1128,7 @@ var brdfOperator01Step00 = function(snap) {
    var px = bbox.cx, py = bbox.y+bbox.height+40;
    g.transform(Snap.matrix(1, 0, 0, 1, px, py));
 
-   slider.onchange = function(value) {
+   slider.oninput = function(value) {
       var canvas = document.getElementById("draw_cov_brdf-gl");
       // var scene  = createScene();
       scene.objects[0].E = 1.0/this.value;
@@ -1202,30 +1207,6 @@ var occlOperator01Step00 = function(snap) {
    if(fourier_bt_press) {
       render_fourier_occl();
    }
-
-   // Create the clickable button
-//    var bbox = box.getBBox();
-//    var text = snap.text(bbox.cx, bbox.y+bbox.height+40, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
-//    var tbb  = text.getBBox();
-//    var rect = snap.rect(tbb.x-10, tbb.y-10, tbb.width+20, tbb.height+20).attr({fill: "#999999", rx: 5, ry: 5/*, filter: "drop-shadow( 2px 2px 2px #666 )" */});
-//    var g    = snap.g(rect, text);
-
-
-//    g.click(function() {
-//       fourier_bt_press = !fourier_bt_press;
-//       render(canvas, scene, 0);
-//       if(fourier_bt_press) {
-//             text.attr({text: "Apply inverse Fourier Transform"});
-//             var tbb  = text.getBBox();
-//             rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
-//             render_fourier_occl();
-//       } else {
-//             text.attr({text: "Apply Fourier Transform"});
-//             var tbb  = text.getBBox();
-//             rect.attr({x: tbb.x-10, y: tbb.y-10, width: tbb.width+20, height: tbb.height+20});
-//       }
-//    });
-//    snap.select("#layer1").append(g);
 
    var text = snap.text(0, 0, "Apply Fourier Transform").attr({textAnchor: "middle", fontSize: "0.4em"});
    var tbb  = text.getBBox();
@@ -1431,7 +1412,7 @@ function curvOperator01Step00(snap) {
    //const initcy = parseFloat(sphere.attr("cy"));
 
    
-   slider.onchange = function(event) {
+   slider.oninput = function(event) {
          var curvature = slider.valueAsNumber
          var value     = 1.0/curvature;
          var sval      = value - curvature*1000;

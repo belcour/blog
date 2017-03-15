@@ -19,9 +19,7 @@ javascripts:
 
 <div style="width:100%;"><a style="float:left;" href="{{site.url | append: site.baseurl }}/siggraph-2016-course.html">&larr; Table of content</a><a style="float:right;" href="{{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html">Part 2 &rarr;</a></div><br />
 
-<center style="color:#EE0000;"><span>This course note is still a work in progress!</span></center><br />
-
-<center style="color:#EE0000;"><span>This webpage does not correctly render on Chrome yet. It has been tested on Firefox and Safari.</span><br /><span> If you have trouble with it, please <a href="mailto:laurent@unity3d.com">send me a note!</a></span>
+<center style="color:#EE0000;"><span>This course note is still a work in progress! If you have trouble with browser compatibility, please <a href="mailto:laurent@unity3d.com">send me a note!</a></span>
 </center><br />
 
 
@@ -267,13 +265,31 @@ A Matlab implementation of the operator is the following:
 <h4>The BRDF operator</h4>
 <strong>The BRDF operator</strong> describes how the roughness reduces the bandwidth of the reflected local radiance. This is well known that the BRDF can be thought as being a blurring filter (think of pre-filtered envmaps).
 
-<center>
+<!--<center>
 <div style="position:relative;width:600px;height:300px;">
 <canvas id="draw_cov_brdf-gl" style="position:absolute;left:335px;top:26px;width:243px;height:243px;background-color:#FFF;border:0px"></canvas>
-<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_brdf.svg" width="600px" id="draw_cov_brdf-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
-<div>BRDF exponent: 100 <input style="vertical-align: middle;" type="range" min="100" max="1000" value="1000" step="5" onchange="drawBRDF(this.value)" /> 1000</div>
+<object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_brdf.svg" width="600px" height="300px" id="draw_cov_brdf-cv" style="position:absolute;top:0px;left:0px;"></object></div><br />
+<div>BRDF exponent: 100 <input style="vertical-align: middle;" type="range" min="100" max="1000" value="1000" step="5" oninput="drawBRDF(this.value)" /> 1000</div>
 <div style="width:600px;"><em>The BRDF operator. In this case, we use as input a tight Gaussian cone light. The light's cone is blurred by the BRDF. Using the cursor, you can vary the phong exponent from 100 to 1000 and see the blurring effect.</em></div>
 </center><br />
+
+<script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_brdf.js" type="text/javascript"></script>
+<script id="raytracer2d-fs"  type="x-shader/x-fragment">{% include shaders/raytracer2d.fs %}</script>
+<script id="raytracer2d-vs"  type="x-shader/x-vertex">{% include shaders/raytracer2d.vs %}</script>
+-->
+<center>
+      <div style="position:relative;width:600px;height:350px;">
+            <canvas id="draw_cov_brdf-gl" style="position:absolute;"></canvas>
+            <!--<svg id="draw_cov_brdf-cv" width="900px" height="500px" style="position:absolute;top:0px;left:0px;"></svg>--><object type="image/svg+xml" data="{{ site.url | append: site.baseurl }}/data/svg/cov_brdf.svg" width="600px" height="350px" id="draw_cov_brdf-cv" style="position:absolute;top:0px;left:0px;"></object>
+      </div><br />
+      <div style="font-size:1em;">BRDF roughness: 0 <input style="vertical-align: middle;" type="range" min="0.0001" max="0.05" value="0.0001" step="0.0005" id="draw_cov_brdf-slider" /> 0.05</div>
+</center>
+<script type="text/javascript">
+    addLoadEvent(function() {
+        var svg_brdf = Snap('#draw_cov_brdf-cv');
+        brdfOperator01Step00(svg_brdf, false);
+    });
+</script><br />
 
 This operator describes the integral product of the incoming local radiance with the BRDF. For an isotropic BRDF model, it is possible to express the outgoing radiance using a convolutive form:
 
@@ -354,8 +370,4 @@ In the [next section][course-part2], we will see how to pratically use the knowl
 [course-part1]: {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part1.html
 [course-part2]: {{ site.url | append: site.baseurl }}/course/2016/08/25/siggraph-course-part2.html
 [wiki-fourier]: https://en.wikipedia.org/wiki/Fourier_transform
-
-<script src="{{ site.url | append: site.baseurl }}/javascripts/draw_cov_brdf.js" type="text/javascript"></script>
-<script id="raytracer2d-fs"  type="x-shader/x-fragment">{% include shaders/raytracer2d.fs %}</script>
-<script id="raytracer2d-vs"  type="x-shader/x-vertex">{% include shaders/raytracer2d.vs %}</script>
 
