@@ -87,7 +87,8 @@ simulation or to adapt the sampling budget locally.
   <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Irid.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
   <td style="vertical-align:top;"><b>A Practical Extension to Microfacet Theory for the Modeling of Varying Iridescence</b> <br />
       Laurent Belcour, Pascal Barla<br />
-      <em>ACM Transactions on Graphics</em>(proceedings of SIGGRAPH), 2017, 36 (4)
+      <em>ACM Transactions on Graphics</em>(proceedings of SIGGRAPH), 2017, 36 (4) 
+      <a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html">webpage</a> 
       <a href="https://hal.archives-ouvertes.fr/hal-01518344/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01518344/bibtex">bib</a> <a href="https://hal.archives-ouvertes.fr/hal-01518344/file/supplemental-code.zip">code</a>
   </td>
 </tr>
