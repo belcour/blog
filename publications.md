@@ -84,8 +84,16 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Irid.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
+  <td style="vertical-align:top;"><b>A Practical Extension to Microfacet Theory for the Modeling of Varying Iridescence</b> <br />
+      Laurent Belcour, Pascal Barla<br />
+      <em>ACM Transactions on Graphics</em>(proceedings of SIGGRAPH), 2017, 36 (4)
+      <a href="https://hal.archives-ouvertes.fr/hal-01518344/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01518344/bibtex">bib</a> <a href="https://hal.archives-ouvertes.fr/hal-01518344/file/supplemental-code.zip">code</a>
+  </td>
+</tr>
+<tr>
   <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_BrdfParam.png" alt="BRDF-filter" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
-  <td style="vertical-align:top;"><b>In Praise of an Alternative BRDF Parametrization </b> <br />
+  <td style="vertical-align:top;"><b>In Praise of an Alternative BRDF Parametrization</b> <br />
       Pascal Barla, Laurent Belcour, Romain Pacanowski  <br />
       <em>Workshop on Material Appearance Modeling</em>, June 2015, Darmstadt, Germany
       <a href="https://hal.archives-ouvertes.fr/hal-01172118/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01172118/bibtex">bib</a>
