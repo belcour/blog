@@ -22,6 +22,14 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_FreqAnimation.png" alt="frequency-animation" alt="freq-anim" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></a></td>
+  <td style="vertical-align:top;"><b>Frequency Based Radiance Cache for Rendering Animations</b> <br />
+      Adrien Dubouchet, Laurent Belcour, and Derek Nowrouzezahrai <br />
+      <em>Eurographics Symposium on Rendering (EI&amp;I)</em>, 2017
+      <!--<a href="todo">paper</a> <a href="todo">bib</a>-->
+  </td>
+</tr>
+<tr>
   <td><a href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_CovFiltering.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></a></td>
   <td style="vertical-align:top;"><b><a style="color:black;" href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">Antialiasing Complex Global Illumination Effects in Path-space</a></b> <br />
       Laurent Belcour, Ling-Qi Yan, Ravi Ramamoorthi, and Derek Nowrouzezahrai <br />
