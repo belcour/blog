@@ -22,7 +22,7 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
-  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_FreqAnimation.png" alt="frequency-animation" alt="freq-anim" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></a></td>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_FreqAnimation.png" alt="frequency-animation" alt="freq-anim" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></td>
   <td style="vertical-align:top;"><b>Frequency Based Radiance Cache for Rendering Animations</b> <br />
       Adrien Dubouchet, Laurent Belcour, and Derek Nowrouzezahrai <br />
       <em>Eurographics Symposium on Rendering (EI&amp;I)</em>, 2017
