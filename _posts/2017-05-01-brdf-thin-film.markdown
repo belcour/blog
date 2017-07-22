@@ -20,7 +20,7 @@ published: true
 <a href="https://hal.inria.fr/hal-01518344/bibtex"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_latex.png" height="32px">bib</a> &nbsp;
 <a href="https://youtu.be/4nKb9hRYbPA">
 <img src="{{ site.url | append: site.baseurl }}/data/images/icon_video.png" height="32px">video</a> &nbsp;
-<a href="https://hal.archives-ouvertes.fr/hal-01518344/file/supplemental-code.zip">
+<a href="https://hal.inria.fr/hal-01518344v2/file/supplemental-code%20%282%29.zip">
 <img src="{{ site.url | append: site.baseurl }}/data/images/icon_zip.png" height="32px">code</a>
 </span><br />
 

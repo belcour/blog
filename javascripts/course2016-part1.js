@@ -41,7 +41,14 @@ const loadElementFromSVG = function(uri, svgid, elem, call) {
 const loadImageSVG = function(uri, elem, width, height, id) {
       var snap  = Snap(elem);
       var group = snap.g();
-      group.image(getData("general", "baseurl") + uri, 0, 0, width, height);
+      var url;
+      var base = getData("general", "baseurl");
+      if(base == undefined) {
+            url = uri;
+      } else {
+            getData("general", "baseurl") + uri
+      }
+      group.image(url, 0, 0, width, height);
       group.attr({id: id});
 }
 
