@@ -14,9 +14,10 @@ published: true
     <span style="position:absolute;z-index:1;margin:0px;top:-34pt;left:38.5%;">Iridescent microfacets</span>
     <span style="position:absolute;z-index:1;margin:0px;top:-34pt;left:75.5%;">Goniochromatic effects</span>
 </div>
- 
-<span>&nbsp;
+
+<span>
 <a href="https://hal.inria.fr/hal-01518344/document"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px">paper</a> &nbsp;
+<a href="https://hal.archives-ouvertes.fr/hal-01518344/file/supp-mat-small.pdf"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px"/>supp. pdf</a> &nbsp;
 <a href="https://hal.inria.fr/hal-01518344/bibtex"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_latex.png" height="32px">bib</a> &nbsp;
 <a href="https://youtu.be/4nKb9hRYbPA">
 <img src="{{ site.url | append: site.baseurl }}/data/images/icon_video.png" height="32px">video</a> &nbsp;

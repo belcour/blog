@@ -22,11 +22,11 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
-  <td><a href="{{ site.url | append: site.baseurl }}/siggraph-2016-course.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Course2016.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></a></td>
-  <td style="vertical-align:top;"><b><a style="color:black;" href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">A Practical Introduction to Frequency Analysis of Light Transport</a></b> <br />
-      Laurent Belcour<br />
-      ACM SIGGRAPH 2016 Courses
-      <a href="{{ site.url | append: site.baseurl }}/siggraph-2016-course.html">webpage</a>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_FreqAnimation.png" alt="frequency-animation" alt="freq-anim" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></td>
+  <td style="vertical-align:top;"><b>Frequency Based Radiance Cache for Rendering Animations</b> <br />
+      Adrien Dubouchet, Laurent Belcour, and Derek Nowrouzezahrai <br />
+      <em>Eurographics Symposium on Rendering (EI&amp;I)</em>, 2017 <a href="https://hal.archives-ouvertes.fr/hal-01542616/document">paper</a> <a href="https://hal.archives-ouvertes.fr/hal-01542616/bibtex">bib</a>
+      <!--<a href="todo">paper</a> <a href="todo">bib</a>-->
   </td>
 </tr>
 <tr>
@@ -35,6 +35,14 @@ simulation or to adapt the sampling budget locally.
       Laurent Belcour, Ling-Qi Yan, Ravi Ramamoorthi, and Derek Nowrouzezahrai <br />
       <em>ACM Transaction on Graphics</em>, 2017, 36 (1)
       <a href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">project</a> <a href="https://hal.inria.fr/hal-01200710/document">paper</a> <a href="https://hal.inria.fr/hal-01200710/bibtex">bib</a> <a href="https://www.youtube.com/watch?v=lgldxBcuIj0">video</a>
+  </td>
+</tr>
+<tr>
+  <td><a href="{{ site.url | append: site.baseurl }}/siggraph-2016-course.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Course2016.png" alt="covariance-filtering" alt="snail_cov" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></a></td>
+  <td style="vertical-align:top;"><b><a style="color:black;" href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">A Practical Introduction to Frequency Analysis of Light Transport</a></b> <br />
+      Laurent Belcour<br />
+      ACM SIGGRAPH 2016 Courses
+      <a href="{{ site.url | append: site.baseurl }}/siggraph-2016-course.html">webpage</a>
   </td>
 </tr>
 <tr>
@@ -65,31 +73,40 @@ simulation or to adapt the sampling budget locally.
 <br />
 
 
-### Appearance Edition
-
-<table>
-<tr>
-  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_MatCaps.png" alt="chopper_cov" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
-  <td style="vertical-align:top;"><b>MatCap Decomposition for Dynamic Appearance Manipulation</b> <br />
-      Carlos Jorge Zubiaga, Adolfo Muñoz, Laurent Belcour, Carles Bosch and Pascal Barla <br />
-      <em>Proceedings of  the Euroographics Symposium on Rendering (EI&I track)</em>, 2015
-      <a href="https://hal.archives-ouvertes.fr/hal-01164590/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01164590/bibtex">bib</a> <a href="https://vimeo.com/132005080">video</a>
-  </td>
-</tr>
-</table>
-<br />
-
-
-### BRDF Modelisation and Analysis
+### BRDF Modeling
 
 <table>
 <tr>
   <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Irid.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
   <td style="vertical-align:top;"><b>A Practical Extension to Microfacet Theory for the Modeling of Varying Iridescence</b> <br />
       Laurent Belcour, Pascal Barla<br />
-      <em>ACM Transactions on Graphics</em>(proceedings of SIGGRAPH), 2017, 36 (4) 
+      <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2017, 36 (4) 
       <a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html">webpage</a> 
       <a href="https://hal.archives-ouvertes.fr/hal-01518344/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01518344/bibtex">bib</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supplemental-code%20%282%29.zip">code</a>
+  </td>
+</tr>
+<tr>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Pivot.png" alt="Pivot" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
+  <td style="vertical-align:top;"><b>A Spherical Cap Preserving Parameterization for Spherical Distributions</b> <br />
+      <a href="http://onrendering.com/" style="color:rgb(0,0,0);">Jonathan Dupuy</a>, Eric Heitz, Laurent Belcour<br />
+      <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2017, 36 (4) 
+      <a href="https://www.youtube.com/watch?v=9aZMRjbflpo">video</a> <a href="http://onrendering.com/data/papers/pivot.pdf">pdf</a> <a href="http://onrendering.com/data/papers/supplemental.zip">supp</a> <a href="http://github.com/jdupuy/pivot">code</a>
+  </td>
+</tr>
+</table>
+<br />
+
+
+### BRDF Analysis
+
+<table>
+
+<tr>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_MatCaps.png" alt="chopper_cov" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
+  <td style="vertical-align:top;"><b>MatCap Decomposition for Dynamic Appearance Manipulation</b> <br />
+      Carlos Jorge Zubiaga, Adolfo Muñoz, Laurent Belcour, Carles Bosch and Pascal Barla <br />
+      <em>Proceedings of  the Euroographics Symposium on Rendering (EI&I track)</em>, 2015
+      <a href="https://hal.archives-ouvertes.fr/hal-01164590/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01164590/bibtex">bib</a> <a href="https://vimeo.com/132005080">video</a>
   </td>
 </tr>
 <tr>
@@ -110,7 +127,7 @@ simulation or to adapt the sampling budget locally.
 </tr>
 <tr>
   <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Alta.svg" alt="ALTA" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
-  <td style="vertical-align:top;"><b>ALTA: A BRDF analysis library </b> <br />
+  <td style="vertical-align:top;"><b>ALTA: A BRDF Analysis Library </b> <br />
       Laurent Belcour, Pascal Barla, Romain Pacanowski  <br />
       <em>Workshop on Material Appearance Modeling</em>, June 2014, Lyon, France
       <a href="https://hal.archives-ouvertes.fr/hal-01016531/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01016531/bibtex">bib</a>
