@@ -1,0 +1,1083 @@
+<!doctype html>
+<html>
+   <head>
+      <meta charset="utf-8">
+
+      <title>Antialiasing Complex Global Illumination Effects in Path-space</title>
+
+      <meta name="description" content="Slides">
+      <meta name="author" content="Laurent Belcour">
+
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+      <link rel="stylesheet" href="ext/reveal.js/css/reveal.css">
+      <link rel="stylesheet" href="ext/reveal.js/css/unity-white.css" id="theme">
+
+      <script src="ext/jquery/dist/jquery.min.js"></script>
+      <script src="ext/snap.svg/dist/snap.svg-min.js"></script>
+      <script src="ext/headjs/dist/1.0.0/head.min.js"></script>
+      <script src="ext/reveal.js/js/reveal.js"></script>
+
+      <script src="./js/covariance_filtering.js"></script>
+      <style>
+body {
+  background: #EEE;
+  background-color: #EEE; }
+
+.reveal .slides > section,
+.reveal .slides > section > section {
+      background-color: #EEE;
+      /*box-shadow: none;*/
+}
+      </style>
+   </head>
+   <body>
+      <div class="reveal">
+            <div class="slides">
+                  <!-- Title slide -->
+                  <section class="title"  data-background-color="#ffffff" data-background-image="images/png/background.png" style="background-color: #0000; box-shadow: none;" data-background-size="90%" >
+                        <h2 style="padding-bottom:5%; padding-top:15%;text-align:left; left: 30px; position: relative;">
+                              Antialiasing Complex Global Illumination Effects<br />in Path-space
+                        </h2>
+                        <div style="font-size: 0.8em">
+                              <div style="display: flex; justify-content: space-around;">
+                                    <div style="width: 230px; text-align: center;">Laurent Belcour<hr style="margin: 5px;"><small>Montréal University</small></div>
+                                    <div style="width: 230px; text-align: center;">Ling-Qi Yan<hr style="margin: 5px;"><small>UC Berkeley</small></div>
+                                    <div style="width: 230px; text-align: center;">Ravi Ramamoorthi<hr style="margin: 5px;"><small>UC San Diego</small></div>
+                                    <div style="width: 230px; text-align: center;">Derek Nowrouzezahrai<hr style="margin: 5px;"><small>Montréal University</small></div>
+                              </div>
+                        </div>
+                  <aside class="notes">
+                  This is a HTML presentation. It was optimized to be displayed on the <a href="https://www.mozilla.org/fr/firefox/new/">Firefox browser</a>.<br />
+                  Notes in this box can be scrolled down.
+                  </aside>
+                  </section>
+
+                  <!-- Antialiasing in a nushell (presenting as well the ray differentials)
+                    -->
+                  <section><h2>Antialiasing Surface Appearance</h2>
+                        <center style="padding-top: 100px;">
+                              <object id="texture_mapping" width="100%" type="image/svg+xml" data="images/svg/texture_mapping.svg"></object>
+                              <div style="float:right;font-size:0.5em; padding-top: 100px;">Image from Mitsuba [Wenzel Jakob]</div>
+                        </center>
+                        <div class="fragment" id="texture_mapping_01"></div>
+                        <div class="fragment" id="texture_mapping_02"></div>
+                        <aside class="notes">
+                              The topic of my talk today will be antialiasing of appearance such as commonly done with texture filtering or BRDF pre-filtering. There, the goal is to remove the part of noise that is caused by an insufficient amount of samples. <strong>*click*</strong> In the case shown here, there aren't enough samples per pixel to integrate the checkerboard pattern when using nearest texel evaluation (on the right). <strong>*click*</strong> Using an antialiasing technic such as the one of Heckbert (on the left) solves the issue.
+                        </aside>
+                        <script type="text/javascript">
+                              Reveal.addEventListener( 'ready', function( event ) {
+                                    var s = Snap("#texture_mapping");
+                                    s.select("#nearest").attr({ opacity: 0 });
+                                    s.select("#ewa").attr({ opacity: 0 });
+                              });
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    var s = Snap("#texture_mapping");
+                                    if(event.fragment.id == "texture_mapping_01") {
+                                          s.select("#nearest").animate({ opacity: 1.0 }, 500);
+                                    }
+                                    if(event.fragment.id == "texture_mapping_02") {
+                                          s.select("#ewa").animate({ opacity: 1.0 }, 500);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    var s = Snap("#texture_mapping");
+                                    if(event.fragment.id == "texture_mapping_01") {
+                                          s.select("#nearest").animate({ opacity: 0.0 }, 500);
+                                    }
+                                    if(event.fragment.id == "texture_mapping_02") {
+                                          s.select("#ewa").animate({ opacity: 0.0 }, 500);
+                                    }
+                              });
+                        </script>
+                  </section>
+                  <section>
+                        <h2>Antialiasing Surface Appearance</h2>
+                        <center style="margin-top: 50px;">
+                              <object width="80%" height="80%" style="overflow: visible;" type="image/svg+xml" data="images/svg/filtering01a.svg" id="filtering01_svg"></object>
+                        </center>
+                        <script type="text/javascript">
+                              window.addEventListener("onload", function() {
+                                    var s = Snap("#filtering01_svg");
+                                    s.select("#footprint").attr({ opacity: 0 });
+                                    s.select("#zoomedpixelfootprint").attr({ opacity: 0 });
+                              });
+
+                              // Animation for the slide {forward and backward}
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    var s = Snap("#filtering01_svg");
+                                    if(event.fragment.id == "filtering01_01") {
+                                          s.select("#integral").animate({ opacity: 1.0 }, 500);
+                                          s.select("#zoomedpixelfootprint").animate({ opacity: 1.0 }, 500);
+                                          s.select("#footprint").animate({ opacity: 1.0 }, 500);
+                                          var l = s.select("#light");
+                                          var m = l.transform().localMatrix;
+                                          m.translate(35, 0);
+                                          l.attr({ transform: m });
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    var s = Snap("#filtering01_svg");
+                                    if(event.fragment.id == "filtering01_01") {
+                                          s.select("#integral").animate({ opacity: 0.0 }, 500);
+                                          s.select("#footprint").animate({ opacity: 0.0 }, 500);
+                                          s.select("#zoomedpixelfootprint").animate({ opacity: 0.0 }, 500);
+                                          var l = s.select("#light");
+                                          var m = l.transform().localMatrix;
+                                          m.translate(-35, 0);
+                                          l.attr({ transform: m });
+                                    }
+                              });
+                        </script>
+                        <p class="fragment" id="filtering01_01"></p>
+                        <aside class="notes">
+                              The rational behind antialiasing is to decouple part of the rendering integral. In the case of direct lighting, to render an image, we have to integrate the product of the spatially varying BRDF and the lighting in the footprint of a pixel. <strong>*click*</strong><br /><br />
+
+                              When we perform antialiasing, we are decoupling this integral and we compute the product of the average BRDF and the average lighting over the pixel footprint to approximate the pixel value.
+                        </aside>
+                  </section>
+                  <section><h2>Antialiasing Surface Appearance</h2>
+                        <ul>
+                              <li>Idea: limit materials frequency to reduce noise
+                                    <ul>
+                                          <li id="mipmapping_01" class="fragment" data-fragment-index="1"><strong>Adapt texture resolution</strong> to screen resolution</li>
+                                          <li class="fragment" data-fragment-index="2" id="mipmapping_02">Better <strong>cache handling</strong> for textures</li>
+                                    </ul>
+                              </li>
+                        </ul>
+                        <center data-fragment-index="1" class="fragment" style="margin-top: 100px;">
+                              <object width="100%" style="overflow: visible;" type="image/svg+xml" data="images/svg/mipmapping.svg" id="mipmapping_svg"></object>
+                        </center>
+                        <script>
+                              Reveal.addEventListener('ready', function( event ) {
+                              //window.addEventListener("onload", function() {
+                                    var s = Snap("#mipmapping_svg");
+                                    s.select("#p512").attr({ opacity: 0.0 });
+                                    s.select("#p128").attr({ opacity: 0.0 });
+                                    s.select("#p32" ).attr({ opacity: 0.0 });
+                                    s.select("#p16" ).attr({ opacity: 0.0 });
+                                    s.select("#p8"  ).attr({ opacity: 0.0 });
+                                    s.select("#p4"  ).attr({ opacity: 0.0 });
+                                    s.select("#pixelSelected").attr({ opacity: 0.0});
+                              });
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    var s = Snap("#mipmapping_svg");
+                                    if(event.fragment.id == "mipmapping_01") {
+                                          s.select("#p512").animate({ opacity: 1.0 }, 300);
+                                          s.select("#p128").animate({ opacity: 1.0 }, 600);
+                                          s.select("#p32" ).animate({ opacity: 1.0 }, 900);
+                                          s.select("#p16" ).animate({ opacity: 1.0 },1200);
+                                          s.select("#p8"  ).animate({ opacity: 1.0 },1500);
+                                          s.select("#p4"  ).animate({ opacity: 1.0 },1800);
+                                    }
+                                    // if(event.fragment.id == "mipmapping_02") {
+                                    //       s.select("#pixelSelected").animate({ opacity: 1.0}, 500, mina.bounce);
+                                    // }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    var s = Snap("#mipmapping_svg");
+                                    if(event.fragment.id == "mipmapping_01") {
+                                          s.select("#p512").animate({ opacity: 0.0 }, 300);
+                                          s.select("#p128").animate({ opacity: 0.0 }, 600);
+                                          s.select("#p32" ).animate({ opacity: 0.0 }, 900);
+                                          s.select("#p16" ).animate({ opacity: 0.0 },1200);
+                                          s.select("#p8"  ).animate({ opacity: 0.0 },1500);
+                                          s.select("#p4"  ).animate({ opacity: 0.0 },1800);
+                                    }
+                                    // if(event.fragment.id == "mipmapping_02") {
+                                    //       s.select("#pixelSelected").animate({ opacity: 0.0}, 500, mina.bounce);
+                                    // }
+                              });
+                        </script>
+                        <aside class="notes">
+                              This allows to limit the frequency content of rendered materials to our sampling budget. <strong>*click*</strong><br /><br />
+
+                              In the case of texture antialiasing, we use mip-mapping where multiple instances of the same texture at different resolutions are stored. During rendering limiting the frequency content of the texture is equivalent to selecting a maximum resolution for our texture and <strong>*click*</strong>
+
+                              Evaluating the pixels at that resolution. While this introduce bias, it removes a lot of noise from rendered images and allows to improve rendering performances as cache misses are less of a problem with low resolution images.
+                        </aside>
+                  </section>
+                  <section><h2>Antialiasing Surface Appearance</h2>
+                        <ul>
+                              <li style="color: gray;">Idea: limit materials frequency to reduce noise
+                                    <ul>
+                                          <li><strong>Adapt texture resolution</strong> to screen resolution</li>
+                                          <li>Better <strong>cache handling</strong> for textures</li>
+                                    </ul>
+                              </li><br />
+                              <li>Method: use the <strong>pixel's footprint</strong>
+                                    <ul>
+                                          <li><strong>Geometrical method</strong>: what is the pixel's projection?</li>
+                                          <li>Use the pixel/ray derivatives [<a href="igehy1999">Igehy 1999</a>]</li>
+                                    </ul>
+                              </li>
+                        </ul>
+                        <aside class="notes">
+                              Now, one question left open is how to we select this frequency limit?<br /><br />
+
+                              The mainstream solution nowdays is to use the geometric pixel projection. This was theorized by Igehy with rays derivatives. Lets look at how this works.
+                        </aside>
+                  </section>
+                  <section>
+                        <h2>Antialiasing Surface Appearance</h2>
+                        <center style="margin-top: 50px;">
+                              <object width="80%" type="image/svg+xml" data="images/svg/singlescatter.svg" id="antialiasing01"></object>
+                        </center>
+                        <script type="text/javascript">
+                              // Animation for the slide {forward and backward}
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    var s = Snap("#antialiasing01");
+                                    if(event.fragment.id == "antialiasing01step01") {
+                                          s.select("#CentralPoint").animate({ r: 14.0 }, 500, mina.bounce);
+                                          s.select("#SurfaceZoom").animate({ opacity: 1.0 }, 500);
+                                    }
+                                    if(event.fragment.id == "antialiasing01step02") {
+                                          s.select("#CentralPoint").animate({ r: 7.0 }, 500);
+                                          s.select("#FootPrint").animate({ opacity: 1.0 }, 500);
+                                          s.select("#PixelFootPrintZoom").animate({ opacity: 1.0 }, 500);
+                                    }
+                                    if(event.fragment.id == "antialiasing01step03") {
+                                          s.select("#MathEquation").animate({ opacity: 1.0 }, 500);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    var s = Snap("#antialiasing01");
+                                    if(event.fragment.id == "antialiasing01step01") {
+                                          s.select("#CentralPoint").animate({ r: 7.0 }, 500);
+                                          s.select("#SurfaceZoom").animate({ opacity: 0.0 }, 500);
+                                    }
+                                    if(event.fragment.id == "antialiasing01step02") {
+                                          s.select("#CentralPoint").animate({ r: 14.0 }, 500, mina.bounce);
+                                          s.select("#FootPrint").animate({ opacity: 0.0 }, 500);
+                                          s.select("#PixelFootPrintZoom").animate({ opacity: 0.0 }, 500);
+                                    }
+                                    if(event.fragment.id == "antialiasing01step03") {
+                                          s.select("#MathEquation").animate({ opacity: 0.0 }, 500);
+                                    }
+                              });
+                        </script>
+                        <p class="fragment" id="antialiasing01step01"></p>
+                        <p class="fragment" id="antialiasing01step02"></p>
+                        <p class="fragment" id="antialiasing01step03"></p>
+                        <aside class="notes">
+                           Lets assume that we are in this simple configuration where a pinehole camera sees an object lit by a distance point light. <strong>*click*</strong><br /><br />
+
+                           And that the surface's appearance has a very high frequency content. In this case, the texture has very small dots of various color. <strong>*click*</strong><br /><br />
+
+                           To know what area of the object a pixel sees, we need to trace the pixels geometry throught the camera hole onto the geometry. For that we use the derivative of the camera ray with respect to the pixel position (here marked with little arrows) and we project the quadrilateral it defines on the object (here in red). <strong>*click*</strong><br /><br />
+
+                           This quadrilateral defines a surface area P that we can use to integrate the object appearance to obtain its average color in the pixel footprint. Then we can use a single sample to integrate the light contribution and perform shading.
+                        </aside>
+                  </section>
+
+                  <!-- TODO: Previous work on ray differentials -->
+                  <section><h2>Problem Statement</h2>
+                        <div style="width: 100%;">
+                              <ul style="width: 100%;">
+                                    <li class="fragment" data-fragment-index="1">Differentials work fine for specular interaction
+                                          <ul>
+                                                <li>Extended to <strong>rough interaction</strong> by [<a href="">Suykens and Willems 2001</a>]</li>
+                                                <li>But limited ...</li>
+                                          </ul>
+                                    </li><br />
+                                    <li class="fragment" data-fragment-index="2">Fail short to model subtle effects
+                                          <ul>
+                                                <li>Binary footprints: <strong>no pixel filter</strong></li>
+                                          </ul>
+                                    </li><br />
+                                    <li class="fragment"><strong>Decorrelated</strong> light in antialiasing
+                                          <ul>
+                                                <li class="fragment">Can build differentials from light [<a href="">Schj&oslash;th et al. 2007</a>]</li>
+                                          </ul>
+                                    </li>
+                              </ul>
+                        </div>
+                        <center  class="fragment current-visible" data-fragment-index="1" style="width: 100%; position: absolute; top: 300px;">
+                              <img width="50%" src="images/png/path_differentials.png"><br />
+                              <span style="position: relative; left: 150px; font-size: 0.7em;">image from [<a href="">Suykens and Willems 2001</a>]</span>
+                        </center>
+                        <div  class="fragment current-visible" data-fragment-index="2" style="width: 100%; position: absolute; top: 270px; left: 700px; border: none;">
+                              <img width="30%" src="images/png/example-filter-quad.png">
+                        </div>
+                        <aside class="notes">
+                           Now while this sounds like a working model, many flaws appear when we try to use ray differentials into a modern path tracing engine. <strong>*click*</strong><br /><br />
+
+                           The first limitation we usually encounter is that ray differentials are defined for specular transport only. Once a rough material is hit, it requires a different formulation to propagate the geometrical footprint (namely the method of the path differentials). The issue of this later method is that its build a geometry that is no longer a quadrilateral and that the number of facets increases as we perform more bounces.<strong>*click*</strong><br /><br />
+
+                           Also, since the differentials create a geometrical domain, it can only represent the square geometry of the pixel and it will not account for any pixel filter. As you can see on this image, a ray differential footprint will have this quadrilateral shape while the pixel footprint projection will correspond more to the red gaussian falloff.<strong>*click*</strong><br /><br />
+
+                           Another limitation comes from the use of eye path ray differentials. Since only the information from the eye is accounted to separate the integration of spatially varying materials and light, if the lighting contains higher frequency than the material, we will be introducing a non-negligeable bias in rendering. <strong>*click*</strong><br /><br />
+
+                           It is however possible to build ray differentials from the light source and this was used to improve photon mapping. However those differentials do not account for the eye frequency limit.
+                        </aside>
+                  </section>
+                  <section><h2>Problem Statement</h2>
+                        <ul>
+                              <li>Bidirectional path tracing requires symmetric light transport
+                              </li>
+                        </ul><br /><br />
+                        <object class="fragment" id="problem01svg" width="100%;" type="image/svg+xml" data="images/svg/problem-statement.svg"></object>
+                        <script type="text/javascript">
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    var s = Snap("#problem01svg");
+                                    if(event.fragment.id == "problem01step01") {
+                                          s.select("#Strategy1").animate({ opacity: 1.0 }, 500);
+                                    }
+                                    if(event.fragment.id == "problem01step02") {
+                                          s.select("#Strategy2").animate({ opacity: 1.0 }, 500);
+                                          s.select("#Strategy1").animate({ opacity: 0.0 }, 500);
+                                    }
+                                    if(event.fragment.id == "problem01step03") {
+                                          s.select("#Unidir").animate({ opacity: 1.0 }, 500);
+                                    }
+                                    if(event.fragment.id == "problem01step04") {
+                                          s.select("#Bidir").animate({ opacity: 1.0 }, 500);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    var s = Snap("#problem01svg");
+                                    if(event.fragment.id == "problem01step01") {
+                                          s.select("#Strategy1").animate({ opacity: 0.0 }, 500);
+                                    }
+                                    if(event.fragment.id == "problem01step02") {
+                                          s.select("#Strategy2").animate({ opacity: 0.0 }, 500);
+                                          s.select("#Strategy1").animate({ opacity: 1.0 }, 500);
+                                    }
+                                    if(event.fragment.id == "problem01step03") {
+                                          s.select("#Unidir").animate({ opacity: 0.0 }, 500);
+                                    }
+                                    if(event.fragment.id == "problem01step04") {
+                                          s.select("#Bidir").animate({ opacity: 0.0 }, 500);
+                                    }
+                              });
+                        </script>
+                        <p class="fragment" id="problem01step01"></p>
+                        <p class="fragment" id="problem01step02"></p>
+                        <p class="fragment" id="problem01step03"></p>
+                        <p class="fragment" id="problem01step04"></p>
+
+                        <aside class="notes">
+                              That leads us to the most important limitation I would like to raise in this talk is the issue of kernel symmetry. Bidirectional path tracing methods require BSDF symmetry to ensure correct rendering. <strong>*click*</strong><br /><br />
+
+                              Lets look at the following example: a spot light illuminating a diffuse textured wall but the camera sees only the rough reflection of this surface. With BDPT we create two paths, one from the camera and one from the eye and average the contribution of all connecting combinaison with multiple importance sampling. Lets assume for a moment that we can build antialiasing footprints for both paths and that the light path has much wider footprint than the eye path at the same position. <strong>*click*</strong><br /><br />
+
+                              On one hand, we can connect the eye path vertex on the wall directly to the spot light. Since we use the BSDF evaluated during the construction of the eye path and that it is the smallest footprint between the two methods it wont introduce too much bias. <strong>*click*</strong><br /><br />
+
+                              On the other hand, we can also connect the eye path vertex on floor to the light path vertex on the wall. This will result in an incorrect filtering of the texture since we will use the footprint of the spotlight to filter the texture. <strong>*click*</strong><br /><br />
+
+                              Here is the resulting image.  Clearly overblurred. <strong>*click*</strong><br /><br />
+
+                              In this talk, I will present a connection and antialiasing technique that avoid this issue and symmetrize the antialiasing of surfaces.
+                        </aside>
+                  </section>
+
+                  <!-- Our solution -->
+                  <section><h2>Our Solution</h2>
+                        <div style="height:500px;display: flex;">
+                              <ul style=" width: 900px;">
+                                    <li class="fragment" id="outline01">Stop thinking in terms of geometry!
+                                          <ul>
+                                                <li>Use <strong>frequency analysis</strong> to define antialiasing kernels</li>
+                                                <li><strong>Adapt</strong> textures frequency to incoming light-field frequency</li>
+                                          </ul>
+                                    </li><br />
+                                    <li class="fragment" id="outline02">Make modern path tracing (e.g., BDPT) a first class citizen
+                                          <ul>
+                                                <li>Support <strong>multiple non-specular</strong> bounce</li>
+                                                <li>Antialiasing kernels using <strong>both</strong> eye and light paths</li>
+                                          </ul>
+                                    </li><br />
+                                    <li class="fragment" id="outline03">Simple implementation
+                                          <ul>
+                                                <li>Extension of ray class, similar to ray differentials</li>
+                                          </ul>
+                                    </li>
+                              </ul>
+                              <object height="100%" type="image/svg+xml" data="images/svg/outline-vertical.svg" id="outline-vertical"></object>
+                        </div>
+                        <script type="text/javascript">
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    var s = Snap("#outline-vertical");
+                                    if(event.fragment.id == "outline01") {
+                                          s.select("#item1").animate({ opacity: 1 }, 500);
+                                    }
+                                    if(event.fragment.id == "outline02") {
+                                          s.select("#item2").animate({ opacity: 1 }, 500);
+                                    }
+                                    if(event.fragment.id == "outline03") {
+                                          s.select("#item3").animate({ opacity: 1 }, 500);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    var s = Snap("#outline-vertical");
+                                    if(event.fragment.id == "outline01") {
+                                          s.select("#item1").animate({ opacity: 0 }, 500);
+                                    }
+                                    if(event.fragment.id == "outline02") {
+                                          s.select("#item2").animate({ opacity: 0 }, 500);
+                                    }
+                                    if(event.fragment.id == "outline03") {
+                                          s.select("#item3").animate({ opacity: 0 }, 500);
+                                    }
+                              });
+                        </script>
+                        <aside class="notes">
+                              Specifically, I will present the following elements of our method. <strong>*click*</strong><br /><br />
+
+                              First I will present how we change the formalism of antialiasing. With our solution, we got rid of the geometrical formulation of ray and path differentials. Instead, we used frequency analysis to defined antialiasing kernels to adapt the texture frequency limit. <strong>*click*</strong><br /><br />
+
+                              I will also show how to support modern path tracing engines. We enable to specify the antialiasing kernel after multiple boucnes using results from frequency analysis and formulate the combine kernel of eye and light path connection. <strong>*click*</strong><br /><br />
+
+                              Finally, I will give a little details on our implementation and give some results.
+                        </aside>
+                  </section>
+
+
+
+
+                  <!-- We use the kernel to define antialiasing
+                    -->
+                  <section>
+                        <object width="100%" style="position: relative; top: 180px;" type="image/svg+xml" data="images/svg/outline.svg" id="outline-01"></object>
+                        <script type="text/javascript">
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    var s = Snap("#outline-01");
+                                    if(event.fragment.id == "outline01_01") {
+                                          s.select("#item1").animate({ opacity: 1 }, 500);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    var s = Snap("#outline-01");
+                                    if(event.fragment.id == "outline01_01") {
+                                          s.select("#item1").animate({ opacity: 0.2 }, 500);
+                                    }
+                              });
+                        </script>
+                        <div class="fragment" id="outline01_01"></div>
+                        <aside class="notes">
+                              <strong>*click*</strong><br /><br />
+
+                              First, lets talk about our reformulation of antialiasing.
+                        </aside>
+                  </section>
+                  <section><h2>Previous Models for Antialiasing</h2>
+                        <ul>
+                              <li>Filtering is defined by surface area: $\color{red}{\mathcal{P}}$</li>
+                        </ul>
+                        <center>
+                              <object width="80%" type="image/svg+xml" data="images/svg/filtering01.svg" id="antialiasing02"></object>
+                        </center>
+                        <aside class="notes">
+                              Pixel or Ray differentials are using a purely geometrical formulation to integrate the spatially varying reflectance. The idea is to compute the pixel projection onto the surface of the object. Once converted to texture space, this map defines the level of detail for mipmapping.
+                        </aside>
+                  </section>
+                  <section><h2>Our Model for Antialiasing</h2>
+                        <ul>
+                              <li>Pixel filter is a kernel applied on the surface!</li>
+                        </ul>
+                        <center>
+                              <object width="80%" id="antialiasing03_svg" type="image/svg+xml" data="images/svg/filtering02.svg"></object>
+                        </center>
+                        <aside class="notes">
+                              We started from a different idea. Instead of considering the pixel as the primitive for antialiasing, we used the filter function of the pixel. The intuittion is that a pixel filter is a light-field function. By projecting this lightfield at the surface of the object, it is possible to define a kernel function that will be used to antialias the reflectance.
+                        </aside>
+                  </section>
+                  <section><h2>Frequency Analysis Perspective</h2>
+                        <ul>
+                              <li>This kernel is a low-pass filter on the SV-BRDF:</li>
+                        </ul>
+                        <center style="padding-top:50px;">
+                              <svg id="antialiasing04" width="800px" height="450px" style="margin-top:-50px;"></svg>
+                              <div style="position: absolute; top: 600px; left: 890px; text-align: left; font-size: 0.8em;">Fourier domain</div>
+                        </center>
+                        <script type="text/javascript">
+                              var s = Snap("#antialiasing04");
+                              createFilter(s, 0, 400, 790, 300, 400);
+                        </script>
+                        <aside class="notes">
+                              This antialiasing kernel can be seen as a blurring function. In the Fourier domain it acts as a low pass filter (showed in red) on the spatially varying material (showed in green). The bandlimited signal (showed in blue) can be evaluated using mip mapping for example.
+                        </aside>
+                  </section>
+                  <section><h2>What is the Kernel?</h2>
+                        <div class="fragment fade-in" data-fragment-index="2" style="width: 100%; position: absolute; top: 300px; left: 0px;">
+                              <div class="fragment fade-out" data-fragment-index="8" style="display:flex; justify-content: space-around;">
+                                    <div class="fragment" id="color_box_01" data-fragment-index="3" style="width: 150px; height: 100px; border: 1px solid red; position: absolute; left: 250px; top: -5px;"></div>
+                                    <div class="fragment" id="color_box_02" data-fragment-index="4" style="width: 150px; height: 100px; border: 1px solid blue; position: absolute; left: 410px; top: 97px;"></div>
+                                    <div id="matrix_01">
+                                    $$\Sigma =
+                                    \begin{pmatrix}
+                                          \sigma_{xx} & \sigma_{xy} & \sigma_{xu} & \sigma_{xv} \\
+                                          \sigma_{yx} & \sigma_{yy} & \sigma_{yu} & \sigma_{yv} \\
+                                          \sigma_{ux} & \sigma_{uy} & \sigma_{uu} & \sigma_{uv} \\
+                                          \sigma_{vx} & \sigma_{vy} & \sigma_{vu} & \sigma_{vv} \\
+                                    \end{pmatrix}
+                                    $$
+                                    </div>
+                                    <div id="matrix_02">
+                                    $$\Sigma =
+                                    \begin{pmatrix}
+                                          \color{red}{\sigma_{xx}} & \sigma_{xy} & \sigma_{xu} & \sigma_{xv} \\
+                                          \sigma_{yx} & \color{black}{\sigma_{yy}} & \sigma_{yu} & \sigma_{yv} \\
+                                          \sigma_{ux} & \sigma_{uy} & \color{blue}{\sigma_{uu}} & \sigma_{uv} \\
+                                          \sigma_{vx} & \sigma_{vy} & \sigma_{vu} & \color{black}{\sigma_{vv}} \\
+                                    \end{pmatrix}
+                                    $$
+                                    </div>
+                                    <object class="fragment" id="covariance_svg" data-fragment-index="5"  style="position: relative; top: -15px;" width="200px" type="image/svg+xml" data="images/svg/covariance.svg"></object>
+                              </div>
+                        </div>
+                        <ul>
+                              <li class="fragment" data-fragment-index="1">Use statistical analysis in Fourier space [<a href="">Durand 2005</a>]
+                                    <ul>
+                                          <li>Second order information is relevant [<a href="">Belcour 2012</a>]</li>
+                                          <li>Similar to a Gaussian approximation of the kernel</li>
+                                    </ul>
+                              </li>
+                              <li style="padding-top: 5%;" class="fragment" data-fragment-index="8">Construction similar to Ray Differentials
+                                    <ul>
+                                          <li>Initialize at light/eye vertex and propagate</li>
+                                          <li>Account for rough interactions and volumes</li>
+                                    </ul>
+                              </li>
+                              <li style="padding-top: 5%;" class="fragment" data-fragment-index="9">How to specify it?
+                                    <ul>
+                                          <li>Using the pixel filter function</li>
+                                          <li>Similar to Pre-Filtered IS [<a href="">Colbert and Krivanek 2009</a>]</li>
+                                    </ul>
+                              </li>
+                        </ul>
+                        <div  class="fragment" data-fragment-index="6" id="show_matrix_02"></div>
+                        <script type="text/javascript">
+                              Reveal.addEventListener( 'ready', function( event ) {
+                                    $("#matrix_02").hide();
+                                    $("#matrix_01").show();
+
+                                    var s = Snap("#covariance_svg");
+                                    s.select("#horizontal").attr({ opacity: 0 });
+                                    s.select("#vertical").attr({ opacity: 0 });
+                              });
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    if(event.fragment.id == "show_matrix_02") {
+                                          $("#matrix_02").show();
+                                          $("#matrix_01").hide();
+                                          $("#color_box_01").hide();
+                                          $("#color_box_02").hide();
+
+                                          var s = Snap("#covariance_svg");
+                                          s.select("#horizontal").animate({ opacity: 1 }, 500);
+                                          s.select("#vertical").animate({ opacity: 1 }, 500);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    if(event.fragment.id == "show_matrix_02") {
+                                          $("#matrix_02").hide();
+                                          $("#matrix_01").show();
+                                          $("#color_box_01").show();
+                                          $("#color_box_02").show();
+
+                                          var s = Snap("#covariance_svg");
+                                          s.select("#horizontal").animate({ opacity: 0 }, 500);
+                                          s.select("#vertical").animate({ opacity: 0 }, 500);
+                                    }
+                              });
+                        </script>
+                        <aside class="notes">
+                              Now the question we need to solve is the following: how can we compute this kernel? <strong>*click*</strong><br /><br />
+
+                              Our solution for was rely on Frequency Analysis of light transport and to use covariance tracing. Covariance tracing works directly in Fourier space and store the second order statistics matrix of the light-field Fourier transform. <strong>*click*</strong><br /><br />
+
+                              This matrix contains information of the amount of variation in the spatial domain <strong>*click*</strong> and in the angular domain. <strong>*click*</strong><br /><br />
+
+                              During my presentation, I will illustrate this matrix with a Gaussian representing a 2D slice in the first spatial and angular dimension. <strong>*click*</strong> Here the spatial dimension 'x' is displayed horizontally and the angular dimension 'u' is displayed vertically. <strong>*click*</strong><br /><br />
+
+                              This matrix is initiated at the sensor or light vertex and later updated with respect to the path interactions. This very much similar to Ray Differentials but it accounts for rough interactions and participating media out of the box. <strong>*click*</strong><br /><br />
+
+                              To input covariance tracing, we either use the Fourier transform of the pixel filter function or we can use a method similar to pre-filtered importance sampling. The number of sample per pixels will define the input covariance matrix. See our paper for details.
+                        </aside>
+                  </section>
+                  <section>
+                        <h2>Covariance Antialiasing</h2><br />
+                        <center>
+                        <svg id="cov03" width="800px" height="600px"></svg>
+                        </center>
+                        <script type="text/javascript">
+                              loadElementFromSVG("./images/svg/bidir-filter-example.svg", "#cov03", "#layer3", antialiasingAppearance06Step00);
+
+                              // Animation for the slide {forward and backward}
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    var s = Snap("#cov03");
+                                    if(event.fragment.id == "cov03lightfielddisplay") {
+                                          s.select("#LightField").animate({opacity : 1.0}, 500);
+                                    }
+                                    if(event.fragment.id == "cov03display") {
+                                          s.select(".covariance").animate({opacity : 1.0}, 500);
+                                    }
+                                    if(event.fragment.id == "cov03lightfieldhide") {
+                                          s.select("#LightField").animate({opacity : 0.0}, 500);
+                                    }
+                                    if(event.fragment.id == "cov03shear01") {Cov03ShearCov(1); Cov03MoveCursor01(1); return; }
+                                    if(event.fragment.id == "cov03kernel01") { Cov03DisplayKernel(1); return; }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    var s = Snap("#cov03");
+                                    if(event.fragment.id == "cov03lightfielddisplay") {
+                                          s.select("#LightField").animate({opacity : 0.0}, 500);
+                                    }
+                                    if(event.fragment.id == "cov03display") {
+                                          s.select(".covariance").animate({opacity : 0.0}, 500);
+                                    }
+                                    if(event.fragment.id == "cov03lightfieldhide") {
+                                          s.select("#LightField").animate({opacity : 1.0}, 500);
+                                    }
+                                    if(event.fragment.id == "cov03shear01") { Cov03ShearCov(-1); Cov03MoveCursor01(-1); return; }
+                                    if(event.fragment.id == "cov03kernel01") { Cov03DisplayKernel(-1); return; }
+                              });
+                        </script>
+                        <p class="fragment" id="cov03lightfielddisplay"></p>
+                        <p class="fragment" id="cov03display"></p>
+                        <p class="fragment" id="cov03lightfieldhide"></p>
+                        <p class="fragment" id="cov03shear01"></p>
+                        <p class="fragment" id="cov03kernel01"></p>
+                        <aside class="notes">
+                              This is how it works in the unidrectional case: we first start from the sensor where we can ... <strong>*click*</strong><br /><br />
+
+                              ... express the pixel filter as a light field function. That is the kernel is a function of both space and direction. In the case of a pinehole camera this function is a dirac in space at the aperture and has the angular footprint of the pixel in directional. <strong>*click*</strong><br /><br />
+
+                              We can express this function in Fourier space and define its moments. In the case of the pinehole camera the fourier transform is infinite along the spatial axis and its angular bandlimit correspond to the solid angle of the pixel. <strong>*click*</strong><br /><br />
+
+                              Then, we perform covariance tracing. As we build the path, we update the covariance information to account for travel, curvature, BRDF, and so on and we store this covariance at vertices. This is similar to what is needed to propagate a ray differential except that it can account for rough materials and participating media. <strong>*click*</strong><br /><br />
+
+                              At the surface location, we can evaluate the antialiasing kernel on the surface using the inverse Fourier transform of the spatial slice of the Fourier transform. There is a closed form in the case of Gaussian kernels. <br /><br />
+
+                              We generate antialiasing kernel from the light the same way.
+                        </aside>
+                  </section>
+                  <!-- The kernel enable to work with global illumination
+                    -->
+                  <section>
+                        <object width="100%" style="position: relative; top: 180px;" type="image/svg+xml" data="images/svg/outline.svg" id="outline-02"></object>
+                        <script type="text/javascript">
+                              //window.addEventListener("onload", function() {
+                              Reveal.addEventListener( 'ready', function( event ) {
+                                    var s = Snap("#outline-02");
+                                    s.select("#item2").attr({ opacity: 1 });
+                              });
+                        </script>
+                        <aside class="notes">
+                              Now that we know how to generate antialiasing kernel from paths, we need to find the way to perform antialiasing when we are doing bidirectional path tracing.
+                        </aside>
+                  </section>
+
+
+                  <!-- Bidirectionnal path tracing -->
+                  <section><h2>Bidirectional Antialiasing</h2>
+                        <center>
+                               <object data="images/svg/bidir01.svg" type="image/svg+xml" id="bidir01" width="90%" style="margin-top:0px;"></object>
+                        </center>
+                        <script type="text/javascript">
+                              Reveal.addEventListener( 'ready', function( event ) {
+                              //window.addEventListener("onload", function() {
+                                    var snap = Snap("#bidir01");
+                                    snap.select("#lightFootprint").attr({ opacity: 0 });
+                                    snap.select("#IndirectBounces").attr({ opacity: 0 });
+                                    snap.select("#FirstKernel").attr({ opacity: 0 });
+                                    snap.select("#SecondKernel").attr({ opacity: 0 });
+                                    snap.select("#LightKernel").attr({ opacity: 0 });
+                              });
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    var snap = Snap("#bidir01");
+                                    if(event.fragment.id == "bidir-step01") {
+                                          snap.select("#FirstKernel").animate({ opacity: 1 }, 500);
+                                    }
+                                    if(event.fragment.id == "bidir-step02") {
+                                          snap.select("#IndirectBounces").animate({ opacity: 1 }, 500);
+                                          snap.select("#SingleBounce").animate({ opacity: 0 }, 500);
+                                          snap.select("#SecondKernel").animate({ opacity: 1 }, 500);
+                                    }
+                                    if(event.fragment.id == "bidir-step03") {
+                                          snap.select("#lightFootprint").animate({ opacity: 1 }, 500);
+                                    }
+                                    if(event.fragment.id == "bidir-step04") {
+                                          snap.select("#LightKernel").animate({ opacity: 1 }, 500);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    var snap = Snap("#bidir01");
+                                    if(event.fragment.id == "bidir-step01") {
+                                          snap.select("#FirstKernel").animate({ opacity: 0 }, 500);
+                                    }
+                                    if(event.fragment.id == "bidir-step02") {
+                                          snap.select("#IndirectBounces").animate({ opacity: 0 }, 500);
+                                          snap.select("#SingleBounce").animate({ opacity: 1 }, 500);
+                                          snap.select("#SecondKernel").animate({ opacity: 0 }, 500);
+                                    }
+                                    if(event.fragment.id == "bidir-step03") {
+                                          snap.select("#lightFootprint").animate({ opacity: 0 }, 500);
+                                    }
+                                    if(event.fragment.id == "bidir-step04") {
+                                          snap.select("#LightKernel").animate({ opacity: 0 }, 500);
+                                    }
+                              });
+                        </script>
+                        <p class="fragment" id="bidir-step01"></p>
+                        <p class="fragment" id="bidir-step02"></p>
+                        <p class="fragment" id="bidir-step03"></p>
+                        <p class="fragment" id="bidir-step04"></p>
+                        <aside class="notes">
+                              For that, let's go back to the example of the textured wall and the rough ground plane. Using covariance tracing from the eye, we can build a path and ... <strong>*click*</strong><br /><br />
+
+                              ... evaluate its antialiasing kernel at each intersections. Here for the ground plane. <strong>*click*</strong><br /><br />
+
+                              And here for the wall. <strong>*click*</strong><br /><br />
+
+                              Now the issue we are facing is when we want to connect this path to a light path (say here the light vertex). <strong>*click*</strong><br /><br />
+
+                              The light path kernel might not match the eye path kernel. If the light path kernel is spatially much larger in spread than the eye path kernel, everything would be fine and we would not introduce a big bias. <strong>*click*</strong><br /><br />
+
+                              However, as in this case, if the spatial spread of the light kernel is narrow, then we will be overblurring and introducing bias.
+                        </aside>
+                  </section>
+                  <section><h2>Bidirectional Antialiasing</h2>
+                        <center style="position:relative; padding-top: 50px; font-size: 0.8em;">
+                              <object width="60%" data="./images/svg/filtering03a.svg"></object>
+                              <div style="position: absolute; top:220px; left: 420px; color: blue;">eye kernel</div>
+                              <div style="position: absolute; top:220px; left: 575px; color: red;">material</div>
+                              <div style="position: absolute; top:220px; left: 850px; color: #ffd527;">light</div>
+                              <div style="position: absolute; top:500px; left: 420px; color: green;">light kernel</div>
+                              <div style="position: absolute; top:500px; left: 575px; color: red;">material</div>
+                              <div style="position: absolute; top:500px; left: 850px; color: #ffd527;">light</div>
+                        </center>
+                        <aside class="notes">
+                              What happens here is that we have the choice between two decorrelation. One is using the the kernel from the eye and the other the kernel from the light. We showed that we can theoretically define a kernel accouting for both using the product of the light and eye path kernels.
+                        </aside>
+                  </section>
+
+
+                  <section><h2>Bidirectional Antialiasing</h2>
+                        <center style="position:relative; padding-top: 120px;">
+                              <object width="50%" data="./images/svg/filtering03.svg"></object>
+                              <div class="fragment" style="position:relative;padding-top:70px; font-size:2em;">$$ \color{blue}{\Sigma_e} \; + \; \color{green}{\Sigma_l} \; = \; \Sigma $$</div>
+                        </center>
+                        <aside class="notes">
+                              This defines a new antialiasing kernel and the question left is how to can we estimate it from covariance tracing? <strong>*click*</strong><br /><br />
+
+                              Fortunately there is an analytical answer for covariances. Due to linearity of the covariance matrix, the covariance of the product is the sum of the light and eye covariance both expressed at the surface location.
+                        </aside>
+                  </section>
+
+                  <section><h2>Bidirectional Antialiasing</h2>
+                        <center style="position:relative; padding-top: 0px;">
+                              <object id="multiscattering3" type="image/svg+xml" data="./images/svg/multiscatter3.svg" width="90%"></object>
+                        </center>
+                        <script type="text/javascript">
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    var snap = Snap("#multiscattering3");
+                                    if(event.fragment.id == "multiscattering3step01") {
+                                          snap.select("#ShadingPoint").animate({ opacity: 1 }, 500);
+                                          snap.select("#FrameLight").animate({ opacity: 1 }, 500);
+                                    }
+                                    if(event.fragment.id == "multiscattering3step02") {
+                                          snap.select("#ConnectionVertex").animate({ opacity: 1 }, 500);
+                                          snap.select("#FrameEye").animate({ opacity: 1 }, 500);
+                                    }
+                                    if(event.fragment.id == "multiscattering3step03") {
+                                          snap.select("#ConnectionVertex").animate({ opacity: 1 }, 500);
+                                          var path   = snap.select("#ConnectionPath");
+                                          var length = path.getTotalLength();
+                                          var point  = path.getPointAtLength(length);
+                                          snap.select("#ConnectionVertex").animate({ cx: point.x, cy: point.y }, 500);
+                                          var cov = snap.select("#CovarianceEye");
+                                          var m1 = cov.transform().localMatrix;
+                                          Snap.animate(0, 5, function(val) {
+                                                cov.transform(m1.skewY(val));
+                                          }, 500);
+                                    }
+                                    if(event.fragment.id == "multiscattering3step04") {
+                                          snap.select("#FrameSum").animate({ opacity: 1 }, 800);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    var snap = Snap("#multiscattering3");
+                                    if(event.fragment.id == "multiscattering3step01") {
+                                          snap.select("#ShadingPoint").animate({ opacity: 0 }, 500);
+                                          snap.select("#FrameLight").animate({ opacity: 0 }, 500);
+                                    }
+                                    if(event.fragment.id == "multiscattering3step02") {
+                                          snap.select("#ConnectionVertex").animate({ opacity: 0 }, 500);
+                                          snap.select("#FrameEye").animate({ opacity: 0 }, 500);
+                                    }
+                                    if(event.fragment.id == "multiscattering3step03") {
+                                          snap.select("#ConnectionVertex").animate({ opacity: 0 }, 500);
+                                          var path   = snap.select("#ConnectionPath");
+                                          var length = path.getTotalLength();
+                                          var point  = path.getPointAtLength(0);
+                                          snap.select("#ConnectionVertex").animate({ cx: point.x, cy: point.y }, 500);
+                                          var cov = snap.select("#CovarianceEye");
+                                          var m1 = cov.transform().localMatrix;
+                                          Snap.animate(0, 5, function(val) {
+                                                cov.transform(m1.skewY(-val));
+                                          }, 500);
+                                    }
+                                    if(event.fragment.id == "multiscattering3step04") {
+                                          snap.select("#FrameSum").animate({ opacity: 0 }, 500);
+                                    }
+                              });
+                        </script>
+                        <div class="fragment" id="multiscattering3step01"></div>
+                        <div class="fragment" id="multiscattering3step02"></div>
+                        <div class="fragment" id="multiscattering3step03"></div>
+                        <div class="fragment" id="multiscattering3step04"></div>
+                        <aside class="notes">
+                              Now there is a subtlety in this evaluation because we usually don't know the covariance for both eye and light direction for all vertices. A vertex is depend on its sampling strategy. <strong>*click*</strong><br /><br />
+
+                              Let say for a moment that we want to evaluate the summed covariance for the red vertex here. Since it was generated by light path sampling, it already stores the covariance for the light path. However, the covariance for the eye path is unkown. <strong>*click*</strong><br /><br />
+
+                              What we need to do is to take the eye path vertex at which we are doing the connection and ... <strong>*click*</strong><br /><br />
+
+                              ... propagate this covariance matrix to the select vertex.  <strong>*click*</strong><br /><br />
+
+                              Then we can sum them once they are in the same coordinate frame.
+                        </aside>
+                  </section>
+
+
+
+                  <!--
+                        Implementation details: how simple is it to put in practice
+                  -->
+                  <section>
+                        <object width="100%" style="position: relative; top: 180px;" type="image/svg+xml" data="images/svg/outline.svg" id="outline-03"></object>
+                        <script type="text/javascript">
+                              //window.addEventListener("onload", function() {
+                              Reveal.addEventListener( 'ready', function( event ) {
+                                    var s = Snap("#outline-03");
+                                    s.select("#item3").attr({ opacity: 1 });
+                              });
+                        </script>
+                        <aside class="notes">
+                              We have covered most of the theoretical insights of our covariance antialiasing method. For the complete mathematical details, please refer to the paper. But there are some subtleties in the implementation I would like to talk about.
+                        </aside>
+                  </section>
+                  <section><h2>Implementation details</h2>
+                        <ul>
+                              <li>We need to re-evaluate BSDFs at each connection
+                                    <ul>
+                                          <li>To account for the mean covariance
+                                          <li>In practice we can re-evaluate at connection vertices only
+                                    </ul>
+                              </li>
+                              <li class="fragment" style="padding-top: 30px;"><a href="">Mitsuba</a> Implementation
+                                    <ul>
+                                          <li>Added a <span>RayCovariance</span> class</li>
+                                          <li>Convertion to <span>RayDifferential</span> before BSDF evaluation</li>
+                                    </ul>
+                              </li>
+                              <li class="fragment" style="padding-top: 30px;">Providing a <a href="">Small PT</a> [<a href="">Beason 2010</a>] example
+                                    <ul>
+                                          <li>Available on GitHub</li>
+                                    </ul>
+                              </li>
+                        </ul>
+                        <aside class="notes">
+                              Theoretically, to compute the contribution of a connection in BDPT, we should re-evaluate the BSDF of every vertex to account for the summed covariance of the resulting path. However, this might be too costly. In practice, we only re-evaluate the BSDF using the summed covariance at a predefined vertex of the connection. This still produces a symmetric evaluation of the path and we did not experienced overblurring with it. <strong>*click*</strong><br /><br />
+
+                              To quickly test covariance antialiasing in a renderer already supporting RayDifferentials, it is possible to convert on the fly a covariance matrix to equivalent differentials. We show in our paper how to do so and we used this technique for our Mitsuba implementation. <strong>*click*</strong><br /><br />
+
+                              In our supplemental code, that you can find on github, we provide an implementation of our covariance kernel prediction insde Small Path Tracer from Kevin Beason.
+                        </aside>
+                  </section>
+                  <section><h2>Kernel Validation</h2>
+                        <center>
+                              <svg id="demo01" width="512" height="512"></svg><br />
+                              <small>Kernel after one bounce</small>
+                        </center>
+                        <script>
+                              var s = Snap("#demo01");
+                              var x = 225;
+                              s.clear();
+                              s.image("./images/png/unidirectional-filter-cov.png", 0, 0, 512, 512);
+                              var block = s.rect(0, x, 512, 512).attr({fill: "#ffffff", id: "block"});
+                              var image = s.image("./images/png/unidirectional-filter-ref.png", 0, 0, 512, 512);
+                              var line  = s.line(0, x, 512, x).attr({id: "line", stroke: "#000", strokeWidth:2});
+                              s.rect(1, 1, 510, 510).attr({fillOpacity: 0, strokeWidth: 2, stroke: "#000"});
+                              var textu = s.text(500, x-15, "predicted kernel").attr({fillOpacity: 0.7, fill: "#FD5154", fontSize: "0.6em", textAnchor: "end"});
+                              var textl = s.text(500, x+25, "ground truth kernel").attr({fillOpacity: 0.7, fill: "#59FE5B", fontSize: "0.6em", textAnchor: "end"});
+                              var g = s.g(block, line, textu, textl).attr({id: "group"});
+                              image.attr({id: "image", mask: block});
+
+                              s.circle(320, 365, 5).attr({fill: "#aaaaff", stroke: "#5555ff", strokeWidth: 2});
+                              s.text(330, 370, "pixel").attr({fontSize: "0.6em", fillOpacity: 0.9, fill: "#aaaaff"})
+
+                              const demo01move = function(x, y, event) {
+                              var s = Snap("#demo01");
+                              var g = s.select("#group");
+                              var i = s.select("#image");
+                              var b = s.select("#block");
+                              g.transform("t0," + y);
+                              b.attr({transform: "t0," + y});
+                              i.attr({mask: s.select("block")});
+                              }
+
+                              s.drag(demo01move);
+                        </script>
+                        <aside class="notes">
+                              Here is a comparison of our predicted kernel using covariance tracing against a ground truth that is computed using density estimation. The kernel is generated by the reflection of the pixel filter on the blue pixel. We can notice a slight difference between kernels. This is due to the reference kernel begin skewed. Covariance tracing cannot estimate skewe kernel but this isn't a big deal since we are interested in the width of the kernel.
+                        </aside>
+                  </section>
+
+
+                  <!-- Result section -->
+                  <section>
+                        <div width="100%" style="width: 100%; text-align: center; position: relative; top: 250px;"><h2>Results</h2></div>
+                        <aside class="notes">
+                              Now lets look at some results.
+                        </aside>
+                  </section>
+                  <section><h2>Results: Snails</h2>
+                        <ul>
+                              <li>Unidirectional antialiasing kernels
+                                    <ul>
+                                          <li>Using [<a href="yan2016">Yan 2016</a>] normal map model</li>
+                                          <li>Focusing on indirect footprints with glossy materials</li>
+                                    </ul>
+                              </li>
+                        </ul>
+                        <aside class="notes">
+                              First I will show you results using unidirectional kernels in the context of unidirectional path tracing with next event estimation. Our kernels are used to antialias high resolution normal maps using the method of Yan and colleagues. Please focus on the indrect reflection of glittery object on rough materials.
+                        </aside>
+                  </section>
+                  <section>
+                        <center>
+                              <video style="position:relative; top:-30px;" width="100%" data-autoplay  controls id="covariance-filtering-video" src="./videos/covariance-filtering.m4v" ></video>
+                        </center>
+                  </section>
+                   <section><h2>Results: Spoon</h2>
+                        <ul>
+                              <li>Bidirectional antialiasing kernels
+                                    <ul>
+                                          <li>Using [<a href="yan2016">Yan 2016</a>] normal map model</li>
+                                          <li>Focusing on long light paths (caustics)</li>
+                                    </ul>
+                              </li>
+                        </ul>
+                        <center style="padding-top: 30px;">
+                              <img width="60%" src="images/png/spoon/bidir-example-ref.png" />
+                        </center>
+                        <div class="fragment" style="position: absolute; top: 50px; left: 850px; font-size: 0.7em; text-align: right;">
+                              <img style="margin: 0px;" width="350px" src="images/png/spoon/bidir-example-cbpt-crop.png" />
+                              <div style="height: 0px; position: relative; top: -40px; left: -10px; color: white;">Ours (~50min)</div>
+                              <img style="margin: 0px;" width="350px" src="images/png/spoon/bidir-example-ref-crop.png" />
+                              <div style="height: 0px; position: relative; top: -40px; left: -10px; color: white;">Reference (24 days)</div>
+                              <img style="margin: 0px;" width="350px" src="images/png/spoon/bidir-example-bpt-crop.png" />
+                              <div style="height: 0px; position: relative; top: -40px; left: -10px; color: white;">BDPT (equal-time)</div>
+                        </div>
+                        <aside class="notes">
+                              Next, I will show you results of using bidirectional kernels with BDPT. Again, we antialias high resolution normal maps using the method of Yan and colleagues to resolve the caustics on the spoon where the light kernels can be arbitrarily small due to caustic focusing. <strong>*click*</strong><br /><br />
+
+                              Notice how our method capture the lighting better than bidirectional path tracing with the same rendering time. We used the classical bidirectional path tracer to obtain the reference.
+                        </aside>
+                  </section>
+                   <section><h2>Results: Christmas</h2>
+                        <ul>
+                              <li>Bidirectional antialiasing kernels
+                                    <ul>
+                                          <li>Highly indirect illumination</li>
+                                          <li>Complex lighting (light bulbs)</li>
+                                    </ul>
+                              </li>
+                        </ul>
+                        <center style="padding-top: 10px;">
+                              <img width="60%" src="images/png/christmas/christmas-2-cbdpt.png" />
+                        </center>
+                        <div class="fragment" style="position: absolute; top: 50px; left: 900px; font-size: 0.7em; text-align: right;">
+                              <img style="margin: 0px;" height="200px" src="images/png/christmas/christmas-2-cbdpt-crop2.png" />
+                              <div style="height: 0px; position: relative; top: -40px; left: -10px; color: white;">Ours (~4h)</div>
+                              <img style="margin: 0px;" height="200px" src="images/png/christmas/christmas-2-bdpt2-crop2.png" />
+                              <div style="height: 0px; position: relative; top: -40px; left: -10px; color: white;">Reference (141 days)</div>
+                              <img style="margin: 0px;" height="200px" src="images/png/christmas/christmas-2-bdpt1-crop2.png" />
+                              <div style="height: 0px; position: relative; top: -40px; left: -10px; color: white;">BDPT (equal-time)</div>
+                        </div>
+                        <aside class="notes">
+                        Finally, I will present a very complex scenario, where we create very indirect paths. In this christmass tree scene, we embedded light sources inside dielectric light bulbs and visualized the indirect light on christmass ornaments. <strong>*click*</strong><br /><br />
+
+                        Our method, here also, better caputer the appearance of the resulting image compared to an equal time rendering with BDPT.
+                        </aside>
+                  </section>
+
+
+                  <!-- Limitation slide and future work stuff -->
+                  <section><h2>Limitations and Future Work</h2>
+                        <ul>
+                              <li class="fragment" style="padding-top:50px">Limitations
+                                    <ul>
+                                          <li>Only treated spatial antialiasing</li>
+                                          <li>Stationary footprint</li>
+                                    </ul>
+                              </li>
+                              <li class="fragment" style="padding-top:50px">Future directions of work
+                                    <ul>
+                                          <li>Incorporate geometry in antialiasing (curvature, ...)</li>
+                                          <li>Antialiasing kernels for participating media</li>
+                                          <li>Other uses of covariance tracing</li>
+                                    </ul>
+                              </li>
+                        </ul>
+                        <aside class="notes">
+                              Finally, I would like to talk a little bit of the limitations and potentialities of our work. <strong>*click*</strong><br /><br />
+
+                              In this work, we only tackled the problem of surface antialiasing without accounting for the angular componnent of the BSDF signal. For example a glint model such as the one of Yan et al. or Jakob et al. still contain high frequency content in the angular domain that needs to be resolved by dense integration. Note that this is not limited by our framework, but more by the model we had at hand. <br /><br />
+
+                              In this work, we assumed that the footprint was completely covered by the surface to antialias, and the surface planar. This is definitively not the case when kernel get wide. But then a surface modelisation might not be the best solution. <strong>*click*</strong> <br /><br />
+
+                              Regarding future works, it would be nice to have antialiasing models that incorporate elements of geometry such as curvature. <br /><br />
+
+                              We are also interested to look at the extension of our work to antialias volumetric media such as the SGGX model. <br /><br />
+
+                              We would like to look at other use of covariance tracing as well as it is quite a general framework to solve issues in rendering.
+                        </aside>
+                  </section>
+
+                  <!-- Last slide -->
+                  <section><h2>Thank you for your attention</h2>
+                        <center style="padding-top: 130px;">
+                        <table>
+                              <tr>
+                                    <td style="padding-bottom: 0px; padding-right: 50px;"><img style="width: 128px; border: none; box-shadow: none; margin: 0px;" src="./images/svg/end/pdf.svg" /></td>
+                              <td style="padding-bottom: 0px;"><img style="width: 128px; border: none; box-shadow: none; margin: 0px;" src="./images/svg/end/cpp.svg" /></td>
+                              </tr>
+                              <tr>
+                              <td style="padding-top: 0px; padding-right: 50px; position:relative; left: 50px; font-size: 0.7em;">paper</td>
+                              <td style="padding-top: 0px; position:relative; left: 50px; font-size: 0.7em;">code</td>
+                              </tr>
+                        </table>
+                        </center>
+                        <center style="padding-top: 80px;">available at <a href="https://belcour.github.io/blog">belcour.github.io/blog</a></center>
+                        <aside class="notes">
+                              I invite you to look at our paper and our supplemental material available on github. Thank you for you attention.
+                        </aside>
+                  </section>
+            </div>
+      </div>
+      <script>
+            Reveal.initialize({
+                  width: 1280,
+                  height: 720,
+                  margin: 0.0,
+                  history: true,
+                  slideNumber: true,
+                  showNotes: true,
+                  transition: 'fade',
+
+                  math: {
+		            config: 'TeX-AMS_SVG-full'
+	            },
+
+                  dependencies: [
+                        { src: 'ext/reveal.js/plugin/math/math.js', async: true },
+                        { src: 'ext/reveal.js/plugin/notes/notes.js', async: true }
+                  ]
+            });
+      </script>
+   </body>
+</html>
+
