@@ -1,0 +1,1456 @@
+<!doctype html>
+<html>
+   <head>
+      <meta charset="utf-8">
+
+      <title>Modeling Varying Iridescence on Microfacet Models</title>
+
+      <meta name="description" content="Slides">
+      <meta name="author" content="Laurent Belcour">
+
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+      <link rel="stylesheet" href="ext/reveal.js/css/reveal.css">
+      <link rel="stylesheet" href="ext/reveal.js/css/unity-white.css" id="theme">
+
+      <script src="ext/jquery/dist/jquery.min.js"></script>
+      <script src="ext/Snap.svg/dist/snap.svg-min.js"></script>
+      <script src="ext/headjs/dist/1.0.0/head.min.js"></script>
+      <script src="ext/reveal.js/js/reveal.js"></script>
+      <script src="ext/webgl/scripts/utils.js"></script>
+
+   </head>
+   <body>
+      <div class="reveal">
+            <div class="slides">
+                  <section class="title">
+                     <h2 style="padding-bottom:2%; padding-top:12%;text-align:left;">
+                        A Practical Extension to Microfacet Theory<br />
+                        for the Modeling of Varying Iridescence
+                     </h2>
+                     <table style="margin-left:25%;">
+                        <tr>
+                           <td style="text-align:center;padding-right:3em;padding-bottom:0px;">Laurent Belcour</td>
+                           <td style="text-align:center;;padding-bottom:0px;">Pascal Barla</td>
+                        </tr>
+                        <tr>
+                           <td style="text-align:center;padding:0px 3em 0px 0px;"><img class="plain" style="width:120px;" src="./images/logos/unity-black.png" /></td>
+                           <td style="text-align:center;"><img class="plain"  style="width:120px;padding-left:20px;" src="./images/logos/inria-black.png" /></td>
+                        </tr>
+                     </table>
+                     <object style="position:absolute;z-index:-1;top:0px;left:0px;" width="1280px" height="720px" data="./images/title.svg" type="image/svg+xml"></object>
+                     <aside class="notes">
+                        This is a HTML presentation. It was optimized to be displayed on the <a href="https://www.mozilla.org/fr/firefox/new/">Firefox browser</a>.<br />
+                        Notes in this box can be scrolled down.
+                     </aside>
+                  </section>
+
+
+                  <!-- Introduction & Motivation
+                       Start with the little story about Maxwell blog post
+                    -->
+
+                  <section>
+                        <h2>Motivation</h2>
+                        <div style="padding:50px 0px 0px 50px; position: relative;">
+                        <img class="fragment" data-fragment-index="1" width="270px" src="./images/motivation/bubble.jpg" />
+                        <img class="fragment" data-fragment-index="2" width="270px" src="./images/motivation/insect2.png" />
+                        <div class="fragment" data-fragment-index="3" style="position: absolute; top:200px; left:650px; width: 70px; height:180px; border: 2px solid red;"></div>
+                        <img class="fragment" data-fragment-index="3" width="270px" src="./images/motivation/greasy.jpg" /><!-- Copyright BigEmann@Youtube -->
+                        <div class="fragment" data-fragment-index="4" style="position: absolute; top:160px; left:1000px; width: 50px; height:50px; border: 2px solid red;"></div>
+                        <img class="fragment" data-fragment-index="4" width="270px" src="./images/motivation/passivated.jpg" /><!-- Copyright Columbia Chemical -->
+                        <aside class="notes">
+                              The motivation behind our work is that not all appareance can be faithfully represented using the classical model used in graphics. One example of such complex appearance is the case of iridescence.<strong>*click*</strong><br /><br />
+
+                              Causal examples of iridescent appearances are soap bubbles.<strong>*click*</strong><br /><br />
+
+                              Insects such as butterflies or beetles have iridescent shell or wings due to there nanoscopic structure.<strong>*click*</strong><br /><br />
+
+                              But less know is the case of greasy surfaces.<strong>*click*</strong><br /><br />
+
+                              Or metal coating that occurs commonly in oxydation or passivation.
+                        </aside>
+                  </section>
+                  <section>
+                     <h2>Birth of this Research Project</h2>
+                     <div class="fragment current-visible"  data-fragment-index="2" id="maxwell_leather" style="position:absolute; top: 300px; font-size: 0.7em; z-index: 300;" >
+                        <img width="1000px" src="./images/motivation/maxwell-leather.jpg" />
+                        <div style="position: absolute; top: 345px; left: 280px;">Classical microfacets</div>
+                        <div style="position: absolute; top: 345px; left: 750px;">Iridescent microfacets</div>
+                     </div>
+                     <div style="display: flex;">
+                     <div style="width:700px;margin:0px 0px 0px 50px;">
+                           <ul>
+                                 <li class="fragment" data-fragment-index="1">It all started with a blog post</li>
+                                 <li class="fragment">We wanted to achieve it real-time
+                                       <ul>
+                                             <li>First guess: <em>"should be easy"</em></li>
+                                             <li class="fragment">Took us 8 months ...</li>
+                                       </ul>
+                                 </li>
+                        </ul>
+                     </div>
+                     <div class="fragment" data-fragment-index="1" style="width:400px;text-align:center;">
+                        <img width="400px" src="./images/motivation/maxwell-blog.png" /><br />
+                        <small style="font-size:0.7em;"><a href="http://blog.maxwellrender.com/tips/pushing-the-limits-of-realism-of-materials/">Maxwell Render blog</a></small>
+                     </div>
+                     </div>
+                        <script>
+                        </script>
+                     <aside class="notes">
+                           Before getting further, I would like to by share some thoughts on how we came to work on such topic. <strong>*click*</strong><br /><br />
+
+                           It all started about a year ago when I discovered a blog post from the Maxwell render team. Pascal and I were already discussing how it was possible to extend the range of appearance in CG and we were impressed by the visual impact of adding a iridescence to surfaces. <strong>*click*</strong> It is really that blog post that made us start this research project and I would like to pay a tribute to them. This blog post had more impact on us that any of the papers we read on the subject. <strong>*click*</strong><br /><br />
+
+                           Now while reading this blog post we both thought that it would be easy to do a real-time portage of this spectral model and that it wasn't worth any publication at all. <strong>*click*</strong><br /><br />
+
+                           However, what I will tell you today is how this apparently simple portage resolved into something much more complex.
+                     </aside>
+                  </section>
+                  <section><h2>Goniochromism</h2>
+                        <center>
+                              <video height="500px" data-autoplay src="./videos/porshe.m4v"></video><br />
+                              <small style="width:890px;text-align:right;font-size:0.6em;"><a href="https://www.youtube.com/watch?v=hFrpJ1IYGH0">Ⓒ DipYourCar</a></small>
+                        </center>
+                        <aside class="notes">
+                              What is of particular interest in those appearances is goniochromism. Goniochromism is the property of surfaces to change color with respect to view or light incidence. We can see here a live video example of it where the color of this porsche changes from purple to green depending on the view direction.
+                        </aside>
+                  </section>
+
+
+                  <!-- How can we achieve goniochromism
+                    -->
+                  <section><h2>Thin-Film Reflectance</h2>
+                        <div style="padding-top:80px;">
+                              <object width="700px" height="400px" id="fig_thin_film" style="float:left;" data="./images/figures/thin_film.svg" type="image/svg+xml"></object>
+                              <div style="margin-top:12px;float:right;width:400px;height:400px;position:relative;">
+                                    <img id="fig_thin_film_classical" width="400px" height="400px" style="margin:0px;position:absolute;top:0px;left:0px;" src="./images/aliasing/matpreview_classical.png" />
+                                    <img id="fig_thin_film_irid" width="400px" height="400px" style="margin:0px;position:absolute;top:0px;left:0px;opacity:0;" src="./images/aliasing/matpreview_irid.png" />
+                              </div>
+                        </div>
+
+                        <div class="fragment" id="thin_film_01"></div>
+                        <div class="fragment" id="thin_film_02"></div>
+                        <div class="fragment" id="thin_film_03"></div>
+                        <script>
+
+                              function SnapAnimateAll(id_snap, id_base, attr_val, anim_duration) {
+                                    var s = Snap.select('#' + id_snap);
+                                    if(s == null) { return; }
+                                    var l = s.selectAll('[id*=' + id_base + ']')
+                                    for(var i=0; i<l.length; ++i) {
+                                          var e = l[i];
+                                          e.animate(attr_val, anim_duration);
+                                    }
+                              }
+
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    if(event.fragment.id == "thin_film_01") {
+                                          SnapAnimateAll('fig_thin_film', 'topLayer',   {opacity: 1}, 500);
+                                          SnapAnimateAll('fig_thin_film', 'topLayerBar',   {strokeOpacity: 1}, 500);
+                                    }
+                                    if(event.fragment.id == "thin_film_02") {
+                                          $('#fig_thin_film_irid').animate({opacity: 1}, 500);
+                                    }
+                                    if(event.fragment.id == "thin_film_03") {
+                                          SnapAnimateAll('fig_thin_film', 'lightPaths', {opacity: 1}, 500);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    if(event.fragment.id == "thin_film_01") {
+                                          SnapAnimateAll('fig_thin_film', 'topLayer',   {opacity: 0}, 500);
+                                          SnapAnimateAll('fig_thin_film', 'topLayerBar',   {strokeOpacity: 0}, 500);
+                                    }
+                                    if(event.fragment.id == "thin_film_02") {
+                                          $('#fig_thin_film_irid').animate({opacity: 0}, 500);
+                                    }
+                                    if(event.fragment.id == "thin_film_03") {
+                                          SnapAnimateAll('fig_thin_film', 'lightPaths', {opacity: 0}, 500);
+                                    }
+                              });
+                        </script>
+
+                        <aside class="notes">
+                              A simple way to add such appearance to specular surfaces is to use a thin-film layer on top. For example Starting from a pure metal,  ...<strong>*click*</strong><br /><br />
+
+                              ... we can add a dielectric layer that is around a hundred nanometers thick.  <strong>*click*</strong><br /><br />
+
+                              This creates rainbox like colors on the surface as you can see on the left image. <strong>*click*</strong><br /><br />
+
+                              Colors are produced by the interference of outgoing light waves that scatter multiple times between the interfaces.
+                        </aside>
+                  </section>
+
+
+                  <!-- Airy reformulation
+                    -->
+                  <section><h2>Thin-Film Interference: Using Phase</h2>
+                        <div style="position: absolute; top: 250px; left: 190px; font-size: 0.7em; opacity: 0.7;">$\eta_{1}$</div>
+                        <div style="position: absolute; top: 385px; left: 190px; font-size: 0.7em; opacity: 0.7;">$\eta_{2}$</div>
+                        <div style="position: absolute; top: 520px; left: 190px; font-size: 0.7em; opacity: 0.7;">$\vec{\eta}_{3}$</div>
+                        <div id="AiryD1" style="position:absolute; top: 612px; left:605px; color: gray; font-size: 20px; opacity: 0;">$\mathcal{D}$</div>
+                        <div id="AiryD2" style="position:absolute; top: 612px; left:655px; color: gray; font-size: 20px; opacity: 0;">$\mathcal{D}$</div>
+                        <div id="AiryD0" style="position:absolute; top: 510px; left:655px; color: red;  font-size: 20px; opacity: 0;">$\mathcal{D}$</div>
+                        <center style="padding-top: 50px;">
+                              <svg width="1000" height="500" id="fig_airy_summation" data="./images/figures/airy_summation.svg" type="image/svg+xml"></svg>
+                        </center>
+                        <div class="fragment" id="airy_summation_00a"></div>
+                        <div class="fragment" id="airy_summation_00b"></div>
+                        <div class="fragment" id="airy_summation_01" style="position:absolute; top: 600px; width: 1280px; text-align: center;">$\mathcal{D}$ is called the <em>Optical Path Difference</em></div>
+                        <div class="fragment" id="airy_summation_02"></div>
+                        <script>
+                           /* Create a sinusoid that is compatible with the creation of an SVG polyline with
+                            * Snap.SVG.
+                            */
+                           function createSinusoid(pmin, pmax, scale, freq, shift=[0], res=200) {
+                              var sine  = new Array();
+                              var width = pmax.x - pmin.x;
+                              for(var i=0; i<res; ++i) {
+                                 var x = i / res;
+                                 var y = pmin.y;
+                                 for( var j=0; j<scale.length; ++j) {
+                                    y += scale[j]*Math.sin(2.0 * Math.PI * freq[j] * width * x + shift[j]);
+                                 }
+
+                                 sine.push(width * x + pmin.x);
+                                 sine.push(y);
+                              }
+                              return sine;
+                           }
+
+                           Reveal.addEventListener('ready', function( event ) {
+                                 var s = Snap("#fig_airy_summation");
+
+                                 Snap.load("./images/figures/airy_summation.svg", function ( loadedFragment ) {
+                                       s.append(loadedFragment);
+                                       var pmin  = {x: 550, y: 100};
+                                       var pmax  = {x: 950, y: 100};
+                                       var amp   = 40;
+                                       var freq  = 1.0/100;
+
+                                       //var marker = s.select("#marker6936");
+                                       var sine, sineSvg, circle, line, g;
+                                       g = s.g();
+                                       var marker = s.select("#marker7767");
+                                       var polyline = [550, 50, 550, 425];
+                                       line = s.polyline([550, 150, 550, 330]);
+                                       line.attr({id: "VerticalLine", strokeWidth: 3, stroke: "#000000", opacity: 54/255, markerEnd: marker, markerStart: marker, polyline: polyline });
+                                       g.add(line);
+                                       marker  = s.select("#marker7594");
+                                       markerS = s.select("#marker9007");
+                                       line = s.line(550, 100, 975, 100); line.attr({ id: "Sinusoid0Line", strokeWidth: 3, stroke: "#000000", opacity: 0, markerEnd: marker});
+                                       g.add(line);
+                                       line = s.line(550, 200, 975, 200); line.attr({ strokeWidth: 3, stroke: "#000000", opacity: 24/255, markerEnd: marker});
+                                       g.add(line);
+                                       line = s.line(550, 300, 975, 300); line.attr({ strokeWidth: 3, stroke: "#000000", opacity: 24/255, markerEnd: marker});
+                                       g.add(line);
+                                       line = s.line(550, 400, 975, 400); line.attr({ id: "Sinusoid3Line", strokeWidth: 3, stroke: "#000000", opacity: 0, markerEnd: marker});
+                                       g.add(line);
+                                       s.line(510, 335, 540, 335).attr({id: "DeltaD0", strokeWidth: 3, stroke: "#000000", opacity: 0, markerEnd: marker, markerStart: markerS});
+                                       s.line(510, 435, 540, 435).attr({id: "DeltaD1", strokeWidth: 3, stroke: "#000000", opacity: 0, markerEnd: marker, markerStart: markerS});
+                                       s.line(460, 435, 490, 435).attr({id: "DeltaD2", strokeWidth: 3, stroke: "#000000", opacity: 0, markerEnd: marker, markerStart: markerS});
+                                       g.attr({id: "SineGrid", opacity: 0});
+
+                                       sine    = createSinusoid(pmin, pmax, [amp, 0.75*amp, 0.0*amp], [freq, freq, freq], [0, Math.PI, 0.9*Math.PI]);
+                                       sineSvg = s.polyline(sine);
+                                       sineSvg.attr({ strokeWidth: 3, stroke: "#000000", fill: "none"});
+                                       circle  = s.circle(pmin.x, pmin.y, 5);
+                                       circle.attr({ strokeWidth: 3, stroke: "#000000", fill: "#ffffff" });
+                                       s.g(sineSvg, circle).attr({ id: "Sine00", opacity: 0 });
+
+                                       pmin    = {x: 550, y: 200};
+                                       pmax    = {x: 950, y: 200};
+                                       sine    = createSinusoid(pmin, pmax, [amp], [freq]);
+                                       sineSvg = s.polyline(sine);
+                                       sineSvg.attr({ strokeWidth: 3, stroke: "#0083ff", fill: "none"});
+                                       circle  = s.circle(pmin.x, pmin.y, 5);
+                                       circle.attr({ strokeWidth: 3, stroke: "#0083ff", fill: "#ffffff" });
+                                       s.g(sineSvg, circle).attr({ id: "Sine01", opacity: 0 });
+
+                                       pmin    = {x: 500, y: 300};
+                                       pmax    = {x: 950, y: 300};
+                                       sine    = createSinusoid(pmin, pmax, [0.7*amp], [freq]);
+                                       sineSvg = s.polyline(sine);
+                                       sineSvg.attr({ strokeWidth: 3, stroke: "#00a211", fill: "none"});
+                                       circle   = s.circle(pmin.x, pmin.y, 5);
+                                       circle.attr({ strokeWidth: 3, stroke: "#00a211", fill: "#ffffff" });
+                                       s.g(sineSvg, circle).attr({ id: "Sine02", opacity: 0 });
+
+                                       pmin    = {x: 450, y: 400};
+                                       pmax    = {x: 950, y: 400};
+                                       sine    = createSinusoid(pmin, pmax, [0.5*amp], [freq]);
+                                       sineSvg = s.polyline(sine);
+                                       sineSvg.attr({id: "Sinusoid3", strokeWidth: 3, stroke: "#8db591", fill: "none", opacity: 0 });
+                                       circle   = s.circle(pmin.x, pmin.y, 5);
+                                       circle.attr({id: "Sinusoid3Dot", strokeWidth: 3, stroke: "#8db591", fill: "#ffffff", opacity: 0 });
+                                       s.g(sineSvg, circle).attr({ id: "Sine03" });
+
+
+                                       var scale = 0.75;
+
+                                       // Set the shadow keyframes
+                                       var shadow = s.select("#LayersShadow");
+                                       shadow.attr({ 'base-width': shadow.attr('width')});
+                                       shadow.attr({ 'anim-width': scale*shadow.attr('width')});
+                                       shadow.attr({ 'width': shadow.attr('anim-width') });
+
+                                       // Set the top layer keyframes
+                                       var topLayer = s.select("#TopLayer");
+                                       topLayer.attr({ 'base-width': topLayer.attr('width')});
+                                       topLayer.attr({ 'anim-width': scale*topLayer.attr('width')});
+                                       topLayer.attr({ 'width': topLayer.attr('anim-width') });
+
+                                       // Set the bottom layer keyframes
+                                       var baseLayer = s.select("#BaseLayer");
+                                       baseLayer.attr({ 'base-width': baseLayer.attr('width')});
+                                       baseLayer.attr({ 'anim-width': scale*baseLayer.attr('width')});
+                                       baseLayer.attr({ 'width': baseLayer.attr('anim-width') });
+
+                                       // Set the top interface
+                                       var topInterface     = s.select("#TopInterface");
+                                       var topInterfaceCopy = s.path();
+                                       topInterface.after(topInterfaceCopy);
+                                       var length = topInterface.getTotalLength();
+                                       topInterfaceCopy.attr({ id: "TopInterfaceCopy", path: topInterface.getSubpath(0, scale*length),
+                                                               fill: "none", stroke: topInterface.attr("stroke"),
+                                                               strokeWidth: topInterface.attr("strokeWidth") });
+                                       topInterface.attr({ opacity: 0 });
+
+                                       // Set the bottom interface
+                                       var baseInterface     = s.select("#BaseInterface");
+                                       var baseInterfaceCopy = s.path();
+                                       baseInterface.after(baseInterfaceCopy);
+                                       var length = baseInterface.getTotalLength();
+                                       baseInterfaceCopy.attr({ id: "BaseInterfaceCopy", path: baseInterface.getSubpath(0, scale*length),
+                                                               fill: "none", stroke: baseInterface.attr("stroke"),
+                                                               strokeWidth: baseInterface.attr("strokeWidth") });
+                                       baseInterface.attr({ opacity: 0 });
+
+                                       // Set opacity for the multiple scattering part
+                                       s.select("#MultipleScattering").attr({ opacity: 0});
+                                       s.select("#Measure").attr({ opacity: 0});
+                                 });
+                           });
+                           Reveal.addEventListener('fragmentshown', function( event ) {
+                                 var s = Snap("#fig_airy_summation");
+                                 if(event.fragment.id == "airy_summation_00a") {
+                                    s.select("#Sine01").animate({ opacity: 1}, 500);
+                                    s.select("#Sine02").animate({ opacity: 1}, 500);
+                                    s.select("#SineGrid").animate({ opacity: 1}, 500);
+                                 }
+                                 if(event.fragment.id == "airy_summation_00b") {
+                                    s.select("#Sinusoid0Line").animate({ opacity: 0.1}, 500);
+                                    s.select("#Sine00").animate({ opacity: 1}, 500);
+
+                                    var after  = s.select("#VerticalLine").attr('points').map(parseFloat);
+                                    var before = s.select("#VerticalLine").attr('points').map(parseFloat);
+                                    after[1] = 50;
+                                    Snap.animate(before, after, function(value) {
+                                          s.select("#VerticalLine").attr({ points: value});
+                                    }, 500);
+                                 }
+                                 if(event.fragment.id == "airy_summation_01") {
+                                    s.select("#Measure").animate({ opacity: 1}, 500);
+                                    s.select("#DeltaD0").animate({ opacity: 0.2}, 500);
+                                    $('#AiryD0').animate({opacity: 1}, 500);
+                                 }
+                                 if(event.fragment.id == "airy_summation_02") {
+                                    $('#airy_summation_01').animate({ opacity: 0 }, 200);
+                                    s.select("#Measure").animate({ opacity: 0}, 500);
+                                    s.select("#MultipleScattering").animate({ opacity: 1}, 500);
+                                    s.select("#LayersShadow").animate({ width: s.select("#LayersShadow").attr("base-width")}, 500);
+                                    s.select("#TopLayer").animate({ width: s.select("#TopLayer").attr("base-width")}, 500);
+                                    s.select("#BaseLayer").animate({ width: s.select("#BaseLayer").attr("base-width")}, 500);
+
+                                    // Change the interface border
+                                    var topElement = s.select("#TopInterface");
+                                    var topLength  = topElement.getTotalLength();
+                                    var topSubPath = topElement.getSubpath(0, topLength);
+                                    s.select("#TopInterfaceCopy").attr({ path: topSubPath });
+
+                                    var baseElement = s.select("#BaseInterface");
+                                    var baseLength  = baseElement.getTotalLength();
+                                    var baseSubPath = baseElement.getSubpath(0, baseLength);
+                                    s.select("#BaseInterfaceCopy").attr({ path: baseSubPath });
+
+                                    s.select("#DeltaD1").animate({ opacity: 0.2}, 500);
+                                    $('#AiryD1').animate({opacity: 1}, 500);
+                                    s.select("#DeltaD2").animate({ opacity: 0.2}, 500);
+                                    $('#AiryD2').animate({opacity: 1}, 500);
+
+                                    s.select("#Sinusoid3").animate({ opacity: 1}, 500);
+                                    s.select("#Sinusoid3Dot").animate({ opacity: 1}, 500);
+                                    s.select("#Sinusoid3Line").animate({ opacity: 0.2}, 500);
+
+                                    var before = s.select("#VerticalLine").attr('points').map(parseFloat);
+                                    var after  = s.select("#VerticalLine").attr('polyline').split(",").map(parseFloat);
+                                    Snap.animate(before, after, function(value) {
+                                       s.select("#VerticalLine").attr({ points: value});
+                                    }, 500);
+                                 }
+                           });
+                           Reveal.addEventListener('fragmenthidden', function( event ) {
+                                 var s = Snap("#fig_airy_summation");
+                                 var scale = 0.75;
+                                 if(event.fragment.id == "airy_summation_00a") {
+                                    s.select("#Sine01").animate({ opacity: 0}, 500);
+                                    s.select("#Sine02").animate({ opacity: 0}, 500);
+                                    s.select("#SineGrid").animate({ opacity: 0}, 500);
+                                 }
+                                 if(event.fragment.id == "airy_summation_00b") {
+                                    s.select("#Sinusoid0Line").animate({ opacity: 0}, 500);
+                                    s.select("#Sine00").animate({ opacity: 0}, 500);
+
+                                    var after  = s.select("#VerticalLine").attr('points').map(parseFloat);
+                                    var before = s.select("#VerticalLine").attr('points').map(parseFloat);
+                                    after[1] = 150;
+                                    Snap.animate(before, after, function(value) {
+                                          s.select("#VerticalLine").attr({ points: value});
+                                    }, 500);
+                                 }
+                                 if(event.fragment.id == "airy_summation_01") {
+                                    s.select("#Measure").animate({ opacity: 0}, 500);
+                                    s.select("#DeltaD0").animate({ opacity: 0.0}, 500);
+                                    $('#AiryD0').animate({opacity: 0}, 500);
+                                 }
+                                 if(event.fragment.id == "airy_summation_02") {
+                                       $('#airy_summation_01').animate({ opacity: 1 }, 200);
+                                       s.select("#Measure").animate({ opacity: 1}, 500);
+                                       s.select("#MultipleScattering").animate({ opacity: 0}, 500);
+                                       s.select("#LayersShadow").animate({ width: s.select("#LayersShadow").attr("anim-width")}, 500);
+                                       s.select("#TopLayer").animate({ width: s.select("#TopLayer").attr("anim-width")}, 500);
+                                       s.select("#BaseLayer").animate({ width: s.select("#BaseLayer").attr("anim-width")}, 500);
+
+                                       // Change the interfaces borders
+                                       var topElement = s.select("#TopInterface");
+                                       var topLength  = topElement.getTotalLength();
+                                       var topSubPath = topElement.getSubpath(0, scale*topLength);
+                                       s.select("#TopInterfaceCopy").attr({ path: topSubPath });
+
+                                       var baseElement = s.select("#BaseInterface");
+                                       var baseLength  = baseElement.getTotalLength();
+                                       var baseSubPath = baseElement.getSubpath(0, scale*baseLength);
+                                       s.select("#BaseInterfaceCopy").attr({ path: baseSubPath });
+
+                                       s.select("#DeltaD1").animate({ opacity: 0}, 500);
+                                       $('#AiryD1').animate({opacity: 0}, 500);
+                                       s.select("#DeltaD2").animate({ opacity: 0}, 500);
+                                       $('#AiryD2').animate({opacity: 0}, 500);
+
+                                       s.select("#Sinusoid3").animate({ opacity: 0}, 500);
+                                       s.select("#Sinusoid3Dot").animate({ opacity: 0}, 500);
+                                       s.select("#Sinusoid3Line").animate({ opacity: 0}, 500);
+
+                                       var after  = s.select("#VerticalLine").attr('points').map(parseFloat);
+                                       var before = s.select("#VerticalLine").attr('points').map(parseFloat);
+                                       after[3] = 330;
+                                       Snap.animate(before, after, function(value) {
+                                          s.select("#VerticalLine").attr({ points: value});
+                                       }, 500);
+                                 }
+                           });
+                        </script>
+
+                        <aside class="notes">
+                              To understand how interference produces colors, we have to dive into wave optics and analyze the relative phase and amplitude of each outgoing light waves. I will illustrate how interference occurs and create colors in this example. In this case, we assume that the incoming light has a single wavelength.<strong>*click*</strong><br /><br />
+
+                              We will look at the waves corresponding to the blue and green light rays. Note that those waves have a different amplitude due to the transmission and reflection coeffcients. They also have a different shift which will have an important impact.<strong>*click*</strong><br /><br />
+
+                              When we sum those waves together, the difference in shift can cause destructive or constructive interference meaning that the amplitude of the black wave depends on both the amplitude of the green and blue wave but also their relative shift. Since the shift is wavelength dependant, the spectral response of this surface with be colored and create those rainbow pattern we just saw.<strong>*click*</strong><br /><br />
+
+                              This shift is caused by two things. The first one is the optical path difference denoted 'D' here. The optical path difference is the difference in distance between the two light paths from the gray dot to where they align with respect to the outgoing planar wave (the blue and green dot respectively). The second one is the reflection by the interfaces. Conductors and dielectric introduce a non negligeable change in phase that needs to be accounted when resolving interference. Our model is the first to correctly account for the polarized phase shift due to conductors and dielectrics. However in this talk I will simplify the discussion by phase shift into D and not talking about the different polarization plane.<strong>*click*</strong><br /><br />
+
+                              If we add more bounces we will have to account for the amplitude and phase of other light waves. However, it is to notice that the shift between waves will always be a mutliple of the one bounce shift.
+                        </aside>
+                  </section>
+                  <section><h2>Thin-Film Interference : Airy Summation</h2>
+                        <div style="position: absolute; top: 250px; left: 190px; font-size: 0.7em; opacity: 0.7;">$\eta_{1}$</div>
+                        <div style="position: absolute; top: 385px; left: 190px; font-size: 0.7em; opacity: 0.7;">$\eta_{2}$</div>
+                        <div style="position: absolute; top: 520px; left: 190px; font-size: 0.7em; opacity: 0.7;">$\vec{\eta}_{3}$</div>
+                        <center style="padding-top: 0px;">
+                              <object width="1000" height="500" data="./images/figures/airy_summation.svg" type="image/svg+xml"></object>
+                        </center>
+                        <center style="position:absolute; left:650px; top:250px; width: 550px;">
+                           <div>
+                              outgoing reflectance $ R = |\vec{r}|^2$<br /><br />
+                              with $\vec{r} = \color{red}{\vec{r}_{12}} + \color{blue}{t_{12}} \color{green}{\vec{r}_{23}e^{i \Delta\phi}} \color{orange}{t_{21}} + \cdots$
+                           </div>
+                           <div class="fragment" style="margin-top: 70px;" id="airy_summation_equation">
+                              <div style="padding-top: 20px; padding-bottom: 20px; border: 1.5px solid red;">$$\vec{r} = \color{red}{\vec{r}_{12}} + \color{blue}{t_{12}} \color{green}{\dfrac{\vec{r}_{23}e^{i \Delta\phi}}{1 - \vec{r}_{21}\vec{r}_{23}e^{i \Delta\phi}}} \color{orange}{t_{21}}$$</div>
+                              <small style="margin-top: 10px; color: red;">Analytical form: Airy summation</small>
+                           </div>
+                        </center>
+
+                        <aside class="notes">
+                              To obtain the reflectance capital R we need to compute the average wave amplitude. For that, we can use complex numbers marked with arrows here. Each wave can be represented by a complex number with its amplitude and phase. The outgoing wave complex number is the sum of all the different waves interacting with the two interfaces. Because light can potentially interact an infinite number of time, we need an infinite sum of complex numbers. <strong>*click*</strong><br /><br />
+
+                              Since this infinite sum is a geometrical series, it can be simplified in a formula called the Airy summation. Note that this equation is valid for a single wavelength.
+                        </aside>
+                  </section>
+
+
+                  <!-- Problem
+                    -->
+                  <section data-transition="none"><h2>Naive Implementation</h2>
+                        <center>
+                              <table>
+                                    <tr>
+                                          <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/aliasing/matpreview_rgb.png" /></td><td style="width:512px;"></td>
+                                    </tr>
+                                    <tr style="position:absolute; top:645px;">
+                                          <td style="text-align:center;width:512px;"><small><strong>RGB renderer</strong> - Naive implementation</small></td>
+                                          <td style="width:512px;"></td>
+                                    </tr>
+                              </table>
+                        </center>
+
+                        <aside class="notes">
+                              In a classical RGB renderer we will have to select one wavelength per color channel to compute its intensity. This produces a nice looking image and it looks like we achieved the kind of appearance we wanted. However, when we compared our renderings to a spectral reference we obtained ...
+                        </aside>
+                  </section>
+
+                  <section data-transition="none"><h2>Comparison with Spectral Renderer</h2>
+                        <center>
+                              <table id="spectral_aliasing_01_table" style="position:relative;">
+                                    <tr>
+                                          <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/aliasing/matpreview_rgb.png" /></td>
+                                          <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/aliasing/matpreview-128spp.png" /></td>
+                                    </tr>
+                                    <tr id="spectral_aliasing_01_tr" style="display: none;">
+                                          <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/plots/spectral_aliasing_rgb.png" /></td>
+                                          <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/plots/spectral_aliasing_128spp.png" /></td>
+                                    </tr>
+                                    <tr id="spectral_aliasing_01_row" style="position:absolute;top:522px;left:0px;">
+                                          <td style="text-align:center;width:512px;"><small><strong>RGB renderer</strong> - Naive implementation</small></td>
+                                          <td style="text-align:center;width:512px;"><small><strong>128 spectral samples</strong> - Naive implementation</small></td>
+                                    </tr>
+                              </table>
+                        </center>
+                        <div class="fragment" id="spectral_aliasing_01"></div>
+                        <script>
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    if(event.fragment.id == "spectral_aliasing_01") {
+                                          $('#spectral_aliasing_01_table').animate({top: -256}, 500);
+                                          $('#spectral_aliasing_01_row').animate({top: 776}, 500);
+                                          $("#spectral_aliasing_01_tr").fadeIn(500);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    if(event.fragment.id == "spectral_aliasing_01") {
+                                          $('#spectral_aliasing_01_table').animate({top: 0}, 500);
+                                          $('#spectral_aliasing_01_row').animate({top: 522}, 500);
+                                          $("#spectral_aliasing_01_tr").fadeOut(500);
+                                    }
+                              });
+                        </script>
+                        <aside class="notes">
+                              ... this. While the overall look is kind of the same, notice how saturated the colors are and how some colors are wrong such as the blue tint close to the center of this material checker.<strong>*click*</strong><br /><br />
+
+                              We tried to understand why those images were so off with one another and we looked at the spectral curves integrated when doing direct rendering of a thin-film with respect to the XYZ sensitivity function. I display those curves here. It turns out that this is well explained by the fact that spectral rendering performs an integral in the spectral domain. <strong>*click*</strong> Using a RGB renderer is equivalent to performing this integral with only one sample per pixel!
+                        </aside>
+                  </section>
+                  <section><h2>Issue: Spectral Aliasing</h2>
+                        <ul style="padding:20px 0px 0px 50px;">
+                              <li>Using Naive RGB rendering does spectral <strong>aliasing</strong>
+                                    <ul>
+                                          <li>Affect goniochromatic materials</li>
+                                          <li class="fragment">Can be solved using spectral rendering</li>
+                                    </ul>
+                              </li>
+                              <li style="padding:50px 0px 0px 0px;" class="fragment">Spectral rendering is <strong>not an option</strong> for video-games
+                                    <ul>
+                                          <li class="fragment">Can't tabulate the range of all parameters as [<a href="">Smits and Meyer 1992</a>]</li>
+                                    </ul>
+                              </li>
+                              <li style="padding:50px 0px 0px 0px;" class="fragment">Our solution: <strong>spectral antialiasing</strong>
+                                    <ul>
+                                          <li>Account for spectral integration <strong>inside</strong> the model</li>
+                                          <li>Required a novel view on Airy's summation</li>
+                                    </ul>
+                              </li>
+                        </ul>
+                        <aside class="notes">
+                              In signal processing, an insufficent sampling of a function causes aliasing and this is exactly what we see here. This is due to the use of only one spectral sample per channel and <strong>*click*</strong> of course the use of a spectral renderer will solve this issue.<strong>*click*</strong><br /><br />
+
+                              However we were trying to implement such appearance for real-time RGB scenario and spectral integration wasn't possible. <strong>*click*</strong>. Another issue we had to face is that to be able to use both conductors and dielectric as the bottom interface, we could not precompute the spectral integral and store it in a look-up table. There was too many dimensions to correctly fit it in memory.<strong>*click*</strong><br /><br />
+
+                              So we developped a method that enables to perform spectral antialiasing on the fly by directly incorporating spectral integration into the reflectance term. This required us to develop a novel view on Airy's summation that was new even to optics community.
+                        </aside>
+                  </section>
+
+
+                  <!-- Spectral antialiasing section -->
+                  <section><h2>Spectral Integration with Sensor Sensitivity</h2>
+                        <center>
+                              <object data="./images/figures/modelisation.svg" type="image/svg+xml"></object>
+                              <div  id="spectral_rendering_01_latex" style="position:absolute; left:10px; top:490px; opacity: 0; font-size: 65px; z-index: 3; display:flex;">
+                                   <div>$$\int$$</div>
+                                   <div style="position:relative; left:323px; top:50px;">$$\times$$</div>
+                                   <div style="position:relative; left:655px; top:50px;">$$\times$$</div>
+                                   <div style="position:relative; left:985px; top:50px;">$$\mbox{d}\lambda$$</div>
+                              </div>
+                              <table id="spectral_rendering_01_tr" style="position:relative; top:-100px; opacity: 0;">
+                                    <tr>
+                                          <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/plots/cmf.png" /></td>
+                                          <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/plots/thin_film.png" /></td>
+                                          <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/plots/illuminant.png" /></td>
+                                    </tr>
+                                    <tr>
+                                          <td style="width:512px;text-align:center;font-size:16px;">XYZ Color Matching Curves</td>
+                                          <td style="width:512px;text-align:center;font-size:16px;">Spectral BRDF</td>
+                                          <td style="width:512px;text-align:center;font-size:16px;">Illuminant A</td>
+                                    </tr>
+                              </table>
+                        </center>
+                        <div class="fragment" id="spectral_rendering_01"></div>
+                        <div class="fragment" id="spectral_rendering_02"></div>
+                        <script>
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    if(event.fragment.id == "spectral_rendering_01") {
+                                          $('#spectral_rendering_01_tr').animate({top: -150, opacity: 1}, 500);
+                                    }
+                                    if(event.fragment.id == "spectral_rendering_02") {
+                                          $('#spectral_rendering_01_latex').animate({opacity: 1}, 500);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    if(event.fragment.id == "spectral_rendering_01") {
+                                          $('#spectral_rendering_01_tr').animate({top: -100, opacity: 0}, 500);
+                                    }
+                                    if(event.fragment.id == "spectral_rendering_02") {
+                                          $('#spectral_rendering_01_latex').animate({opacity: 0}, 500);
+                                    }
+                              });
+                        </script>
+                        <aside class="notes">
+                              Our intuition was to incorporate the sensor into the definition of the thin-film reflectance. We looked at the setup of a directly lit object. <strong>*click*</strong> <br /><br />
+
+                              In this context, there are three main spectral quantities involved in rendering: the sensor's sensitivity function which is a triplet of function (here XYZ on the left), the spectral reflectance (in the middle) and the light's spectrum (on the right). <strong>*click*</strong><br /><br />
+
+                              The RGB pixel value is defined as the integral of the product of those three terms.
+                        </aside>
+                  </section>
+                  <section><h2>Our Solution: Pre-Integration</h2>
+                        <ul style="position:absolute; padding:20px 0px 0px 50px; height: 0px;">
+                              <li class="fragment" data-fragment-index="1"><strong>Under approximations</strong>
+                                    <ul>
+                                          <li>Illuminant constant per sensitivity function</li>
+                                          <li>Material properties (IORs) constant as well</li>
+                                    </ul>
+                              </li>
+                              <li class="fragment" data-fragment-index="2">We can approximate the spectral integral in <strong>closed-form</strong></li>
+                        </ul>
+                        <center style="position:relative;">
+                              <object style="filter: blur(5px); opacity: 0.3;" data="./images/figures/modelisation.svg" type="image/svg+xml"></object>
+                              <div class="fragment" data-fragment-index="2"  style="position:absolute; left:115px; top:330px; opacity:1; font-size:65px; z-index:3;">
+                                   $$R \! = \! \int \hspace{500px} \mbox{d}\lambda$$
+                              </div>
+                              <table class="fragment" data-fragment-index="2" style="position:relative; top:-230px; opacity: 1;">
+                                    <tr>
+                                          <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/plots/thin_film_times_xyz.png" /></td>
+                                    </tr>
+                                    <tr>
+                                          <td style="width:512px;text-align:center;font-size:16px;">XYZ times Reflectance</td>
+                                    </tr>
+                              </table>
+                        </center>
+                        <aside class="notes">
+                              Using this setup, we build our pre-integration solution. <strong>*click*</strong> <br /><br />
+
+                              Assuming that the light's spectrum and the materials' index of refraction are roughly constant in the footprint of each sensitivity function, it is possible to closely approximate the integral of the pixel's sensitivity function and the spectral reflectances. The closed-form expression can be used as a replacement of the reflectance for RGB renderers.
+                        </aside>
+                  </section>
+                  <section><h2>Airy Summation Reordered</h2>
+                        <ul class="fragment" data-fragment-index="1" style="padding:20px 0px 0px 50px;">
+                              <li>Start from Airy summation</li>
+                        </ul><br /><br />
+                        <center class="fragment" data-fragment-index="1">
+                              $$
+                              \vec{r} = \color{red}{\vec{r}_{12}} + \color{blue}{t_{12}} \color{green}{\vec{r}_{23}e^{i \Delta\phi}} \color{orange}{t_{21}} + \cdots
+                              $$
+                        </center>
+                        <ul class="fragment" data-fragment-index="2" style="padding:20px 0px 0px 50px;">
+                              <li>Work on <strong>reflectivity</strong> and <strong>expand</strong> summation</li>
+                        </ul><br /><br />
+                        <center class="fragment" data-fragment-index="2">
+                              $$R = |\vec{r}|^2 = C_0 + \sum_{m = 1}^{+\infty} C_m \color{blue}{\underbrace{\color{black}{\cos(m \Phi)}}}$$
+                        </center>
+                        <div class="fragment" data-fragment-index="2" style="position:absolute; top:520px; left:710px; color:blue;">
+                              <small>equal phase difference</small>
+                        </div>
+                        <aside class="notes">
+                              But first, we had to express the reflectance in a form more amendable to simplifications. <strong>*click*</strong> <br /><br />
+
+                              First, we start back from the Airy summation, not the closed-form expression. <strong>*click*</strong> <br /><br />
+
+                              Then, we expanded the square modulus of this infinite sum and by reordering the summation terms, we found a nice expression of it by grouping together terms with the same difference in phase. Our expression for the reflectance is still an infinite series, ...
+                        </aside>
+                  </section>
+                  <section><h2>Airy Summation Reordered</h2>
+                        <center style="padding-top:120px;">
+                              <object height="300px;" data="./images/figures/airy_C1.svg" type="image/svg+xml"></object>
+                        </center>
+                        <aside class="notes">
+                              But every element of this series is the sum of all pairs of paths with the same optical path difference. Here we show the first term of the series.
+                        </aside>
+                  </section>
+                  <section><h2>Airy Summation Reordered</h2>
+                        <center style="padding-top:120px;">
+                              <object style="position: relative; left: 62px;" height="300px;" data="./images/figures/airy_C2.svg" type="image/svg+xml"></object>
+                        </center>
+                        <aside class="notes">
+                              Add here the second term of the series. Notice how the element k in the series correspond to the paths with k bounces difference in the thin-film.
+                        </aside>
+                  </section>
+                  <section><h2>Airy Summation Reordered</h2>
+                        <center style="padding-top:150px;">
+                              <object width="600px;" data="./images/figures/airy_reformulation.svg" type="image/svg+xml"></object>
+                        </center>
+                        <aside class="notes">
+                              I encourage you to look to our papers where we show how each C_k term can be evaluated in closed form,in a form similar to complex Airy summation.<br /><br />
+
+                              Aside its clean formulation, this series expansion also has the nice property that the wavelength dependant term (under our hypothesis) is this cosine term in green. When we looked at this series, we thought <em>why not use the Fourier Transform</em>
+
+                              However, the \Phi term is inversely proportional to the wavelength variable we are integrating.
+                        </aside>
+                  </section>
+                  <section><h2>Change of Variable</h2>
+                        <ul style="padding:20px 0px 0px 50px;">
+                              <li>Express $R$ with respect to light frequency and not wavelength</li>
+                        </ul>
+                        <table style="position:relative; top: 40px; opacity: 1;">
+                              <tr>
+                                    <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/plots/thin_film.png" /></td>
+                                    <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/plots/thin_film_change_of_variable.png" /></td>
+                              </tr>
+                              <tr>
+                                    <td style="width:512px;text-align:center;font-size:30px;">$R(\lambda)$</td>
+                                    <td style="width:512px;text-align:center;font-size:30px;">$R(\mu)$ with $\mu \sim \frac{1}{\lambda}$</td>
+                              </tr>
+                        </table>
+                        <div style="position: absolute; left: 590px; top: 320px; display: flex; opacity: 0.5;">
+                              <div style="position: relative; top: 25px; width: 50px; height: 50px; background: gray;"></div>
+                              <div style="position: relative; top: 0px; width: 0; height: 0; border-top: 50px solid transparent; border-left: 50px solid gray; border-bottom: 50px solid transparent;"></div>
+                        </div>
+                        <aside class="notes">
+                              So we had to perform a change of variable. Instead of expressing our integral with respect to wavelength, we expressed it with respect to the light's frequency, the inverse of the wavelength. There, our reflectance had a very nice sinusoidal form as you can see on the right.
+                        </aside>
+                  </section>
+                  <section><h2>Fourier Transform of the Reflectance</h2>
+                        <ul style="padding:20px 0px 0px 50px;">
+                              <li>Has discrete form with respect to light frequency</li>
+                        </ul>
+                        <table style="position:relative; top: 40px; opacity: 1;">
+                              <tr>
+                                    <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/plots/thin_film_change_of_variable.png" /></td>
+                                    <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/plots/thin_film_fourier.png" /></td>
+                              </tr>
+                              <tr>
+                                    <td style="width:512px;text-align:center;font-size:30px;">$R(\mu)$ with $\mu \sim \frac{1}{\lambda}$</td>
+                                    <td style="width:512px;text-align:center;font-size:30px;">$\mathcal{F}\left[R\right]$</td>
+                              </tr>
+                        </table>
+                        <div style="position: absolute; left: 590px; top: 320px; display: flex; opacity: 0.5;">
+                              <div style="position: relative; top: 25px; width: 50px; height: 50px; background: gray;"></div>
+                              <div style="position: relative; top: 0px; width: 0; height: 0; border-top: 50px solid transparent; border-left: 50px solid gray; border-bottom: 50px solid transparent;"></div>
+                        </div>
+                        <aside class="notes">
+                              This is nice because the Fourier transform of this signal is a set of symmetric diracs of amplitude, the C_k terms. Another very interesting property of the C_k terms is that the series is dropping very quickly to zero and a good approximation of the reflectance can be obtained using only a few terms in the series.
+                        </aside>
+                  </section>
+                  <section><h2>Integration in Fourier's Space</h2>
+                        <ul style="padding:0px 0px 0px 50px;">
+                              <li>Using Parseval's theorem</li>
+                        </ul><br /><br />
+                        <center style="font-size: 40px;">
+                              $$R_j = \int \hat{R}(\mu) \, \overline{\hat{S}_j(\mu)} \, \mbox{d}\mu$$
+                        </center>
+                        <table style="position:relative; top: 40px; opacity: 1;">
+                              <tr>
+                                    <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/plots/thin_film_times_xyz.png" /></td>
+                                    <td style="width: 60px;"></td>
+                                    <td style="width:512px;"><img width="512px" style="margin: 0px;" src="./images/plots/thin_film_parseval.png" /></td>
+                              </tr>
+                              <tr style="position:relative; top: -10px;">
+                                    <td style="width:512px;text-align:center;"><small>Continuous integral</small></td>
+                                    <td></td>
+                                    <td style="width:512px;text-align:center;"><small>Discrete sum</small></td>
+                              </tr>
+                        </table>
+                        <div style="position:absolute; left:10px; top:410px; opacity: 1; font-size: 65px; z-index: 3; display:flex;">
+                              <div>$$\int$$</div>
+                              <div style="position:relative; left:490px; top:50px;">$$=$$</div>
+                              <div style="position:relative; left:495px; top:40px;">$$\sum$$</div>
+                        </div>
+                        <aside class="notes">
+                              Our dive into Fourier space wasn't gratuitous (wanton). In that in that space, we can leverage the power of Parseval's theorem that relate the integral of two function to the integral of their Fourier Transforms.<br /><br />
+
+                              Since our expansion for the reflectance in Fourier is a sum of diracs, the continuous integral to obtain the spectrally antialiased reflectance turns into a discrete sum. This sum evaluates the Fourier transform of the sensitivity function at specific location weighted by the C_k terms.<br /><br />
+                        </aside>
+                  </section>
+                  <section><h2>Integration in Fourier's Space</h2>
+                        <ul>
+                              <li style="padding-bottom:10px;">Evaluation of the sensitivity's Fourier Transform
+                                    <ul>
+                                          <li>Can be precomputed as a RGB texture</li>
+                                          <li>Can be approximated using 4 Gaussians</li>
+                                    </ul>
+                              </li>
+                        </ul>
+                        <div style="display: flex; justify-content: space-around; width: 100%; margin-top: 30px;">
+                              <center style="font-family: Purisa; font-size: 0.7em;">
+                                    <img style="margin-top: 65px;" width="400px;" src="./images/plots/sensitivity_table.png" /><br />
+                                    Real and imaginary table
+                              </center>
+                              <center style="font-family: Purisa; font-size: 0.7em;">
+                                    <img style="margin: 5px 0px;" width="400px;" src="./images/plots/xyz_curves.png" /><br />
+                                    Fitting sensitivity functions with Gaussians
+                              </center>
+                        </div>
+                        <aside class="notes">
+                              A nice property of the sensitivity function is that its Fourier transform can be precomputed or fitted and is independant of the parameters of the reflectance (that is the film's thickness, the different IORs, etc.).
+                        </aside>
+                  </section>
+
+
+                  <!-- Microfacets theory section -->
+                  <section><h2>Integration in Microfacet Models</h2>
+                        <svg style="position:absolute; top:200px; left:-350px;" id="microfacets_film_01_obj" width="2140" height="647"></svg>
+                        <script>
+                              var scale = 45;
+                              var diff_x =-957*(scale-1), diff_y =-(647-423)*(scale-1);
+                              var start_x = -300, start_y = 200;
+
+                              var s = Snap("#microfacets_film_01_obj");
+                              var g = s.group();
+                              s.attr({transform: 's1,1'});
+                              var t = Snap.load("./images/figures/microfacets_film.svg", function ( loadedFragment ) {
+                                    g.append( loadedFragment );
+                                    var m = new Snap.Matrix();
+
+                                    m.translate(diff_x, diff_y);
+                                    m.scale(scale);
+                                    s.attr({transform: m});
+                              });
+
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    if(event.fragment.id == "microfacets_film_01") {
+                                          var s = Snap("#microfacets_film_01_obj");
+                                          var m = new Snap.Matrix();
+                                          s.animate({transform: m}, 500);
+                                          s.select("#stroke").animate({opacity: 0}, 300);
+                                          $("#eq_microfacets").animate({ opacity: 1 }, 800, mina.linear);
+                                    }
+                                    if(event.fragment.id == "microfacets_film_02") {
+                                          $("#eq_microfacets").animate({ opacity: 0 }, 500, mina.linear);
+                                          $("#eq_ours").animate({ opacity: 1 }, 500, mina.linear);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    if(event.fragment.id == "microfacets_film_01") {
+                                          var s = Snap("#microfacets_film_01_obj");
+                                          var m = new Snap.Matrix();
+
+                                          m.translate(diff_x, diff_y);
+                                          m.scale(scale);
+                                          s.animate({transform: m}, 500);
+                                          s.select("#stroke").animate({opacity: 1}, 300);
+                                          $("#eq_microfacets").animate({ opacity: 0 }, 800, mina.linear);
+                                    }
+                                    if(event.fragment.id == "microfacets_film_02") {
+                                          $("#eq_microfacets").animate({ opacity: 1 }, 500, mina.linear);
+                                          $("#eq_ours").animate({ opacity: 0 }, 500, mina.linear);
+                                    }
+                              });
+                        </script>
+                        <div id="eq_microfacets" style="position: absolute; top: 200px; left: 50px; opacity: 0;">$$\rho = \frac{D(\mathbf{h}) \; G(\pmb{\omega}_i, \pmb{\omega}_o) \; F(\mathbf{h} \cdot \pmb{\omega}_i)}{4 \; (\pmb{\omega}_i \cdot \mathbf{n}) \; (\pmb{\omega}_o \cdot \mathbf{n})} $$</div>
+                        <div id="eq_ours" style="position: absolute; top: 200px; left: 50px; opacity: 0;">$$\rho = \frac{D(\mathbf{h}) \; G(\pmb{\omega}_i, \pmb{\omega}_o) \color{red}{R_i(\mathbf{h} \cdot \pmb{\omega}_i)}}{4 \; (\pmb{\omega}_i \cdot \mathbf{n}) \; (\pmb{\omega}_o \cdot \mathbf{n})} $$</div>
+                        <div class="fragment" id="microfacets_film_01"></div>
+                        <div class="fragment" id="microfacets_film_02"></div>
+                        <aside class="notes">
+                              Now what we have so far is only a reflectance model for specular surfaces. Unfortunately, appart from the soap bubble, not many surfaces we are interested in are purely specular. So we decided to couple our spectraly antialased reflectance term with a microfacet model.<strong>*click*</strong><br /><br />
+
+                              A nice property of our reflectance term is that it simply replace the Fresnel term in a classical microfacet model. <strong>*click*</strong><br /><br />
+
+                              The only difference is that it has more parameters. Where a Fresnel term would have a complex IOR, we have to deal with one complex and two real IORs and the film's thickness.
+                        </aside>
+                  </section>
+
+                  <!-- Microfacets theory section -->
+                  <section><h2>Real-Time Rendering Constraints</h2>
+                        <div style="display: flex;">
+                              <div style="width:600px; margin:0px 10px 0px 50px;">
+                                    <ul>
+                                          <li style="padding-bottom:10px;">Approximation for IBL and Area-Lights
+                                                <ul>
+                                                      <li>Decorrelate $R_i$ from the IBL/AL pre-integration</li>
+                                                      <li>Evaluate $R_i$ using the mirror direction</li>
+                                                      <li class="fragment" id="realtime_rendering_01">Oversaturate colors for rough materials</li>
+                                                </ul>
+                                          </li>
+                                    </ul>
+                              </div>
+                              <div style="width: 550px; padding-top:10px;"><center>
+                                    <svg width="550px" height="580px" id="realtime_rendering">
+                                          <filter id="dropshadow" height="130%">
+                                                <feGaussianBlur in="SourceAlpha" stdDeviation="3"/> <!-- stdDeviation is how much to blur -->
+                                                <feOffset dx="2" dy="2" result="offsetblur"/> <!-- how much to offset -->
+                                                <feMerge>
+                                                      <feMergeNode/> <!-- this contains the offset blurred image -->
+                                                      <feMergeNode in="SourceGraphic"/> <!-- this contains the element that the filter is applied to -->
+                                                </feMerge>
+                                          </filter>
+                                    </svg>
+                              </center></div>
+                        </div>
+                        <script type="text/javascript">
+                              Reveal.addEventListener( 'ready', function( event ) {
+                                    var s = Snap("#realtime_rendering");
+                                    var m = s.rect(1, 1, 504, 550); m.attr({ fill: "#fff", filter:"url(#dropshadow)"});
+
+                                    s.image("./images/realtime/beetle_spec_ref.png", 1, 1, 504, 550).attr({id: "spec_ref_big"});
+                                    s.image("./images/realtime/beetle_rough_ref.png", 1, 1, 504, 550).attr({id: "rough_ref_big", opacity: 0});
+                                    s.rect(1, 1, 504, 550).attr({ fill: "none", strokeWidth: 1, stroke: "#000" });
+
+                                    s.rect(280, 280, 250, 250).attr({ fill: "#fff", filter:"url(#dropshadow)" });
+
+                                    var m = new Snap.Matrix();
+                                    m.translate(-100, 50);
+                                    m.scale(2);
+
+                                    var m1 = s.rect(190, 155 - 40, 126/2, 251/2).attr({ fill: "#fff" });
+                                    var m2 = s.rect(252.5, 155 - 40, 126/2, 251/2).attr({ fill: "#fff" });
+                                    var m3 = s.rect(190, 155 - 40, 126/2, 251/2).attr({ fill: "#fff" });
+                                    var m4 = s.rect(252.5, 155 - 40, 126/2, 251/2).attr({ fill: "#fff" });
+
+
+                                    var ours1 = s.image("./images/realtime/beetle_spec_ours.png", 1, 1, 504, 550).attr({id: "spec_our", transform: m, mask: m1});
+                                    var ref1  = s.image("./images/realtime/beetle_spec_ref.png", 1, 1, 504, 550).attr({id: "spec_ref", transform: m, mask: m2});
+
+                                    var ours2 = s.image("./images/realtime/beetle_rough_ours.png", 1, 1, 504, 550).attr({id: "rough_our", transform: m, mask: m3, opacity: 0});
+                                    var ref2  = s.image("./images/realtime/beetle_rough_ref.png", 1, 1, 504, 550).attr({id: "rough_ref", transform: m, mask: m4, opacity: 0});
+
+                                    s.line(405, 280, 405, 530).attr({ fill: "none", strokeWidth: 1, stroke: "#000" });
+                                    s.rect(280, 280, 250, 250).attr({ fill: "none", strokeWidth: 1, stroke: "#000" });
+                                    s.text(465, 515, "approx.").attr({ textAnchor: "middle", fill: "#fff", fontSize: "20px" });
+                                    s.text(340, 515, "reference").attr({ textAnchor: "middle", fill: "#fff", fontSize: "20px" });
+                              });
+
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    if(event.fragment.id == "realtime_rendering_01") {
+                                          var s = Snap("#realtime_rendering");
+                                          s.select("#rough_our").animate({opacity: 1}, 500);
+                                          s.select("#rough_ref").animate({opacity: 1}, 500);
+                                          s.select("#rough_ref_big").animate({opacity: 1}, 500);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    if(event.fragment.id == "realtime_rendering_01") {
+                                          var s = Snap("#realtime_rendering");
+                                          s.select("#rough_our").animate({opacity: 0}, 500);
+                                          s.select("#rough_ref").animate({opacity: 0}, 500);
+                                          s.select("#rough_ref_big").animate({opacity: 0}, 500);
+                                    }
+                              });
+                        </script>
+                        <aside class="notes">
+                              However, this isn't the end of the story. We wanted to ensure that our reflectance model was compatible with the requirements of real-time rendering. For that we have to make sure that our new microfacet code is compatible with environement map prefiltering and area lights integrals.<br /><br />
+
+                              In those scenarios, the Fresnel is decorrelated from the pre-integration and its integral is tabulated. We found that using the mirror direction to evaluate our reflectance term in those situation held good results for small roughness.<strong>*click*</strong><br /><br />
+
+                              But it tends to oversaturate the reflectance colors for higher roughness.
+                        </aside>
+                  </section>
+
+
+                  <!-- Results section -->
+                  <section><h2>Results: Matlab Validation</h2>
+                        <div style="display: flex;">
+                              <div style="width:600px; margin:0px 50px 0px 50px;">
+                                    <ul>
+                                          <li style="padding-bottom:10px;">Dielectric film over a dielectric base
+                                          </li>
+                                          <li style="padding-bottom:10px;">Truncating the infinite sum
+                                                <ul>
+                                                      <li>Using up to 3 terms in the series</li>
+                                                      <li>In practice: still good up to 2</li>
+                                                </ul>
+                                          </li>
+                                    </ul>
+                              </div>
+                              <div style="width: 450px; padding-top:50px;"><center>
+                                    <img width="450px" style="max-width:100%; max-height:100%;margin:0px;" src="./images/plots/comparing_angular_cst_over_cst.png" /><br />
+                                    <div style="font-family:Purisa; font-size: 14px;">
+                                          XYZ Reflectance w/r to Elevation
+                                    </div>
+                              </center></div>
+                        </div>
+                        <aside class="notes">
+                              We validated our reflectance term in matlab prior to rendering. In this example, we illustrate the case of a dielectric thin-film over a dielectric base surface. We used 3 terms in the series for our prediction. As you can see it fit closely the reference curve. In practice and for real-time scenario, using 2 terms in the series is still producing good results. Please refer to the paper for details.
+                        </aside>
+                  </section>
+                  <section><h2>Results: Matlab Validation</h2>
+                        <div style="display: flex;">
+                              <div style="width:600px; margin:0px 50px 0px 50px;">
+                                    <ul>
+                                          <li style="padding-bottom:10px; color: gray;">Dielectric film over a dielectric base
+                                          </li>
+                                          <li style="padding-bottom:10px; color: gray;">Truncating the infinite sum
+                                                <ul>
+                                                      <li>Using up to 3 Optical Path Difference ($\mathcal{D}$)</li>
+                                                      <li>In practice: still good up to 2 $\mathcal{D}$</li>
+                                                </ul>
+                                          </li>
+                                          <li style="padding-bottom:10px;">Also visible in <em>Chromaticity Space</em>
+                                                <ul>
+                                                      <li>Display curves w/r $[x,y] = \left[\frac{X}{X+Y+Z}, \frac{Y}{X+Y+Z}\right]$</li>
+                                                      <li class="fragment" id="matlab_results_01">Our model faithfully reproduce the GT</li>
+                                                </ul>
+                                          </li>
+                                          <li class="fragment" id="matlab_results_02">Comparison with Naive RGB</em>
+                                                <ul>
+                                                      <li>Fails to correctly reproduce color</li>
+                                                      <li>Often goes out of gamut</li>
+                                                </ul>
+                                          </li>
+                                    </ul>
+                              </div>
+                              <div style="width: 450px; padding-top:50px;"><center>
+                                    <object id="chromaticity_space" style="box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); border: solid 1px black;" width="450px" data="./images/plots/comparing_chromaticity_cst_over_cst.svg" type="image/svg+xml"></object><br />
+                                    <div style="font-family:Purisa; font-size: 14px;">
+                                          Chromaticity space x/y
+                                    </div>
+                              </center></div>
+                        </div>
+                        <script>
+                              Reveal.addEventListener( 'fragmentshown', function( event ) {
+                                    if(event.fragment.id == "matlab_results_01") {
+                                          var s = Snap("#chromaticity_space");
+                                          s.select("#Ours").animate({opacity: 1}, 500);
+                                          s.select("#Reference").animate({opacity: 1}, 500);
+                                          s.select("#LabelG").animate({opacity: 1}, 500);
+                                    }
+                                    if(event.fragment.id == "matlab_results_02") {
+                                          var s = Snap("#chromaticity_space");
+                                          s.select("#NaiveLabel").animate({opacity: 1}, 500);
+                                          s.select("#NaivePlot").animate({opacity: 1}, 500);
+                                          s.select("#LabelBox").animate({ height: 128 }, 500);
+                                    }
+                              });
+                              Reveal.addEventListener( 'fragmenthidden', function( event ) {
+                                    if(event.fragment.id == "matlab_results_01") {
+                                          var s = Snap("#chromaticity_space");
+                                          s.select("#Ours").animate({opacity: 0}, 500);
+                                          s.select("#Reference").animate({opacity: 0}, 500);
+                                          s.select("#LabelG").animate({opacity: 0}, 500);
+                                    }
+                                    if(event.fragment.id == "matlab_results_02") {
+                                          var s = Snap("#chromaticity_space");
+                                          s.select("#NaiveLabel").animate({opacity: 0}, 500);
+                                          s.select("#NaivePlot").animate({opacity: 0}, 500);
+                                          s.select("#LabelBox").animate({ height: 100 }, 500);
+                                    }
+                              });
+                        </script>
+                        <aside class="notes">
+                              It is also possible to compare the same curves in chromaticity space. Here we take the XYZ components of our signal and display their chromatic compoment. It simplify the plot as their is only one curve per method compared to three in the last example.<strong>*click*</strong><br /><br />
+
+                              Here as well our method pecisely reproduce the ground truth.<strong>*click*</strong><br /><br />
+
+                              Where a naive RGB rendering would not produce correct colors and even exist the gamut of RGB screens.
+                        </aside>
+                  </section>
+                  <section><h2>Results: Offline Validation</h2>
+                        <ul>
+                              <li>Rendering in <a href="">Mitsuba</a>
+                                    <ul>
+                                          <li>Conductor base with $\eta = 1.9$ and $\kappa = 1.5$</li>
+                                          <li>Film of thickness $h = 550 \mbox{nm}$</li>
+                                    </ul>
+                              </li>
+                        </ul>
+                        <div style="display: flex; justify-content: center; flex-wrap: wrap; text-align: center; padding-top: 10px;">
+                              <div style="width: 350px; height: 350px; position: relative; margin: auto;">
+                                    <img src="./images/comparisons/ours_k15_n19_h550.png" />
+                              </div>
+                              <div style="width: 350px; height: 350px; position: relative; margin: auto;">
+                                    <img src="./images/comparisons/ref_k15_n19_h550.png" />
+                              </div>
+                              <div class="fragment" data-fragment-index="1" style="width: 350px; height: 350px; position: relative; margin: auto;">
+                                    <img src="./images/comparisons/smits_k15_n19_h550.png" />
+                              </div>
+                              <small style="width: 350px; margin: auto; margin-top: 10px;">
+                                    Ours (RGB)
+                              </small>
+                              <small style="width: 350px; margin: auto; margin-top: 10px;">
+                                    Ref. (Spectral)
+                              </small>
+                              <small class="fragment" data-fragment-index="1" style="width: 350px; margin: auto; margin-top: 10px;">
+                                    [<a href="">Smits and Meyer 1992</a>]
+                              </small>
+                        </div>
+                        <aside class="notes">
+                              We implemented our reflectance model in a Mitsuba plugin that you can find in our supplemental code and I show here a comparison with ground truth for a conducting base. <strong>*click*</strong><br /><br />
+
+                              We also compared our method to the model of Smits and Meyer that pre-integrate the reflectivity. However they only account for a dielectric base and work with unpolarized light.
+                        </aside>
+                  </section>
+                  <!-- TODO: What is the appearance range?
+                  <section><h2>Results: Appearance Range</h2>
+                  </section>
+                  -->
+                  <section><h2>Results: Real-Time Validation</h2>
+                        <div style="display: flex;">
+                              <div style="width:600px; margin:0px 0px 0px 50px;">
+                                    <ul>
+                                          <li style="padding:0px 0px 10px 0px;">Rendering in <a href="">BRDF Explorer</a>, <a href="">Gratin</a> and <a href="">Unity</a>
+                                                <ul>
+                                                      <li>GLSL implementation provided in supp. mat.</li>
+                                                      <li>Using the Gaussian approximation of XYZ</li>
+                                                </ul>
+                                          </li>
+                                          <!-- <li style="padding:0px 0px 10px 0px;">Performances
+                                          </li> -->
+                                          <li style="padding:0px 0px 10px 0px;">Spatial Variations
+                                                <ul>
+                                                      <li>All parameters can be mapped to textures</li>
+                                                      <li>In practice: better vary only the thickness</li>
+                                                </ul>
+                                          </li>
+                                    </ul>
+                              </div>
+                              <div style="width:500px;">
+                                 <img width="500px" src="./images/realtime/brdf-explorer.png" />
+                              </div>
+                        </div>
+                        <aside class="notes">
+                              We also implemented our improved microfacet model in real-time softwares such as BRDF-Explorer, Gratin and Unity and we provide our reference GLSL code in our supplemental materials.<br /><br />
+
+                              While all parameters can be mapped to textures, it is often more practical to only expose the film's thickness as a map parameters and let the user set the others globally per object.
+                        </aside>
+                  </section>
+                  <!-- <section><h2>Results: AntiAliasing Thickness Map</h2>
+                        <div style="display: flex;">
+                              <div style="width:600px; margin:0px 0px 0px 50px;">
+                                    <ul>
+                                          <li style="padding:0px 0px 10px 0px;">Microfacet theory fits well LOD rendering
+                                                <ul>
+                                                      <li>Using the Normal Distribution Function (NDF)</li>
+                                                      <li>Example: LEADR Mapping</li>
+                                                </ul>
+                                          </li>
+                                          <li style="padding:0px 0px 10px 0px;" class="fragment" data-fragment-index="2">Thin-film's Thickness is compatible with LOD
+                                                <ul>
+                                                      <li>NDF and thickness are decorrelated</li>
+                                                      <li>Thickness distribution is Gaussian</li>
+                                                </ul>
+                                          </li>
+                                          <li class="fragment">More details in the paper</li>
+                                    </ul>
+                              </div>
+                              <div class="fragment" data-fragment-index="2" style="width: 450px; padding-top:50px; position: relative;"><center>
+                                    <img width="450px" src="./images/realtime/aa_gt.png"/>
+                                    <img width="230px;" style="position:absolute; top: 30px; left:290px;"  src="./images/realtime/aa_zoom_off.png" />
+                                    <img width="230px;" style="position:absolute; top: 170px; left:290px;"  src="./images/realtime/aa_zoom_gt.png" />
+                                    <img width="230px;" style="position:absolute; top: 310px; left:290px;"  src="./images/realtime/aa_zoom_on.png" />
+                                    <div style="position:absolute; top: 150px; left:300px; color: white; font-size: 0.6em;">No height AA</div>
+                                    <div style="position:absolute; top: 290px; left:300px; color: white; font-size: 0.6em;">Reference</div>
+                                    <div style="position:absolute; top: 430px; left:300px; color: white; font-size: 0.6em;">Height AA</div>
+                              </center></div>
+                        </div>
+                  </section> -->
+                  <section><h2>Results: Chair</h2>
+                     <ul id="chair_text" style="padding:0px 0px 0px 50px; opacity: 1.0; z-index: 1;">
+                              <li>Following Maxwell Render team's blog post
+                                    <ul>
+                                          <li>Start from a classical microfacet model and add iridescence</li>
+                                          <li>Similar appearance with same inputs</li>
+                                          <li>Produce a subtle but convincing effect</li>
+                                    </ul>
+                              </li>
+                              <li>Rendered in <a href="">Mitsuba</a></li>
+                     </ul>
+                     <center style="position:absolute; width:1280px; top: 120px; left: 0px; z-index: 0;">
+                        <video id="chair_turnaround_video" style="filter: blur(5px); opacity: 0.0;" height="500px" src="./videos/chair-sequence.m4v"></video>
+                        <div class="fragment" id="chair_turnaround"></div>
+                        <script>
+                           Reveal.addEventListener('fragmentshown', function( event ) {
+                                 if(event.fragment.id == "chair_turnaround") {
+                                    var chair_video = $("#chair_turnaround_video")[0];
+                                    chair_video.style.opacity = "1.0";
+                                    chair_video.style.filter = "none";
+                                    chair_video.style.transition = "all 0.5s ease-out";
+                                    window.setTimeout(function() {
+                                       chair_video.loop = true;
+                                       chair_video.currentTime = 0;
+                                       chair_video.play();
+                                    }, 500);
+                                    var chair_text = $("#chair_text");
+                                    chair_text.animate({ opacity : 0.0 }, 500);
+                                 }
+                           });
+                           Reveal.addEventListener('fragmenthidden', function( event ) {
+                                 if(event.fragment.id == "chair_turnaround") {
+                                    var chair_video = $("#chair_turnaround_video")[0];
+                                    chair_video.style.opacity = "0.0";
+                                    chair_video.style.filter = "blur(5px)";
+                                    chair_video.style.transition = "all 0.5s ease-out";
+                                    window.setTimeout(function() {
+                                       chair_video.loop = true;
+                                       chair_video.currentTime = 0;
+                                       chair_video.pause();
+                                    }, 500);
+                                    var chair_text = $("#chair_text");
+                                    chair_text.animate({ opacity: 1.0 }, 500);
+                                 }
+                           });
+                        </script>
+                     </center>
+                        <aside class="notes">
+                              I will now show you some results using our Mitsuba plugin. We tried to reproduce the leather example illustrated in Maxwell render blog post. For that, we started from a classical microfacet model and add our thin-film model using the paramters given in the blog post. This produces a subtle but quite convicing leather look to the chair. <strong>*click*</strong><br /><br />
+
+                              Here we start with the classical microfacet model. And we then fade to our model. Notice how our model contains both shades going from blue to subtle green depending on the view point.
+                        </aside>
+                  </section>
+                  <section><h2>Results: Robot Bust</h2>
+                     <ul id="robot_text" style="padding:0px 0px 0px 50px; opacity: 1.0; z-index: 1;">
+                              <li>Illustrate some possible appearances
+                                    <ul>
+                                          <li>Increase thickness gradually</li>
+                                          <li>Add texture to modulate thickness</li>
+                                    </ul>
+                              </li>
+                              <li>Rendered in <a href="">Mitsuba</a></li>
+                     </ul>
+                     <center style="position:absolute; width:1280px; top: 120px; left: 0px; z-index: 0;">
+                        <video id="robot_turnaround_video" style="filter: blur(5px); opacity: 0.0;" height="500px" src="./videos/robot-irid.m4v"></video>
+                        <div class="fragment" id="robot_turnaround"></div>
+                        <script>
+                           Reveal.addEventListener('fragmentshown', function( event ) {
+                                 if(event.fragment.id == "robot_turnaround") {
+                                    var robot_video = $("#robot_turnaround_video")[0];
+                                    robot_video.style.opacity = "1.0";
+                                    robot_video.style.filter = "none";
+                                    robot_video.style.transition = "all 0.5s ease-out";
+                                    window.setTimeout(function() {
+                                       robot_video.loop = true;
+                                       robot_video.currentTime = 0;
+                                       robot_video.playbackRate = 2;
+                                       robot_video.play();
+                                    }, 500);
+                                    var robot_text = $("#robot_text");
+                                    robot_text.animate({ opacity : 0.0 }, 500);
+                                 }
+                           });
+                           Reveal.addEventListener('fragmenthidden', function( event ) {
+                                 if(event.fragment.id == "robot_turnaround") {
+                                    var robot_video = $("#robot_turnaround_video")[0];
+                                    robot_video.style.opacity = "0.0";
+                                    robot_video.style.filter = "blur(5px)";
+                                    robot_video.style.transition = "all 0.5s ease-out";
+                                    window.setTimeout(function() {
+                                       robot_video.loop = true;
+                                       robot_video.currentTime = 0;
+                                       robot_video.playbackRate = 2;
+                                       robot_video.pause();
+                                    }, 500);
+                                    var robot_text = $("#robot_text");
+                                    robot_text.animate({ opacity: 1.0 }, 500);
+                                 }
+                           });
+                        </script>
+                     </center>
+                        <aside class="notes">
+                              In the following example I will illustrate a subset of obtainable appearances by varying the thin-film's thickness. I will also add texture to modulate this look and give the impression of weathering. <strong>*click*</strong><br /><br />
+
+                              Here we start from a zero thickness and increase it to 400 nanometers.
+                        </aside>
+                  </section>
+                  <section><h2>Results: Beetle</h2>
+                     <ul id="beetle_video_text" style="padding:0px 0px 0px 50px; opacity: 1.0; z-index: 1;">
+                              <li>Replicating special effect car paint
+                                    <ul>
+                                          <li>Inside <a href="">Unity's Scriptable RenderLoop</a></li>
+                                          <li>Recorded on a Geforce 1080</li>
+                                    </ul>
+                              </li>
+                     </ul>
+                        <video id="beetle_unity_video" style="position:absolute; top:0px; left:0px; width:100%; margin: 0px; max-width: 100%; max-height:100%; z-index: 0; opacity: 0.0;" src="./videos/unity.m4v"></video>
+                         <div class="fragment" id="beetle_unity"></div>
+                         <script>
+                           Reveal.addEventListener('fragmentshown', function( event ) {
+                                 if(event.fragment.id == "beetle_unity") {
+                                    var chair_video = $("#beetle_unity_video")[0];
+                                    chair_video.style.opacity = "1.0";
+                                    chair_video.style.filter = "none";
+                                    chair_video.style.transition = "all 0.5s ease-out";
+                                    window.setTimeout(function() {
+                                       chair_video.loop = true;
+                                       chair_video.currentTime = 0;
+                                       chair_video.play();
+                                    }, 500);
+                                    var chair_text = $("#beetle_video_text");
+                                    chair_text.animate({ opacity : 0.0 }, 500);
+                                 }
+                           });
+                           Reveal.addEventListener('fragmenthidden', function( event ) {
+                                 if(event.fragment.id == "beetle_unity") {
+                                    var chair_video = $("#beetle_unity_video")[0];
+                                    chair_video.style.opacity = "0.0";
+                                    chair_video.style.filter = "blur(5px)";
+                                    chair_video.style.transition = "all 0.5s ease-out";
+                                    window.setTimeout(function() {
+                                       chair_video.loop = true;
+                                       chair_video.currentTime = 0;
+                                       chair_video.pause();
+                                    }, 500);
+                                    var chair_text = $("#beetle_video_text");
+                                    chair_text.animate({ opacity: 1.0 }, 500);
+                                 }
+                           });
+                        </script>
+                        <aside class="notes">
+                              I will now show you some results using our Unity implementation. We used the upcoming scriptable rendering pipeline to and added iridescence as a new forward rendering material. This video was recorded on a desktop PC with a recent video card and there, our shader evaluate in real-time. <strong>*click*</strong><br /><br />
+                        </aside>
+                  </section>
+
+
+                  <!-- Limitations section -->
+                  <section><h2>Limitations</h2>
+                        <ul style="padding:0px 0px 0px 50px;">
+                              <li>Varying Index of Refraction (IOR)
+                                    <ul>
+                                          <li>Using measured data</li>
+                                          <li>Fail to correctly replicated color for highly varying IORs</li>
+                                    </ul>
+                              </li>
+                        </ul>
+                        <div style="display: flex; justify-content: center; flex-wrap: wrap; text-align: center; padding-top: 10px; transform: scale(0.8);">
+                              <div style="width: 350px; height: 350px; position: relative; margin: auto;">
+                                    <svg width="350px" height="350px" id="limitation_glass" style="border: 1px solid black; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);"></svg>
+                              </div>
+                              <div style="width: 350px; height: 350px; position: relative; margin: auto;">
+                                    <svg width="350px" height="350px" id="limitation_mercury" style="border: 1px solid black; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);"></svg>
+                              </div>
+                              <div style="width: 350px; height: 350px; position: relative; margin: auto;">
+                                    <svg width="350px" height="350px" id="limitation_copper" style="border: 1px solid black; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);"></svg>
+                              </div>
+                              <small style="width: 350px; margin: auto; margin-top: 10px;">
+                                    Glass base
+                              </small>
+                              <small style="width: 350px; margin: auto; margin-top: 10px;">
+                                    Mercury base
+                              </small>
+                              <small style="width: 350px; margin: auto; margin-top: 10px;">
+                                    Copper base
+                              </small>
+                        </div>
+                        <script type="text/javascript">
+                              Reveal.addEventListener( 'ready', function( event ) {
+                                    var s = Snap("#limitation_glass");
+                                    var m = s.rect(0, 0, 175, 350); m.attr({ fill: "#fff"});
+                                    s.image("./images/limitations/glasssf5_our.png", 0, 0, 350, 350).attr({id: "our"});
+                                    s.image("./images/limitations/glasssf5_ref.png", 0, 0, 350, 350).attr({id: "ref", mask: m});
+                                    s.line(175, 0, 175, 350).attr({ fill: "none", strokeWidth: 1, stroke: "#000"});
+                                    s.text(87.5, 335, "Ours").attr({fontSize: "20px", fill: "#fff", textAnchor: "middle"});
+                                    s.text(262.5, 335, "Reference").attr({fontSize: "20px", fill: "#fff", textAnchor: "middle"});
+
+                                    var s = Snap("#limitation_mercury");
+                                    var m = s.rect(0, 0, 175, 350); m.attr({ fill: "#fff"});
+                                    s.image("./images/limitations/mercurial_our.png", 0, 0, 350, 350).attr({id: "our"});
+                                    s.image("./images/limitations/mercurial_ref.png", 0, 0, 350, 350).attr({id: "ref", mask: m});
+                                    s.line(175, 0, 175, 350).attr({ fill: "none", strokeWidth: 1, stroke: "#000"});
+                                    s.text(87.5, 335, "Ours").attr({fontSize: "20px", fill: "#fff", textAnchor: "middle"});
+                                    s.text(262.5, 335, "Reference").attr({fontSize: "20px", fill: "#fff", textAnchor: "middle"});
+
+                                    var s = Snap("#limitation_copper");
+                                    var m = s.rect(0, 0, 175, 350); m.attr({ fill: "#fff"});
+                                    s.image("./images/limitations/copper_our.png", 0, 0, 350, 350).attr({id: "our"});
+                                    s.image("./images/limitations/copper_ref.png", 0, 0, 350, 350).attr({id: "ref", mask: m});
+                                    s.line(175, 0, 175, 350).attr({ fill: "none", strokeWidth: 1, stroke: "#000"});
+                                    s.text(87.5, 335, "Ours").attr({fontSize: "20px", fill: "#fff", textAnchor: "middle"});
+                                    s.text(262.5, 335, "Reference").attr({fontSize: "20px", fill: "#fff", textAnchor: "middle"});
+                              });
+                        </script>
+                        <aside class="notes">
+                              Our model has some limitations and the most important one to our eyes is the fact that we assumed that the IORs were constant per color channel. We rendered images of measured IORs materials and we noticed that we could not correctly replicate the colors of highly varying IORs such as copper.
+                        </aside>
+                        </section>
+
+
+                  <!-- Conclusion -->
+                  <section><h2>Summary</h2>
+                        <video style="position:absolute; top:0; left: 390px; margin: 0; border: none; box-shadow: none; max-width: 100%; max-height: 100%; z-index: -500;" height="100%" width="100%" data-autoplay loop src="./videos/soap.m4v"></video>
+                        <div style="position:absolute; top:0; left: 0px; margin: 0; border: 1px solid black; box-shadow: 0px 0px 10px #FFFFFF55; max-width: 100%; max-height: 100%; z-index: -5; width: 720px; height:720px; background-color: #DDD "></div>
+                        <div style="display: flex;">
+                              <div style="width:600px; margin:0px 0px 0px 50px;">
+                                    <ul>
+                                       <li class="fragment" style="padding:0px 0px 10px 0px;">A <strong>extension</strong> to microfacet models
+                                                <ul>
+                                                      <li>Adding interference from thin-films</li>
+                                                      <li>Enable a richer set of appearances</li>
+                                                </ul>
+                                          </li>
+                                          <li class="fragment" style="padding:0px 0px 10px 0px;">Our <strong>contributions</strong>
+                                                <ul>
+                                                      <li>Spectral antialiasing from modified Airy summation</li>
+                                                      <li>Compatible with RGB real-time constraints</li>
+                                                      <li>Compatible with LOD rendering (see paper!)</li>
+                                                </ul>
+                                          </li>
+                                    </ul>
+                              </div>
+                        </div>
+                        <aside class="notes">
+                              To summarize, I introduce to you an extension to microfacet models that enables to add thin-film interference appearance that enables to render a richer set of appearances. <strong>*click*</strong><br /><br />
+
+                              Our we specificaly provided a thin-film model that is spectrally antialased and that enable to produce, under some hypothesis, simlar renders than spectral rendering with a RGB engine. Our model is even compatible with level of details with respect to the thickness map.
+                        </aside>
+                  </section>
+                  <section><h2>Thank you for your attention</h2>
+
+                     <center style="padding-top: 70px;">
+                        <table>
+                           <tr>
+                              <td style="padding-bottom: 0px;"><img style="width: 256px; border: none; box-shadow: none; margin: 0px;" src="./images/end/paper.png" /></td>
+                              <td style="padding-bottom: 0px;"><img style="width: 256px; border: none; box-shadow: none; margin: 0px;" src="./images/end/supp.png" /></td>
+                              <td style="padding-bottom: 0px;"><img style="width: 256px; border: none; box-shadow: none; margin: 0px;" src="./images/end/code.png" /></td>
+                           </tr>
+                           <tr>
+                              <td style="padding-top: 0px; position:relative; left: 60px; font-size: 0.7em;">paper</td>
+                              <td style="padding-top: 0px; position:relative; left: 45px; font-size: 0.7em;">supp. mat.</td>
+                              <td style="padding-top: 0px; position:relative; left: 65px; font-size: 0.7em;">code</td>
+                           </tr>
+                        </table>
+                     </center>
+
+                     <center style="padding-top: 80px;">available at <a href="https://labs.unity.com">labs.unity.com</a></center>
+                        <aside class="notes">
+                              I encourage you to go to Unity labs website to check our paper and our supplementary pdf and code and also to check out our other research projects. Thank you for your attention.
+                        </aside>
+                  </section>
+            </div>
+      </div>
+      <script>
+            Reveal.initialize({
+                  width: 1280,
+                  height: 720,
+                  margin: 0.0,
+                  history: true,
+                  slideNumber: true,
+                  showNotes: true,
+                  transition: 'fade',
+
+                  math: {
+		            config: 'TeX-AMS_SVG-full'
+	            },
+
+                  dependencies: [
+                        { src: 'ext/reveal.js/plugin/math/math.js', async: true },
+                        { src: 'ext/reveal.js/plugin/notes/notes.js', async: true }
+                  ]
+            });
+      </script>
+   </body>
+</html>
+
