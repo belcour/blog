@@ -34,7 +34,7 @@ simulation or to adapt the sampling budget locally.
   <td style="vertical-align:top;"><b><a style="color:black;" href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">Antialiasing Complex Global Illumination Effects in Path-space</a></b> <br />
       Laurent Belcour, Ling-Qi Yan, Ravi Ramamoorthi, and Derek Nowrouzezahrai <br />
       <em>ACM Transaction on Graphics</em>, 2017, 36 (1)
-      <a href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">project</a> <a href="https://hal.inria.fr/hal-01200710/document">paper</a> <a href="https://hal.inria.fr/hal-01200710/bibtex">bib</a> <a href="https://www.youtube.com/watch?v=lgldxBcuIj0">video</a>
+      <a href="{{ site.url | append: site.baseurl }}/research/2015/12/09/covariance-filtering.html">project</a> <a href="https://hal.inria.fr/hal-01200710/document">paper</a> <a href="https://hal.inria.fr/hal-01200710/bibtex">bib</a> <a href="https://www.youtube.com/watch?v=lgldxBcuIj0">video</a> <a href="{{ site.url | append: site.baseurl }}/slides/2017-covariance-filtering/slides.html">slides</a>
   </td>
 </tr>
 <tr>
@@ -82,7 +82,7 @@ simulation or to adapt the sampling budget locally.
       Laurent Belcour, Pascal Barla<br />
       <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2017, 36 (4) 
       <a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html">webpage</a> 
-      <a href="https://hal.archives-ouvertes.fr/hal-01518344/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01518344/bibtex">bib</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supplemental-code%20%282%29.zip">code</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-01518344/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01518344/bibtex">bib</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supplemental-code%20%282%29.zip">code</a> <a href="{{ site.url | append: site.baseurl }}/slides/2017-brdf-thin-film/slides.html">slides</a>
   </td>
 </tr>
 <tr>
