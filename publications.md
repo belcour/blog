@@ -73,15 +73,24 @@ simulation or to adapt the sampling budget locally.
 <br />
 
 
-### BRDF Modeling
+### BRDF Modeling and Integration
 
 <table>
+<tr>
+  <td><a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_SHInt.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
+  <td style="vertical-align:top;"><b>Integrating Clipped Spherical Harmonics Expansions</b> <br />
+      Laurent Belcour, Guofu Xie, Christophe Hery, Mark Meyer, Wojciech Jarosz, and Derek Nowrouzezahrai<br />
+      <em>ACM Transactions on Graphics</em>, 2018,(to appear)
+      <a href="{{ site.url | append: site.baseurl }}/research/2018/02/01/sh-integral.html">webpage</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-01695284/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01695284/bibtex">bib</a>
+  </td>
+</tr>
 <tr>
   <td><a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Irid.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
   <td style="vertical-align:top;"><b>A Practical Extension to Microfacet Theory for the Modeling of Varying Iridescence</b> <br />
       Laurent Belcour, Pascal Barla<br />
-      <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2017, 36 (4) 
-      <a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html">webpage</a> 
+      <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2017, 36 (4)
+      <a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html">webpage</a>
       <a href="https://hal.archives-ouvertes.fr/hal-01518344/document">pdf</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supp-mat-small%20%281%29.pdf">supp. pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01518344/bibtex">bib</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supplemental-code%20%282%29.zip">code</a> <a href="{{ site.url | append: site.baseurl }}/slides/2017-brdf-thin-film/slides.html">slides</a>
   </td>
 </tr>
@@ -89,7 +98,7 @@ simulation or to adapt the sampling budget locally.
   <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Pivot.png" alt="Pivot" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
   <td style="vertical-align:top;"><b>A Spherical Cap Preserving Parameterization for Spherical Distributions</b> <br />
       <a href="http://onrendering.com/" style="color:rgb(0,0,0);">Jonathan Dupuy</a>, Eric Heitz, Laurent Belcour<br />
-      <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2017, 36 (4) 
+      <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2017, 36 (4)
       <a href="https://www.youtube.com/watch?v=9aZMRjbflpo">video</a> <a href="http://onrendering.com/data/papers/pivot.pdf">pdf</a> <a href="http://onrendering.com/data/papers/supplemental.zip">supp</a> <a href="http://github.com/jdupuy/pivot">code</a>
   </td>
 </tr>
@@ -152,7 +161,7 @@ I helped (unofficially) the following master students:
   <td><a href="http://hdl.handle.net/1866/13443"><img src="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/13443/Milaenen_David_2015_memoire.pdf.jpg?sequence=4&isAllowed=y" alt="DavidMilaenen" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
   <td style="vertical-align:top;"><b>Theory and numerical integration of subsurface light transport </b> <br />
       David Milaenen  <br />
-      <em>Université de Montréal</em>, March 2016 
+      <em>Université de Montréal</em>, March 2016
       <a href="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/13443/Milaenen_David_2015_memoire.pdf?sequence=2&isAllowed=y
 ">pdf</a>
   </td>
@@ -161,7 +170,7 @@ I helped (unofficially) the following master students:
   <td><a href="http://hdl.handle.net/1866/12834"><img src="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/12834/Dubouchet_Renaud_2014_memoire.pdf.jpg?sequence=4&isAllowed=y" alt="AdrienDubouchet" width="90" height="90" style="margin-bottom:10px;spacing-right:10px;border:1px solid black;" /></a></td>
   <td style="vertical-align:top;"><b>Theory and numerical integration of subsurface light transport </b> <br />
       Adrien Dubouchet <br />
-      <em>Université de Montréal</em>, February 2015 
+      <em>Université de Montréal</em>, February 2015
       <a href="https://papyrus.bib.umontreal.ca/xmlui/bitstream/handle/1866/12834/Dubouchet_Renaud_2014_memoire.pdf?sequence=2&isAllowed=y">pdf</a>
   </td>
 </tr>
