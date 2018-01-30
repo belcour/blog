@@ -29,3 +29,7 @@ published: true
 <h4>Project Abstract</h4>
 
 Thin film iridescence permits to reproduce the appearance of leather. However, this theory requires spectral rendering engines (such as Maxwell Render) to correctly integrate the change of appearance with respect to viewpoint (known as goniochromatism). This is due to aliasing in the spectral domain as real-time renderers only work with three components (RGB) for the entire range of visible light. In this work, we show how to anti-alias a thin-film model, how to incorporate it in microfacet theory, and how to integrate it in a real-time rendering engine. This widens the range of reproducible appearances with microfacet models.
+
+<h4>Other Implementations</h4>
+
+Apparently, this work was implemented by users of <a href="https://github.com/cCharkes/Iridescence">Unity</a>, <a href="http://polycount.com/discussion/comment/2604578/#Comment_2604578">Unreal</a>, and <a href="https://blenderartists.org/forum/showthread.php?433309-Micro-angle-dependent-Roughness-amp-Iridescence/page14">Blender</a>.
