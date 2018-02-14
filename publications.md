@@ -82,7 +82,7 @@ simulation or to adapt the sampling budget locally.
       Laurent Belcour, Pascal Barla<br />
       <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2017, 36 (4) 
       <a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html">webpage</a> 
-      <a href="https://hal.archives-ouvertes.fr/hal-01518344/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01518344/bibtex">bib</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supplemental-code%20%282%29.zip">code</a> <a href="{{ site.url | append: site.baseurl }}/slides/2017-brdf-thin-film/slides.html">slides</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-01518344/document">pdf</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supp-mat-small%20%281%29.pdf">supp. pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01518344/bibtex">bib</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supplemental-code%20%282%29.zip">code</a> <a href="{{ site.url | append: site.baseurl }}/slides/2017-brdf-thin-film/slides.html">slides</a>
   </td>
 </tr>
 <tr>
