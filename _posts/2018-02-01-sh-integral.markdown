@@ -7,6 +7,7 @@ date:   2018-02-01
 categories: research
 published: true
 ---
+<center><img src="{{ site.url | append: site.baseurl }}/data/images/shint/teaser.svg" /></center><br />
 
 <span>
    <a href="https://hal.inria.fr/hal-01695284/document">
@@ -21,8 +22,7 @@ published: true
 </span><br />
 
 <h4>Project Summary</h4>
-
-Rendering often results in computing the integral of spherical functions. For example the appearance of a surface lit by an polygonal light source is defined as the integral of an hemispherical function: the Bidirectional Reflectance Distribution Function (BRDF). Mathematically, we need to compute the integral of this hemispherical function in footprint of the polygon projected on the hemisphere.
+Many applications in rendering rely on integrating functions over spherical polygons. We present a new numerical solution for computing the integral of spherical harmonics (SH) expansions clipped to polygonal domains. For example the appearance of a surface lit by an polygonal light source is defined as the integral of an hemispherical function, the Bidirectional Reflectance Distribution Function (BRDF), over the projected footprint of the light. Mathematically, we need to compute the integral of this hemispherical function in footprint of the polygon projected on the hemisphere.
 <center><div style="font-size: 90%;">
     <table style="width:50%;">
         <tr>
@@ -31,7 +31,7 @@ Rendering often results in computing the integral of spherical functions. For ex
         </tr>
         <tr style="text-align: center;">
             <td><em>Measured BRDF</em></td>
-            <td><em>Integrating over area-light</em></td>
+            <td><em>Integrating over area light</em></td>
         </tr>        
     </table>
 </div></center><br />
@@ -42,7 +42,7 @@ However, such integral is usualy not easy to do. We introduce an efficient way t
     <em>First elements of the SH basis</em>
 </div></center><br />
 Any spherical function can be decomposed in an infinte SH expansion. For computation reasons, we restrict ourselves to bandlimited expansion, that is expansion with a finite sum. In such as case, we can evaluate the integral of the SH expansion over a polygonal footprint by decomposing each element of the SH basis into a weighted sum of cosine power. Cosine power are spherical function defined using the dot product with a unit direction raised to a power.
-<center>
+<center style="font-size: 90%;">
     <table style="width:75%;">
         <tr>
             <td><img  src="{{ site.url | append: site.baseurl }}/data/images/shint/cos1.gif" /></td>
@@ -57,4 +57,5 @@ We can use <a href="https://dl.acm.org/citation.cfm?id=218467">Arvo's method</a>
     <img  src="{{ site.url | append: site.baseurl }}/data/images/shint/cos_int.gif" />
     <br />
     <em>Integrating cosine powers</em>
-</div></center>
+</div></center><br />
+We apply our technique to problems in rendering, including surface and volume shading, hierarchical product importance sampling, and fast basis projection for interactive rendering. Moreover, we show how to handle general, nonpolynomial integrands in a Monte Carlo setting using control variates. Our technique computes the integral of bandlimited spherical functions with performance competitive to (or faster than) more general numerical integration methods for a broad class of problems, both in offline and interactive rendering contexts.
