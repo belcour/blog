@@ -7,7 +7,7 @@ date:   2018-02-01
 categories: research
 published: true
 ---
-<center><img src="{{ site.url | append: site.baseurl }}/data/images/shint/teaser.svg" /></center><br />
+<!-- <center><img src="{{ site.url | append: site.baseurl }}/data/images/shint/teaser.svg" /></center><br /> -->
 
 <span>
    <a href="https://hal.inria.fr/hal-01695284/document">

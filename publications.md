@@ -3,8 +3,6 @@ layout: page
 title: Publications
 permalink: /publications/
 published: true
-javascripts:
-   - my_script
 ---
 
 Below is a thematic list of my publications. For a complete list of paper I
@@ -65,22 +63,31 @@ simulation or to adapt the sampling budget locally.
   <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_BwdBuffer.png" alt="fourier-materials" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></td>
   <td style="vertical-align:top;"><b>Interactive Rendering of Acquired Materials on Dynamic Geometry Using Frequency Analysis</b> <br />
       Mahdi Bagher, Cyril Soler, Kartic Subr, Laurent Belcour, Nicolas Holzschuch<br />
-      <em>IEEE Transactions on Visualization and Computer Graphics</em><em>, 2013, 19(5),
+      <em>IEEE Transactions on Visualization and Computer Graphics</em>, 2013, 19(5),
       <a href="https://hal.archives-ouvertes.fr/hal-00814104v1/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-00814104v1/bibtex">bib</a> <a href="https://hal.archives-ouvertes.fr/hal-00652066v4">I3D paper</a> <a href="https://hal.archives-ouvertes.fr/hal-00652066v4/file/Final_Video-11-Apr-2012_QT_5Mbps.mov">video</a>
-  </em></td>
+  </td>
 </tr>
 </table>
 <br />
 
 
-### BRDF Modeling and Integration
+### BRDF Modeling and Rendering
 
 <table>
+<tr>
+  <td><a href="{{ site.url | append: site.baseurl }}/research/2018/05/05/brdf-realtime-layered.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Layered.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
+  <td style="vertical-align:top;"><b>Efficient Rendering of Layered Materials using an Atomic Decomposition with Statistical Operators</b> <br />
+      Laurent Belcour<br />
+      <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2018, 37 (4)
+      <a href="{{ site.url | append: site.baseurl }}/research/2018/05/05/brdf-realtime-layered.html">webpage</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-01785457/document">pdf</a> <a href="https://hal.inria.fr/hal-01785457/file/supp.pdf">supp. pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01785457/bibtex">bib</a> <a href="https://hal.inria.fr/hal-01785457/file/suppl.zip">code</a> <a href="https://youtu.be/wM5E-NJtaug">video</a>  <!--<a href="{{ site.url | append: site.baseurl }}/slides/2017-brdf-thin-film/slides.html">slides</a>-->
+  </td>
+</tr>
 <tr>
   <td><a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_SHInt.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
   <td style="vertical-align:top;"><b>Integrating Clipped Spherical Harmonics Expansions</b> <br />
       Laurent Belcour, Guofu Xie, Christophe Hery, Mark Meyer, Wojciech Jarosz, and Derek Nowrouzezahrai<br />
-      <em>ACM Transactions on Graphics</em>, 2018,(to appear)
+      <em>ACM Transactions on Graphics</em>, 2018
       <a href="{{ site.url | append: site.baseurl }}/research/2018/02/01/sh-integral.html">webpage</a>
       <a href="https://hal.archives-ouvertes.fr/hal-01695284/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01695284/bibtex">bib</a>
   </td>
@@ -91,7 +98,7 @@ simulation or to adapt the sampling budget locally.
       Laurent Belcour, Pascal Barla<br />
       <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2017, 36 (4)
       <a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html">webpage</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-01518344/document">pdf</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supp-mat-small%20%281%29.pdf">supp. pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01518344/bibtex">bib</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supplemental-code%20%282%29.zip">code</a> <a href="{{ site.url | append: site.baseurl }}/slides/2017-brdf-thin-film/slides.html">slides</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-01518344/document">pdf</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supp-mat-small%20%281%29.pdf">supp. pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01518344/bibtex">bib</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supplemental-code%20%282%29.zip">code</a> <a href="https://youtu.be/4nKb9hRYbPA">video</a> <a href="{{ site.url | append: site.baseurl }}/slides/2017-brdf-thin-film/slides.html">slides</a>
   </td>
 </tr>
 <tr>
@@ -109,12 +116,11 @@ simulation or to adapt the sampling budget locally.
 ### BRDF Analysis
 
 <table>
-
 <tr>
   <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_MatCaps.png" alt="chopper_cov" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
   <td style="vertical-align:top;"><b>MatCap Decomposition for Dynamic Appearance Manipulation</b> <br />
       Carlos Jorge Zubiaga, Adolfo Muñoz, Laurent Belcour, Carles Bosch and Pascal Barla <br />
-      <em>Proceedings of  the Euroographics Symposium on Rendering (EI&I track)</em>, 2015
+      <em>Proceedings of  the Eurographics Symposium on Rendering (EI&I track)</em>, 2015
       <a href="https://hal.archives-ouvertes.fr/hal-01164590/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01164590/bibtex">bib</a> <a href="https://vimeo.com/132005080">video</a>
   </td>
 </tr>
