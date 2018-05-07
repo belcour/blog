@@ -74,15 +74,16 @@ simulation or to adapt the sampling budget locally.
 ### BRDF Modeling and Rendering
 
 <table>
-<!-- <tr>
+<tr>
   <td><a href="{{ site.url | append: site.baseurl }}/research/2018/05/05/brdf-realtime-layered.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Layered.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
   <td style="vertical-align:top;"><b>Efficient Rendering of Layered Materials using an Atomic Decomposition with Statistical Operators</b> <br />
       Laurent Belcour<br />
       <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2018, 37 (4)
       <a href="{{ site.url | append: site.baseurl }}/research/2018/05/05/brdf-realtime-layered.html">webpage</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-01785457/document">pdf</a> <a href="https://hal.inria.fr/hal-01785457/file/supp.pdf">supp. pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01785457/bibtex">bib</a> <a href="https://hal.inria.fr/hal-01785457/file/suppl.zip">code</a> <a href="https://youtu.be/wM5E-NJtaug">video</a>
+      <!--
+      <a href="https://hal.archives-ouvertes.fr/hal-01785457/document">pdf</a> <a href="https://hal.inria.fr/hal-01785457/file/supp.pdf">supp. pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01785457/bibtex">bib</a> <a href="https://hal.inria.fr/hal-01785457/file/suppl.zip">code</a> --><a href="https://youtu.be/wM5E-NJtaug">video</a>
   </td>
-</tr> -->
+</tr>
 <tr>
   <td><a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_SHInt.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
   <td style="vertical-align:top;"><b>Integrating Clipped Spherical Harmonics Expansions</b> <br />
