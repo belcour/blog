@@ -125,7 +125,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_BrdfParam.png" alt="BRDF-filter" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td><a href="https://hal.archives-ouvertes.fr/hal-01172118/document"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_BrdfParam.png" alt="BRDF-filter" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></a></td>
   <td style="vertical-align:top;"><b>In Praise of an Alternative BRDF Parametrization</b> <br />
       Pascal Barla, Laurent Belcour, Romain Pacanowski  <br />
       <em>Workshop on Material Appearance Modeling</em>, June 2015, Darmstadt, Germany
@@ -133,7 +133,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_BrdfStats.png" alt="BRDF-param" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
+  <td><a href="https://hal.archives-ouvertes.fr/hal-01123655/document"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_BrdfStats.png" alt="BRDF-param" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
   <td style="vertical-align:top;"><b>Statistical Analysis of Bidirectional Reflectance Distribution Functions</b> <br />
       Carlos Zubiaga, Laurent Belcour, Carles Bosch, Adolfo Muñoz, Pascal Barla  <br />
       <em>SPIE Measuring, Modeling, and Reproducing Material Appearance</em>, February 2015
@@ -141,7 +141,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Alta.svg" alt="ALTA" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></td>
+  <td><a href="https://hal.archives-ouvertes.fr/hal-01016531/document"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Alta.svg" alt="ALTA" width="90" height="90" style="padding-bottom:10px;padding-right:10px" /></a></td>
   <td style="vertical-align:top;"><b>ALTA: A BRDF Analysis Library </b> <br />
       Laurent Belcour, Pascal Barla, Romain Pacanowski  <br />
       <em>Workshop on Material Appearance Modeling</em>, June 2014, Lyon, France
@@ -149,7 +149,7 @@ simulation or to adapt the sampling budget locally.
   </td>
 </tr>
 <tr>
-  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Retro.png" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
+  <td><a href="https://hal.archives-ouvertes.fr/hal-01083366/document"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Retro.png" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
   <td style="vertical-align:top;"><b>BRDF Measurements and Analysis of Retroreflective Materials </b> <br />
        Laurent Belcour, Romain Pacanowski, Marion Delahaie, Aude Laville-Geay, Laure Eupherte  <br />
       <em>Journal of the Optical Society of America, Optical Society of America</em>, 2014, JOSA A, 31 (12)
@@ -158,6 +158,17 @@ simulation or to adapt the sampling budget locally.
 </tr>
 </table><br />
 
+### Sampling
+<table>
+<tr>
+  <td><a href="https://drive.google.com/file/d/1gmwg0Qh5UkAvfAJRwGKA2Hqcl_psE4CA/view?usp=sharing"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_TrackLength.png" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
+  <td style="vertical-align:top;"><b>A note on track-length sampling with non-exponential distributions </b> <br />
+      Eric Heitz, Laurent Belcour  <br />
+      <em>Tech. Report - Unity Technologies</em>, May 2018
+      <a href="https://drive.google.com/file/d/1gmwg0Qh5UkAvfAJRwGKA2Hqcl_psE4CA/view?usp=sharing">pdf</a>
+  </td>
+</tr>
+</table><br />
 
 ### *Co-supervised* master theses
 
