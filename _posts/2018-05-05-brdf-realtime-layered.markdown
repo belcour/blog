@@ -11,19 +11,13 @@ published: true
 <img src="{{ site.url | append: site.baseurl }}/data/svg/layered_teaser.svg" />
 
 <span>
-<a href="https://drive.google.com/open?id=1iRNnqSCGNTcXQQDBUiJU8ySVJqdV4H_6"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px">paper</a> &nbsp;
-<!--
-<a href="https://hal.inria.fr/hal-01785457/document"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px">paper</a> &nbsp;
--->
-<a href="https://drive.google.com/open?id=1FiwUP21cVQDhs2mZERaSJZDxP7gAAFWx"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px"/>supp. pdf</a> &nbsp;
-<!--
-<a href="https://hal.inria.fr/hal-01785457/file/supp.pdf"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px"/>supp. pdf</a> &nbsp;
--->
-<a href="https://drive.google.com/open?id=1V7BgAAaf4VMDanSWp_rFuAlQj7qfKaQ8"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_zip.png" height="32px">supp. code</a> &nbsp;
-<!--
-<a href="https://hal.inria.fr/hal-01785457/file/suppl.zip"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_zip.png" height="32px">supp. code</a> &nbsp;
-<a href="https://hal.inria.fr/hal-01785457/bibtex"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_latex.png" height="32px">bib</a> &nbsp;
--->
+<!-- <a href="https://drive.google.com/open?id=1iRNnqSCGNTcXQQDBUiJU8ySVJqdV4H_6"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px">paper</a> &nbsp; -->
+<a href="https://hal.archives-ouvertes.fr/hal-01785457/document"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px">paper</a> &nbsp;
+<!-- <a href="https://drive.google.com/open?id=1FiwUP21cVQDhs2mZERaSJZDxP7gAAFWx"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px"/>supp. pdf</a> &nbsp; -->
+<a href="https://hal.archives-ouvertes.fr/hal-01785457/file/suppl.pdf"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px"/>supp. pdf</a> &nbsp;
+<!-- <a href="https://drive.google.com/open?id=1V7BgAAaf4VMDanSWp_rFuAlQj7qfKaQ8"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_zip.png" height="32px">supp. code</a> &nbsp; -->
+<a href="https://hal.archives-ouvertes.fr/hal-01785457/file/suppl.zip"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_zip.png" height="32px">supp. code</a> &nbsp;
+<a href="https://hal.archives-ouvertes.fr/hal-01785457/bibtex"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_latex.png" height="32px">bib</a> &nbsp;
 <a href="https://youtu.be/wM5E-NJtaug">
 <img src="{{ site.url | append: site.baseurl }}/data/images/icon_video.png" height="32px">video</a> &nbsp;
 <!-- <a href="https://belcour.github.io/blog/slides/2017-brdf-thin-film/slides.html"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_slides.png" height="32px">slides</a> -->
