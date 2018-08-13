@@ -1,0 +1,1043 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+
+        <title></title>
+
+        <meta name="description" content="Slides">
+        <meta name="author" content="Laurent Belcour">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="ext/reveal.js/css/reveal.css">
+        <link rel="stylesheet" href="ext/webgl/css/unity-white.css" id="theme">
+        <link rel="stylesheet" href="ext/reveal.js/lib/css/zenburn.css">
+        <style>
+            @font-face {
+                    font-family: Purisa;
+                    src: url(./fonts/Purisa.ttf);
+            }
+      </style>
+
+        <script src="ext/jquery/dist/jquery.min.js"></script>
+        <script src="ext/Snap.svg/dist/snap.svg-min.js"></script>
+        <script src="ext/headjs/dist/1.0.0/head.min.js"></script>
+        <script src="ext/reveal.js/js/reveal.js"></script>
+        <script src="ext/webgl/scripts/shaders.js"></script>
+        <script src="ext/webgl/scripts/utils.js"></script>
+        <script src="ext/threejs/three.min.js"></script>
+        <script src="ext/threejs/EXRLoader.js"></script>
+        <!-- <script src="ext/threejs/js/libs/OrbitControls.js"></script> -->
+    </head>
+    <body>
+        <script>
+            Shaders.init('./ext/webgl/');
+        </script>
+        <div class="reveal">
+            <div class="slides">
+                <section class="title">
+                    <h2 style="padding-bottom:12%; padding-top:15%;text-align: center;">Integrating Clipped Spherical Harmonics</h2>
+                    <div style="width:100%; font-size: 0.8em; display: flex; justify-content:space-evenly;">
+                        <div style="text-align: center;">
+                            Laurent Belcour - Guofu Xie<hr />
+                            <small>University of Montreal</small>
+                        </div>
+                        <div style="text-align: center;">
+                            Christophe Hery - Mark Meyer<hr />
+                            <small>Pixar Animation Studio</small>
+                        </div>
+                        <div style="text-align: center;">
+                            Wojciech Jarosz<hr />
+                            <small>Dartmouth College</small>
+                        </div>
+                        <div style="text-align: center;">
+                            Derek Nowrouzezahrai<hr />
+                            <small>McGill University</small>
+                        </div>
+                    </div>
+                    <img width="100%" height="100%" src="images/png/background.png" style="position:absolute; top:0px; left:0px; z-index: -10; margin:0px; box-shadow: none; border: none;" />
+                    <aside class="notes">
+                        In this talk I will present our solution to integrate spherical harmonics expansions on polygonal boundaries.
+                    </aside>
+                </section>
+
+                <section>
+                    <h2>Motivation</h2>
+                    <ul>
+                        <li>Spherical Integrals are common in rendering
+                            <ul>
+                                <li>Shading on surfaces</li>
+                                <li>Shading in volumes</li>
+                                <li>Importance sampling</li>
+                                <li>...</li>
+                            </ul>
+                        </li><br />
+                        <li class="fragment">Analytical forms are <strong>not</strong> common
+                        </li><br />
+                        <li class="fragment">But are needed by real-time rendering
+                        </li>
+                    </ul>
+                    <aside class="notes">
+                        Computing spherical integrals efficiently is one of the tough challenges of rendering. Whether we want to do surface or volume rendering, spherical integrals are needed. Spherical integrals are also required, for example, when we want to compute the cumulative distribution function to do importance samppling. <strong>*click*</strong><br /><br />
+
+                        Unfortunately, analytical forms or exact integration schemes are not the usual and we are often forced to rely on Monte-Carlo integration. <strong>*click*</strong><br /><br />
+
+                        And that is realy problematic in the context of real-time rendering for example. There, Monte-Carlo integration is not an acceptable solution.
+                    </aside>
+                </section>
+
+                <!-- Motivation -->
+                <section>
+                    <h2>Motivation: BRDF Integration</h2>
+                    <ul id="brdf_space_04" style="opacity:0;">
+                        <li style="margin-bottom: 2em;">(Quasi) Monte-Carlo
+                            <ul>
+                                <li>Approximative (contains error)</li>
+                                <li>Large number of samples</li>
+                            </ul>
+                        </li>
+                        <li style="margin-bottom: 2em;" class="fragment" data-fragment-index="4">Real-Time Rendering
+                            <ul>
+                                <li>Sampling is out of the question</li>
+                                <li>Needs efficiency, allows approximate</li>
+                            </ul>
+                        </li>
+                        <li class="fragment" data-fragment-index="5">Analytical solutions are welcome
+                            <ul>
+                                <li>Must include the light (spherical domain)</li>
+
+                            </ul>
+                        </li>
+                    </ul>
+                    <object id="brdf_integration"  style="position:absolute;width:512px;top:150px;left:380px;" data="./images/svg/motivation/cornell.svg"  type="image/svg+xml"></object>
+                    <img    id="brdf_space_01"     style="position:absolute;width:512px;top:200px;left:900px;border:none;box-shadow:none;opacity:0;" src="images/png/motivation/brdf_1.png" />
+                    <div    id="brdf_space_01_div" style="position:absolute;width:512px;top:530px;left:1135px;font-size:1em;font-family:Comfortaa;opacity:0;">BRDF</div>
+                    <img    id="brdf_space_02"     style="position:absolute;width:512px;top:200px;left:900px;border:none;box-shadow:none;opacity:0;" src="images/png/motivation/brdf_2.png" />
+                    <div    id="brdf_space_02_div" style="position:absolute;width:512px;top:350px;left:900px;font-size:1em;font-family:Comfortaa;opacity:0;color:#FEE864;">light</div>
+                    <img    id="brdf_space_03"     style="position:absolute;left:362px;top:200px;width:530px;border:none;box-shadow:none;opacity:0;" src="images/png/motivation/quadrature_1.png" />
+                    <div class="fragment" data-fragment-index="1" id="brdf_integration_01"></div>
+                    <div class="fragment" data-fragment-index="2" id="brdf_integration_02"></div>
+                    <div class="fragment" data-fragment-index="3" id="brdf_integration_03"></div>
+                    <script>
+                    Reveal.addEventListener('ready', function( event ) {
+                        var s = $('#brdf_integration')[0];
+                        s.onload = function() {
+                            var s = Snap("#brdf_integration");
+                            s.text(135, 105, "pixel").attr({ fill: '#FFF', fontSize: '0.9em', fontFamily: 'Comfortaa' });
+                            s.text(175, 35, "light").attr({ fill: '#FEE864', fontSize: '0.9em', fontFamily: 'Comfortaa' });
+                            s.text(165, 290, 'Cornell box (© Hatch Studios)').attr({ color: '#FFF', fontSize: '0.6em', fontFamily: 'Comfortaa'});
+                        }
+                    });
+                    Reveal.addEventListener('fragmentshown', function( event ) {
+                        if(event.fragment.id == "brdf_integration_01") {
+                            $('#brdf_integration').animate({ left: -200, opacity: 0 }, 500);
+                            $('#brdf_space_01').animate({ left: 380, opacity: 1}, 500);
+                            $('#brdf_space_01_div').animate({ left: 600, opacity: 1}, 500);
+                            $('#brdf_space_02').animate({ left: 380}, 500);
+                        }
+                        if(event.fragment.id == "brdf_integration_02") {
+                            $('#brdf_space_01').animate({ opacity: 0}, 500);
+                            $('#brdf_space_02').animate({ opacity: 1 }, 500);
+                            $('#brdf_space_02_div').animate({ opacity: 1 }, 500);
+                        }
+                        if(event.fragment.id == "brdf_integration_03") {
+                            $('#brdf_space_02').animate({ left:600, opacity: 0}, 500);
+                            $('#brdf_space_02').animate({ opacity: 0}, 500);
+                            $('#brdf_space_03').animate({ left:600, opacity: 1 }, 500);
+                            $('#brdf_space_01_div').animate({ opacity: 0 }, 500);
+                            $('#brdf_space_02_div').animate({ opacity: 0 }, 500);
+                            $('#brdf_space_04').animate({ opacity: 1 }, 500);
+                        }
+                    });
+                    Reveal.addEventListener('fragmenthidden', function( event ) {
+                        if(event.fragment.id == "brdf_integration_01") {
+                            $('#brdf_integration').animate({ left: 380, opacity: 1 }, 500);
+                            $('#brdf_space_01_div').animate({ left: 1135, opacity: 0}, 500);
+                            $('#brdf_space_01').animate({ left: 900, opacity: 0}, 500);
+                            $('#brdf_space_02').animate({ left: 900}, 500);
+                        }
+                        if(event.fragment.id == "brdf_integration_02") {
+                            $('#brdf_space_01').animate({ opacity: 1 }, 500);
+                            $('#brdf_space_02').animate({ opacity: 0 }, 500);
+                            $('#brdf_space_02_div').animate({ opacity: 0 }, 500);
+                        }
+                        if(event.fragment.id == "brdf_integration_03") {
+                            $('#brdf_space_02').animate({ left:380, opacity: 1}, 500);
+                            $('#brdf_space_03').animate({ left:365, opacity: 0 }, 500);
+                            $('#brdf_space_01_div').animate({ opacity: 1 }, 500);
+                            $('#brdf_space_02_div').animate({ opacity: 1 }, 500);
+                            $('#brdf_space_04').animate({ opacity: 0 }, 500);
+                        }
+                    });
+                    </script>
+                    <aside class="notes">
+                        To further illustrate this point, let's take the example of direct lighting of an opaque surface. Say we want to compute the reflected radiance of the surface in the white pixel here illuminated by this area light.<strong>*click*</strong><br /><br />
+
+                        For the view vector of the pixel here in red, the bidirectional reflectance distribution function defines the function to integrate. And this integral is restricted to the spherical polygonal defined by the projection of the area light.<strong>*click*</strong><br /><br />
+
+                        In the offline community, the default is to rely on (quasi)-random integration using Monte-Carlo. There, we importance sample directions in the area light or with respect to the BRDF and compute the average. However, in the general case, this solution is an approximation as we will always obtain a noisy/incorrect estimate. It would require an infinite number of samples to get the true value. <strong>*click*</strong><br /><br />
+
+                        But if we look at real-time constraints, using many samples is out of the question given the rendering budget at hand. However, there it is often possible to trade correctness for efficiency and have approximate (yet non-random) answers. <strong>*click*</strong><br /><br />
+
+                        Thus, we seek for analytical solutions of spherical integrals.
+                    </aside>
+                </section>
+
+                <!-- Previous Workd -->
+                <section>
+                    <h2>A Few Existing Methods</h2>
+                    <center id="previous_works_images" style="padding-top:100px;">
+                    <div style="width:90%; display:flex; justify-content:space-between; font-size:0.8em;">
+                        <!-- LTC -->
+                        <div class="fragment" style="width:524px;">
+                                <center style="width:524px;"><strong>Polygonal lights</strong></center>
+                                <img style="width:256px;" src="./images/png/arvo.png">
+                            <img style="width:256px;" src="./images/png/previous/ltc.png">
+                            <center class="previous_works_caption" style="width:524px; margin-left:20px;">[<a href="">Arvo 1995</a>] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  [<a href="">Heitz et al. 2015</a>] </center>
+                        </div>
+
+                        <!-- Spherical lights -->
+                        <div class="fragment" style="width:256px;">
+                            <center style="width:256px;"><strong>Sphere lights</strong></center>
+                            <img style="width:256px;" src="./images/png/previous/pivot.png">
+                            <center class="previous_works_caption" style="width:256px;">[<a href="">Dupuy et al. 2017</a>]</center>
+                        </div>
+
+                        <!-- Envmaps -->
+                        <div class="fragment" style="width:256px;">
+                            <center style="width:256px;"><strong>Linear lights</strong></center>
+                            <img style="width:256px;" src="./images/png/previous/line.png">
+                            <center class="previous_works_caption" style="width:256px;">[<a href="">Heitz et al. 2017</a>]</center>
+                        </div>
+                    </div>
+                    </center>
+                    <ul class="fragment" id="previous_works">
+                        <li style="margin-top: 2em;">But restricted to specific spherical functions
+                        </li>
+                    </ul>
+                    <script>
+                        Reveal.addEventListener('fragmentshown', function( event ) {
+                            if(event.fragment.id == "previous_works") {
+                                $('#previous_works_images').animate({ "padding-top": 30 }, 500);
+                                var elems = $('.previous_works_caption*');
+                                console.log(elems);
+                                elems.animate({ "opacity": 0 }, 500);
+                            }
+                        });
+                        Reveal.addEventListener('fragmenthidden', function( event ) {
+                            if(event.fragment.id == "previous_works") {
+                                $('#previous_works_images').animate({ "padding-top": 100 }, 500);
+                                $('#previous_works_caption').animate({ "opacity": 1 }, 500);
+                            }
+                        });
+                    </script>
+                    <aside class="notes">
+                        <!-- Add Arvo, Snyder 92, Jarosz on SH -->
+                        And it is not surprising that the litterature contains analytical forms for specific light shapes that approximate well BRDF commonly used. <strong>*click*</strong><br /><br />
+
+                        For example, ranging from a decades to the past few years, we saw closed-form solution developped for polygonal lights, <strong>*click*</strong> sphere lights, <strong>*click*</strong> or linear lights. <strong>*click*</strong><br /><br />
+
+                        Unfortunately, those solution are taylored for a specific kind of integrands and they would not work with multi-modal BRDFs or with very heavy tail distributions for example.
+                    </aside>
+                </section>
+
+                <!-- Goals -->
+                <section>
+                    <h2>Our Solution</h2>
+                    <ul>
+                        <li>Integrate Spherical Harmonics expansions on spherical polygons</li>
+                        <li class="fragment">Efficient algorithm
+                            <ul>
+                                <li>scales well with higher order SH</li>
+                            </ul>
+                        </li>
+                        <li class="fragment">We incorporate such analytical solution
+                            <ul>
+                                <li>for shading on surfaces</li>
+                                <li>for shading in volumes</li>
+                            </ul>
+                        </li>
+                        <li class="fragment"><em>"What about shadowing/bias ?"</em>
+                            <ul>
+                                <li>using control variates</li>
+                                <li>or a ratio estimator [<a href="">Heitz et al. 2018</a>]</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <aside class="notes">
+                        So we looked at a broader set of spherical functions that are spherical harmonics. Spherical harmonics are a basis of function that are already used in many application where the spherical distribution to approximate has no specific shape. For example, it is common to use them to bake lightmaps for video games. In this talk, I will show how to integrate those functions over spherical polygons. <strong>*click*</strong><br /><br />
+
+                        We also managed to solve this problem in an efficient way that scales linearly with respect to the number of spherical harmonics coefficients. <strong>*click*</strong><br /><br />
+
+                        In our paper, we show how to incorporate those integrals for surface shading and volume shading. <strong>*click*</strong><br /><br />
+
+                        But we can also incorporate shadowing of the light source using control variate. We use it as well to reduce the approximation error made by the spherical approximation. Note that our solution works as well for the ratio estimator of Heitz and colleagues which is another form of control variate.
+                    </aside>
+                </section>
+
+                <!-- Inspiration -->
+                <section>
+                        <h2>Inspiration: Axial Moments</h2>
+                        <ul>
+                            <li class="fragment" data-fragment-index="1">Function of the dot product, $f(\omega) = \langle \omega \cdot \color{red}{\omega_i} \rangle^\color{green}{n}$</li>
+                            <li class="fragment" data-fragment-index="4" id="axial_moment_def_01">Recursive integration [<a href="http://www.graphics.cornell.edu/pubs/1995/Arv95a.pdf">Arvo 1995</a>]
+                                <ul>
+                                    <li>Linear with respect to the power $\color{green}{n}$</li>
+                                    <li>Each step integrate another power cosine</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <!-- <canvas class="fragment" data-fragment-index="1" id="axial_moment_def" width="1440" height="1024" style="position:absolute;left:470px;width:720px;height:512px;"></canvas> -->
+                        <img class="fragment" data-fragment-index="2" src="images/png/moments/moments_01.png" id="axial_moment_def" width="1440" height="1024" style="position:absolute;left:470px;width:720px;height:512px;border:none;box-shadow:none;">
+                        <img class="fragment" data-fragment-index="3" src="images/png/moments/moments_03.png" id="axial_moment_def" width="1440" height="1024" style="position:absolute;left:470px;width:720px;height:512px;border:none;box-shadow:none;">
+                        <img class="fragment" data-fragment-index="4" src="images/png/moments/moments_02.png" id="axial_moment_def" width="1440" height="1024" style="position:absolute;left:470px;width:720px;height:512px;border:none;box-shadow:none;">
+                        <div class="fragment" data-fragment-index="2" style="position:absolute;left:930px;top:240px;">$\color{red}{\omega_i}$</div>
+                        <div class="fragment fade-out" data-fragment-index="3">
+                            <div class="fragment fade-in"  data-fragment-index="2" style="position:absolute;left:780px;top:580px;">$\langle \omega \cdot \color{red}{\omega_i} \rangle^\color{green}{3}$</div>
+                        </div>
+                        <div class="fragment" data-fragment-index="3" style="position:absolute;left:780px;top:580px;">$\langle \omega \cdot \color{red}{\omega_i} \rangle^\color{green}{5}$</div>
+
+                        <aside class="notes">
+                            Our method is heavily inspired by the closed-form solution that exists for axial moments.<strong>*click*</strong><br /><br />
+
+                            Axial moments are defined as the integral of rotated power cosine. Those are spherical function defined with respect to the dot product between of a direction on the unit sphere and an axis wi raised to a power n. <strong>*click*</strong> The axis determines the orientation of the lobe,  <strong>*click*</strong> and the power its spread. <strong>*click*</strong><br /><br />
+
+                            Jim Arvo showed in a classical paper that the integral of rotated power cosines over spherical polygons can be decomposed as integrals over spherical arc. Those have a recursive form with a complexity linear with respect to the power n. But an interesting point is that each step of the recursion compute another axial moment. I won't go into details about it here. Please refer to this paper for details. <strong>*click*</strong><br /><br />
+                        </aside>
+                    </section>
+
+                <!-- How our method works -->
+                <section>
+                    <h2>Outline of Our Method</h2>
+                    <object id="outline"  style="position:absolute;width:1280px;top:0px;left:0px;" data="./images/svg/motivation/outline.svg"  type="image/svg+xml"></object>
+
+                    <div style="position:absolute;top:550px;left:150px;font-size:0.8em;">$$ \int_\mathcal{P} f(\boldsymbol\omega) \mbox{d}\boldsymbol\omega $$</div>
+                    <div class="fragment" id="outline_01" style="position:absolute;top:550px;left:480px;font-size:0.8em;">$$ \sum f_{l,m} \int_\mathcal{P} y_{l}^{m}(\boldsymbol\omega) \mbox{d}\boldsymbol\omega $$</div>
+                    <div class="fragment" id="outline_02" style="position:absolute;top:550px;left:860px;font-size:0.8em;">$$ \sum c_{k,i} \int_\mathcal{P} \langle \boldsymbol\omega \cdot \boldsymbol\omega_i \rangle^{k} \mbox{d}\boldsymbol\omega $$</div>
+                    <div class="fragment" id="outline_03" style="position:absolute;top:138px;left:910px;font-size:0.6em;color:red">lobe sharing</div>
+                    <script>
+                        Reveal.addEventListener('ready', function( event ) {
+                            $("#outline")[0].onload = function() {
+                                snap = Snap("#outline");
+                                snap.select("#arrow1").attr({opacity : 0});
+                                snap.select("#arrow2").attr({opacity : 0});
+                                snap.select("#sharing").attr({opacity : 0});
+                                snap.select("#sh").attr({opacity : 0});
+                                snap.select("#pc").attr({opacity : 0});
+                            };
+                        });
+                        Reveal.addEventListener('fragmentshown', function( event ) {
+                            snap = Snap("#outline");
+                            if(event.fragment.id == "outline_01") {
+                                snap.select("#arrow1").animate({opacity : 1}, 500);
+                                snap.select("#sh").animate({opacity : 1}, 500);
+
+                            } else if(event.fragment.id == "outline_02") {
+                                snap.select("#arrow1").animate({opacity : 0}, 500);
+                                snap.select("#arrow2").animate({opacity : 1}, 500);
+                                snap.select("#pc").animate({opacity : 1}, 500);
+
+                            } else if(event.fragment.id == "outline_03") {
+                                snap.select("#sharing").animate({opacity : 1}, 500);
+                            }
+                        });
+                        Reveal.addEventListener('fragmenthidden', function( event ) {
+                            snap = Snap("#outline");
+                            if(event.fragment.id == "outline_01") {
+                                snap.select("#arrow1").animate({opacity : 0}, 500);
+                                snap.select("#sh").animate({opacity : 0}, 500);
+
+                            } else if(event.fragment.id == "outline_02") {
+                                snap.select("#arrow1").animate({opacity : 1}, 500);
+                                snap.select("#arrow2").animate({opacity : 0}, 500);
+                                snap.select("#pc").animate({opacity : 0}, 500);
+
+                            } else if(event.fragment.id == "outline_03") {
+                                snap.select("#sharing").animate({opacity : 0}, 500);
+                            }
+                        });
+                    </script>
+                    <aside class="notes">
+                        Now, here is how our method works. To compute the integral of a spherical function over a spherical polygon,  <strong>*click*</strong><br /><br />
+
+                        we use its spherical harmonics decomposition illustrated here. There, we need to compute the integral of each basis element over the spherical polygon. <strong>*click*</strong><br /><br />
+
+                        But instead of trying to solve this task, we show how to convert any spherical harmonics expansion into a set of rotated power cosines for which we can compute the exact integral. So, we remap our problem of integration to a problem of conversion which is much simpler to solve. <strong>*click*</strong><br /><br />
+
+                        To ensure that our method is efficient, we share the same axis for different axial moments and share the computation of the integral.
+                    </aside>
+                </section>
+
+
+                <!-- Our idea -->
+                <section>
+                    <h2>Insight: An Intermediate Step</h2>
+                    <ul class="fragment">
+                        <li>Rotated Zonal Harmonics [<a href="http://www.cim.mcgill.ca/~derek/publication.html?id=32">Nowrouzezahrai et al. 2012</a>]</li>
+                    </ul>
+                    <center class="fragment" style="padding-top: 0px;">
+                        <object id="zonal_decomposition" data="./images/svg/decomposition/zonals.svg" type="image/svg+xml"></object>
+                    </center>
+                    <!-- <div class="fragment" id="zonal_decomposition_01"></div> -->
+                    <div class="fragment" id="zonal_decomposition_02"></div>
+                    <div class="fragment" id="zonal_decomposition_03"></div>
+                    <div class="fragment" id="zonal_decomposition_04"></div>
+                    <!-- <div class="fragment" id="zonal_decomposition_05"></div> -->
+                    <script>
+                        Reveal.addEventListener('ready', function( event ) {
+                            $("#zonal_decomposition")[0].onload = function() {
+                                snap = Snap("#zonal_decomposition");
+                                snap.select("#axials").attr({opacity : 0});
+                                snap.select("#zonals").attr({opacity : 0});
+                                snap.select("#sh").attr({opacity : 1});
+                                snap.select("#decompose").attr({opacity : 1});
+                                snap.select("#rot_zonals_01").attr({opacity : 0});
+                                snap.select("#rotated_zonals").attr({opacity : 0});
+
+                            };
+                        });
+                        Reveal.addEventListener('fragmentshown', function( event ) {
+                            snap = Snap("#zonal_decomposition");
+                            if(event.fragment.id == "zonal_decomposition_01") {
+                                snap.select("#decompose").animate({opacity : 1}, 500);
+                                snap.select("#sh").animate({opacity : 1}, 500);
+
+
+                            } else if(event.fragment.id == "zonal_decomposition_02") {
+                                snap.select("#zonals").animate({opacity : 1}, 500);
+
+                            } else if(event.fragment.id == "zonal_decomposition_03") {
+                                snap.select("#decompose").animate({opacity : 0}, 500);
+                                snap.select("#f").animate({opacity : 0}, 500);
+                                snap.select("#dots").animate({opacity : 0}, 500);
+                                snap.select("#zonals").animate({opacity : 0}, 500);
+                                snap.select("#others").animate( {opacity: 0 }, 500);
+
+                            } else if(event.fragment.id == "zonal_decomposition_04") {
+                                var g = snap.select("#sh_selected");
+                                var m = g.transform().localMatrix;
+                                g.attr({ transform: m.toTransformString() });
+                                m.translate(-100, 0);
+                                g.animate({transform : m.toTransformString()}, 500);
+
+                                g = snap.select("#rot_zonals_01");
+                                m = g.transform().localMatrix;
+                                g.attr({ transform: m.toTransformString() });
+                                m.translate(-100, 0);
+                                g.animate({ transform : m.toTransformString() }, 500);
+
+                                snap.select("#rot_zonals_01").animate({opacity : 1}, 500);
+                            }
+                        });
+                        Reveal.addEventListener('fragmenthidden', function( event ) {
+                            snap = Snap("#zonal_decomposition");
+                            if(event.fragment.id == "zonal_decomposition_01") {
+                                snap.select("#decompose").animate({opacity : 0}, 500);
+                                snap.select("#sh").animate({opacity : 0}, 500);
+
+                            } else if(event.fragment.id == "zonal_decomposition_02") {
+                                snap.select("#zonals").animate({opacity : 0}, 500);
+
+                            } else if(event.fragment.id == "zonal_decomposition_03") {
+                                snap.select("#decompose").animate({opacity : 1}, 500);
+                                snap.select("#f").animate({opacity : 1}, 500);
+                                snap.select("#dots").animate({opacity : 1}, 500);
+                                snap.select("#zonals").animate({opacity : 1}, 500);
+                                snap.select("#others").animate( {opacity: 1}, 500);
+
+                            } else if(event.fragment.id == "zonal_decomposition_04") {
+                                var g = snap.select("#sh_selected");
+                                var m = g.transform().localMatrix;
+                                g.attr({ transform: m.toTransformString() });
+                                m.translate(100, 0);
+                                g.animate({transform : m.toTransformString()}, 500);
+
+                                g = snap.select("#rot_zonals_01");
+                                m = g.transform().localMatrix;
+                                g.attr({ transform: m.toTransformString() });
+                                m.translate(100, 0);
+                                g.animate({transform : m.toTransformString()}, 500);
+
+                                snap.select("#rot_zonals_01").animate({opacity : 0}, 500);
+                            }
+                        });
+                    </script>
+                    <aside class="notes">
+                        Still, we need to find a way to convert a set of spherical harmonics into rotated power cosines. <strong>*click*</strong><br /><br />
+
+                        We use an intermediate step in our pipeline by decomposing Spherical Harmonics in rotated Zonal Harmonics. <strong>*click*</strong><br /><br />
+
+                        Starting from the SH decomposition of a spherical function, here on the right. <strong>*click*</strong>  Zonal Harmonics are the set of circularly symmetric Spherial Harmonics here highlighted in red. <strong>*click*</strong> <br /><br />
+
+                        We can decompose a given Spherical Harmonic, <strong>*click*</strong> by a finite set of rotated Zonal Harmonics.
+                    </aside>
+                </section>
+                <section>
+                    <h2>Decomposing Rotated Zonal Harmonics</h2>
+                    <center class="fragment" style="padding-top: 0px;">
+                        <object id="axial_decomposition" data="./images/svg/decomposition/axials.svg" type="image/svg+xml"></object>
+                    </center>
+                    <div class="fragment" id="axial_decomposition_01"></div>
+                    <!-- <div class="fragment" id="zonal_rotation_02"></div>
+                    <div class="fragment" id="zonal_rotation_03"></div>
+                    <div class="fragment" id="zonal_rotation_04"></div>
+                    <div class="fragment" id="zonal_rotation_05"></div> -->
+                    <script>
+                        Reveal.addEventListener('ready', function( event ) {
+                            $("#axial_decomposition")[0].onload = function() {
+                                snap = Snap("#axial_decomposition");
+                                snap.select("#axials").attr({opacity : 0});
+                            };
+                        });
+                        Reveal.addEventListener('fragmentshown', function( event ) {
+                            snap = Snap("#axial_decomposition");
+                            if(event.fragment.id == "axial_decomposition_01") {
+                                snap.select("#axials").animate({opacity : 1}, 500);
+
+                            }
+                        });
+                        Reveal.addEventListener('fragmenthidden', function( event ) {
+                            snap = Snap("#axial_decomposition");
+                            if(event.fragment.id == "axial_decomposition_01") {
+                                snap.select("#axials").animate({opacity : 0}, 500);
+
+                            }
+                        });
+                    </script>
+                    <aside class="notes">
+                        Now that we have converted our Spherical Harmonics decomposition into a rotated Zonal Harmonics decomposition, we use the property that Zonal Harmonics are defined by a Legendre polynomial with respect to the dot product with the rotated z-axis.<strong>*click*</strong><br /><br />
+
+                        This means that for a given Zonal Harmonics, <strong>*click*</strong> we decompose its Legendre polynomial into a sum of monomials. Each monom is a rotated power cosine with respect to the rotated z-axis.
+                    </aside>
+                </section>
+
+                <!-- Algorithmic summary section -->
+                <section>
+                    <h2>That's All Folks!</h2>
+
+                    <div style="display: flex;" class="fragment" data-fragment-index="0">
+                        <pre style="width:45%; margin: 10px auto;">
+                            <code class="cpp" style="max-height:none;" data-noescape>
+/* Compute the integral of the SH decomposition with
+ * `f` coefficients over a spherical polygon `poly`.
+ */
+function ComputeIntegral(<span style="color:aquamarine;">flm</span>, <span style="color:darksalmon;">poly</span>) {
+    <span class="fragment" data-fragment-index="1">
+    // Generate a set of vectors
+    basis = <span style="color:burlywood;">SharedDirections</span>();</span>
+
+    <span class="fragment" data-fragment-index="2" >
+    // Compute the conversion matrices
+    //   `A` converts SH to Zonals
+    //   `P` converts Zonals to Axials
+    A  = <span style="color:burlywood;">ZonalWeights</span>(basis);
+    P  = <span style="color:burlywood;">AxialWeights</span>(basis);
+    AP = A*P;</span>
+
+    <span class="fragment" data-fragment-index="3" >
+    // Convert the Axial expansion
+    cpw = flm.transpose() * AP;</span>
+
+    <span class="fragment" data-fragment-index="4" >
+    // Return the integral using Arvo's method
+    m = <span style="color:burlywood;">AxialMoments</span>(poly, basis);
+    return cpw.dot(m);</span>
+}
+                            </code>
+                        </pre>
+                        <div style="width:45%; position: relative;">
+                            <div class="fragment fade-out" data-fragment-index="1" style="position: absolute; top:210px; left:50px;">
+                                $$
+                                \mathbf{f}^T \mathbf{y} = \sum_{l,m} \mathcal{\color{green}{f_{l,m}}} \left[ \int_{\mathcal{\color{darksalmon}{P}}} y_{l,m}(\omega) \right]
+                                $$
+                            </div>
+
+                            <div class="fragment fade-out" data-fragment-index="2" style="position: absolute; top:100px; left:70px;">
+                                <img class="fragment fade-in" width="380px" style="border:none; box-shadow:none;" data-fragment-index="1" src="images/svg/directions.svg" />
+                            </div>
+
+                            <div class="fragment fade-in" data-fragment-index="3">
+                            <div class="fragment fade-out" data-fragment-index="4" style="position:relative; top:230px; left:-20px;">
+                                $$
+                                \mathbf{c}^T = \mathbf{f}^T \times AP
+                                $$
+                            </div>
+                            </div>
+
+                            <div class="fragment fade-in" data-fragment-index="4" style="position:relative; top:191px; left:-44px;">
+                                $$
+                                \mathbf{f}^T \mathbf{y} = \underbrace{\mathbf{c}^T}_{\mathbf{f}^T \times AP} \times \mathbf{m}
+                                $$
+                            </div>
+                        </div>
+                    </div>
+                    <aside class="notes">
+                        That is pretty much it for out method. Now we can put everything toghether in the following algorithm. <strong>*click*</strong><br /><br />
+
+                        Our goal is to compute the integral of all the Spherical Harmonics functions over a polygon P. Then to compute the weighted sum of those integral to get the integral we are interested in. <strong>*click*</strong><br /><br />
+
+                        First, we need to precompute a set of axis for the zonal decomposition. <strong>*click*</strong><br /><br />
+
+                        Then, we compute the conversion matrix `A` that converts spherical harmonics coefficients into rotated zonal harmonics coefficients. We also compute the conversion matrix `P` that converts zonal harmonics into rotated cosine powers. <strong>*click*</strong><br /><br />
+
+
+                        Then, we compute the cosine powers coefficients by multiplying the conversion matrices to the Spherical Harmonics coefficients. Note that for efficiency, we should always precompute those coefficient ahead. Here we detail all those aspects in place for clarity. <strong>*click*</strong><br /><br />
+
+                        Last, we compute the integral by doing the dot product between the rotated cosine power coefficents and the axial moments computed using Arvo's method. <strong>*click*</strong><br /><br />
+                    </aside>
+                </section>
+
+                <!-- Optimization section -->
+                <section>
+                    <h2>That's All Folks! (How Really?)</h2>
+                    <ul style="width:100%;">
+                        <li class="fragment" id="lobe_sharing_00">Redudant computation in Arvo's method
+                        <div class="fragment" id="lobe_sharing_01"></div>
+                        </li><br />
+                        <li class="fragment" id="lobe_sharing_01b">We improve performance by
+                            <ul>
+                                <li>sharing axial moment directions</li>
+                                <li>sharing Arvo's recursive evaluation</li>
+                                <div class="fragment" id="lobe_sharing_02"></div>
+                                <div class="fragment" id="lobe_sharing_03"></div>
+                            </ul>
+                        </li><br />
+                        <li class="fragment">Details are in the paper
+                        </li>
+                    </ul>
+                    <center style="position:absolute; top:150px; left:700px;">
+                        <object id="lobe_sharing" data="./images/svg/decomposition/sharing.svg" type="image/svg+xml"></object>
+                    </center>
+                    <script>
+                        Reveal.addEventListener('ready', function( event ) {
+                            $("#lobe_sharing")[0].onload = function() {
+                                snap = Snap("#lobe_sharing");
+                                snap.select("#redundant").attr({opacity : 0});
+                                snap.select("#sh").attr({opacity : 0});
+                                snap.select("#axials").attr({opacity : 0});
+                                snap.select("#zonals").attr({opacity : 0});
+                                snap.select("#sharing").attr({opacity : 0});
+                            };
+                        });
+                        Reveal.addEventListener('fragmentshown', function( event ) {
+                            snap = Snap("#lobe_sharing");
+                            if(event.fragment.id == "lobe_sharing_00") {
+                                var g = snap.select("#zonals");
+                                g.animate({ opacity: 1 }, 500);
+
+                            } else if(event.fragment.id == "lobe_sharing_01") {
+                                var g = snap.select("#redundant");
+                                g.animate({ opacity: 1 }, 500);
+
+                            } else if(event.fragment.id == "lobe_sharing_01b") {
+                                var g = snap.select("#redundant");
+                                g.animate({ opacity: 0 }, 500);
+
+                            } else if(event.fragment.id == "lobe_sharing_02") {
+                                snap.select("#sharing").animate({ opacity: 1 }, 500);
+
+                            } else if(event.fragment.id == "lobe_sharing_03") {
+                                snap.select("#sharing").animate({ opacity: 0 }, 500);
+                                snap.select("#dots").animate({ opacity: 0 }, 500);
+                                snap.select("#others").animate({ opacity: 0 }, 500);
+                                snap.select("#axials").animate({ opacity: 1 }, 500);
+                            }
+                        });
+                        Reveal.addEventListener('fragmenthidden', function( event ) {
+                            snap = Snap("#lobe_sharing");
+                            if(event.fragment.id == "lobe_sharing_01") {
+                                var g = snap.select("#zonals");
+                                g.animate({ opacity: 0 }, 500);
+
+                            } else if(event.fragment.id == "lobe_sharing_02") {
+                                snap.select("#sharing").animate({ opacity: 0 }, 500);
+
+                            } else if(event.fragment.id == "lobe_sharing_03") {
+                                snap.select("#sharing").animate({ opacity: 1 }, 500);
+                                snap.select("#dots").animate({ opacity: 1 }, 500);
+                                snap.select("#others").animate({ opacity: 1 }, 500);
+                                snap.select("#axials").animate({ opacity: 0 }, 500);
+                            }
+                        });
+                    </script>
+                    <aside class="notes">
+                        However, the devil is in the details and a naive implementation of this algorithm could lead to poor performance. <strong>*click*</strong><br /><br />
+
+                        When converting a rotated zonal harmonics in a rotated cosine power, we did not pay attention to the fact that redudant computation will occur in Arvo's integration method. <strong>*click*</strong> For example, <strong>*click*</strong> if we were to compute the integral of the two rotated power cosine hihglihgted here in green independently, due to the recursive form the Arvo's algorithm, we would recompute the same arc integrals twice.<br /><br />
+
+                        The idea to ensure good performance is to couple the main axis of the rotated zonal harmonics across bands to share computation in Arvo's method. <strong>*click*</strong> In the zonal decomposition showed on the right, <strong>*click*</strong> the same axis is shared by different order of rotated zonals harmonics. <strong>*click*</strong> During the computation of Arvo's method, the recursive evaluation of the line integral will be shared across all orders distributing the cost of the integration. <strong>*click*</strong><br /><br />
+
+                        For more details regarding the implementation, please refer to our paper and supplemental code. <strong>*click*</strong><br /><br />
+                    </aside>
+                </section>
+
+                <!-- Validation Section -->
+                <section>
+                    <h2>Algorithmic Complexity</h2>
+                    <ul style="width:100%;">
+                        <li>Linear w.r.t. number of SH coefficients
+                        </li>
+                    </ul>
+                    <center>
+                        <img height="400px" style="box-shadow:none; border:none; margin-top: 30px;" src="images/png/complexity/complexity.png" />
+                    </center>
+                    <aside class="notes">
+                        Thanks to this optimization, our algorithm has a linear cost with respect to the number of Spherical Harmonics coefficients. We validated this property empirically by computing the integral of random spherical functions on our CPU implementation.
+                    </aside>
+                </section>
+
+
+                <!-- Applications Overview -->
+                <section>
+                    <h2>Applications</h2>
+                    <object data="./images/svg/applications.svg" id="applications" width="100%" style="position:absolute;top:0px;left:0px;" type="image/svg+xml"></object>
+
+                    <center class="fragment" id="applications_01" style="position:absolute;top:550px;left:170px;font-size:0.8em;"><strong>real-time rendering</strong></center>
+                    <center class="fragment" id="applications_02" style="position:absolute;top:550px;left:530px;font-size:0.8em;"><strong>importance sampling</strong><br />hierarchichal warping</center>
+                    <center class="fragment" id="applications_03" style="position:absolute;top:550px;left:930px;font-size:0.8em;"><strong>control variate</strong><br />adding shadows</center>
+                    <div class="fragment" id="applications_04"></div>
+                    <script>
+                        Reveal.addEventListener('fragmentshown', function( event ) {
+                            var snap = Snap("#applications");
+                            if(event.fragment.id == "applications_01") {
+                                snap.select("#realtime").animate({ opacity:1 }, 500);
+
+                            } else if(event.fragment.id == "applications_02") {
+                                snap.select("#importance").animate({ opacity:1 }, 500);
+
+                            } else if(event.fragment.id == "applications_03") {
+                                snap.select("#control").animate({ opacity:1}, 500);
+
+                            } else if(event.fragment.id == "applications_04") {
+                                snap.select("#importance").animate({ opacity:0.2 }, 500);
+                                // snap.select("#realtime").animate({ opacity:0.2 }, 500);
+                                $('#applications_02').animate({opacity: 0.2}, 500);
+                                // $('#applications_01').animate({opacity: 0.2}, 500);
+                            }
+                        });
+                        Reveal.addEventListener('fragmenthidden', function( event ) {
+                            var snap = Snap("#applications");
+                            if(event.fragment.id == "applications_01") {
+                                snap.select("#realtime").animate({ opacity:0 }, 500);
+
+                            } else if(event.fragment.id == "applications_02") {
+                                snap.select("#importance").animate({ opacity:0 }, 500);
+
+                            } else if(event.fragment.id == "applications_03") {
+                                snap.select("#control").animate({ opacity:0}, 500);
+
+                            } else if(event.fragment.id == "applications_04") {
+                                snap.select("#importance").animate({ opacity:1 }, 500);
+                                // snap.select("#realtime").animate({ opacity:1 }, 500);
+                                $('#applications_02').animate({opacity: 1}, 500);
+                                // $('#applications_01').animate({opacity: 1}, 500);
+                            }
+                        });
+                    </script>
+                    <aside class="notes">
+                        We applied our integration method to different case scenarios. <strong>*click*</strong><br /><br />
+
+                        Thanks to its efficiency, we performed a GPU implementation of our method for the real-time rendering of area-lights. There, efficiency is a requirement. <strong>*click*</strong><br /><br />
+
+                        Importance sampling of Spherical Harmonics decomposition can be acheived using Hierarchial Warping. This method relies on the decomposition's integral on spherical quads. We applied our method there as well. <strong>*click*</strong><br /><br />
+
+                        Finally, we demonstrated our integration method in an offline rendering scenario. There, we looked at how to incorporate shadows and how to correct for the approximation caused by the Spherical Harmonics decomposition. To that purpose, we applied control variate. <strong>*click*</strong><br /><br />
+
+                        I will only detail this last method. To know more about the other two, please refer to our paper.
+                    </aside>
+                </section>
+
+                <!-- Real-Time results -->
+                <section>
+                    <h2>Surface and Volume Shading</h2>
+                    <center class="fragment fade-in" style="position:absolute; top:170px; left:0px; width:100%;">
+                        <div class="fragment fade-out" >
+                            <img  width="400px" src="images/png/arvo.png" /><br />
+                            <span style="font-size:0.8em;position:relative;top:-20px;">[<a href="">Arvo 1995</a>]</span>
+                        </div>
+                    </center>
+                    <div style="display:flex;justify-content:space-evenly;">
+                        <center class="fragment" style="font-size:0.7em;"><img style="height:490px;" src="images/png/arvo-area.png" /><br />Surface area light</center>
+                        <center class="fragment" style="font-size:0.7em;"><img style="height:490px;" src="images/png/arvo-portal.png" /><br />Surface portal light</center>
+                        <center class="fragment" style="font-size:0.7em;"><img style="height:490px;" src="images/png/arvo-fog-area.png" /><br />Volume area light</center>
+                        <center class="fragment" style="font-size:0.7em;"><img style="height:490px;" src="images/png/arvo-fog-portal.png" /><br />Volume portal light</center>
+                    </div>
+                    <aside class="notes">
+                        I will illustrate multiple applications of our integration method for rendering <strong>*click*</strong> each illustrated by a variation of this scene from Arvo's paper that we remodelled as an hommage to its work. Note that each element of this butterfly stained glass window is a distinct area light. <strong>*click*</strong> <br /><br />
+
+                         We worked on 4 different scenarios: <strong>*click*</strong> surface shading with uniform area lights, <strong>*click*</strong> surface shading with portal lights, <strong>*click*</strong> volume shading with uniform area lights, and <strong>*click*</strong> volume shading with portal lights.
+                    </aside>
+                </section>
+                <section>
+                    <h2>Surface Shading: Area Light</h2>
+                        <center style="font-size:0.5em;position:absolute;top:20px;left:1120px; opacity:0.5;"><img style="height:250px;" src="images/png/arvo-area.png" /><br />Surface area light</center>
+                        <object id="application_area" width="60%" style="position:absolute;top:100px;left:250px;" data="./images/svg/applications-01.svg" type="image/svg+xml"></object>
+                        <div class="fragment" style="width:100%; position:relative ;top:50px; left: -100px; font-size: 1.5em;">
+                            $$
+                            \color{green}{\rho(\boldsymbol{\omega}_i, \cdot}) \simeq \mathbf{f} = \mathbf{y}_i^T, \mbox{M} \quad
+                            \mbox{with} \, \, \mathbf{y}_i = y_{l,m}(\boldsymbol{\omega}_i)
+                            $$
+                            <span style="position:relative;left:170px;top:10px;font-size:0.8em;">[<a href="http://www.graphics.cornell.edu/pubs/1992/WAT92.html">Westin et al. 1992</a>]</span>
+                        </div>
+                    <aside class="notes">
+                        <!-- Text too small -->
+                        The simplest formulation for surface shading is to consider a polygonal with a uniform emission. There, we only need to integrate the BRDF projected in the Spherical Harmonics basis. Since the BRDF is a 4D function, we cannot directly store it as a set of SH coefficients. <strong>*click*</strong> We use a matrix representation of the SH decomposition that is similar to what Stephen Westin and colleagues used. There, the BRDF is stored as a matrix M and we evaluate it for a specific view direction by multiplying this matrix with the SH basis elements evaluated at the incident direction.
+                    </aside>
+                </section>
+                <section>
+                    <h2>Surface Shading: Portal Light</h2>
+                        <center style="font-size:0.5em;position:absolute;top:20px;left:1120px; opacity:0.5;"><img style="height:250px;" src="images/png/arvo-portal.png" /><br />Surface portal light</center>
+                        <object id="application_portal" width="72%" style="position:absolute;top:97px;left:170px;" data="./images/svg/applications-02.svg" type="image/svg+xml"></object>
+                    <aside class="notes">
+                        We can also apply our method to render portal lights. Given an infinite distance light source here in yellow, the portal light restricts the spherical region that source emits with a polygonal shape. The nice property of a portal light is that different positions in the scene will see a different part of the envmap. In practice, we compute the SH coefficients of the envmaps and evaluate the product of the envmap and BRDF at each shading point using their decompositions.
+                    </aside>
+                </section>
+                <section>
+                    <h2>Volume Shading: Area Light</h2>
+                        <center style="font-size:0.5em;position:absolute;top:20px;left:1120px; opacity:0.5;"><img style="height:250px;" src="images/png/arvo-fog-area.png" /><br />Volume area light</center>
+                        <object id="application_area_fog" width="60%" style="position:absolute;top:100px;left:250px;" data="./images/svg/applications-03.svg" type="image/svg+xml"></object>
+                        <div class="fragment" id="application_area_fog_01"></div>
+                    <aside class="notes">
+                        Next, we can also apply our integration scheme to volumetric rendering. In our demo, we ray march along the view direction and at each step perform our integration method. We used the analytical expression of the Heynyey-Greenstein phase function as the vector of SH coefficients to integrate. <strong>*click*</strong> We do not compute the SH expansion of the attenuation with respect to the source. We use the center of the area light to compute the attenuation.
+                    </aside>
+                    <script>
+                        Reveal.addEventListener('fragmentshown', function( event ) {
+                            var snap = Snap("#application_area_fog");
+                            if(event.fragment.id == "application_area_fog_01") {
+                                snap.select("#attenuation").animate({ opacity:1 }, 500);
+                            }
+                        });
+                        Reveal.addEventListener('fragmenthidden', function( event ) {
+                            var snap = Snap("#application_area_fog");
+                            if(event.fragment.id == "application_area_fog_01") {
+                                snap.select("#attenuation").animate({ opacity:0 }, 500);
+                            }
+                        });
+                    </script>
+                </section>
+                <section>
+                    <h2>Volume Shading: Portal Light</h2>
+                        <center style="font-size:0.5em;position:absolute;top:20px;left:1120px; opacity:0.5;"><img style="height:250px;" src="images/png/arvo-fog-portal.png" /><br />Volume portal light</center>
+                        <object id="application_portal_fog" width="72%" style="position:absolute;top:97px;left:170px;" data="./images/svg/applications-04.svg" type="image/svg+xml"></object>
+                    <aside class="notes">
+                        We apply the same principle to the portal light. Only here the phase function decomposition is used instead of the BRDF.
+                    </aside>
+                </section>
+
+                <!-- Real-Time results -->
+                <section>
+                    <h2>Application: Real-Time Rendering</h2>
+                    <center class="fragment">
+                        <video height="600" controls style="border: solid 1px black; clip-path:polygon(0 0, 0 90%, 100% 90%, 100% 0);"  src="videos/realtime.mov" type="video/mp4">
+                        </video>
+                    </center>
+                    <aside class="notes">
+                        We demonstrate the ability of our method to work in real-time. <strong>*click*</strong> Here is a capture of our surface shading method working in the BGFX framework for the Sponza atrium. We restricted the SH order to 5. In this context, we obtain a rendering time of 4 to 6 ms per frames on a Macbook pro with an Intel UHD 630 chip.
+                    </aside>
+                </section>
+
+                <!-- Results Section -->
+                <section>
+                    <h2>Application: Control Variates</h2>
+
+                    <div class="fragment fade-out" data-fragment-index="2" >
+                    <center class="fragment fade-in" data-fragment-index="1" style="position:absolute;top:280px;left:0px;width:100%;">
+                        <img width="48%" style="margin:0px; clip-path:polygon(0 0, 0 95%, 100% 95%, 100% 0);" src="images/svg/noshadow.svg" /><br />
+                        <span style="font-size:0.7em; position:relative; top:-30px;">Our real-time demo <strong>lacks shadows</strong></span>
+                    </center>
+                    </div>
+
+                    <ul style="width:100%;">
+                        <li class="fragment" data-fragment-index="1">Analytical solutions have <strong>bias</strong>
+                            <ul>
+                                <li>they do not account for <strong>shadows</strong></li>
+                                <li>they <strong>approximate</strong> the true BRDF</li>
+                            </ul>
+                        </li>
+                        <li class="fragment" data-fragment-index="2" style="padding-top:30px;">
+                            <strong>Combine</strong> <span style="color: forestgreen;">Closed-Form</span> and <span style="color: blue;">Monte-Carlo results</span>
+                            <div class="fragment" data-fragment-index="3" style="padding-top:30px;position:relative;left:-100px;">
+                            $$
+                            I = \color{green}{\int_{\mathcal{P}} y\left(\boldsymbol\omega\right) \mbox{d}\boldsymbol\omega}  \, - \, \color{blue}{\sum_{k} \left[ y\left(\boldsymbol\omega_k\right) - f\left(\color{blue}{\boldsymbol\omega_k}\right) \right]}
+                            $$
+                            </div>
+                        </li>
+                        <li class="fragment" data-fragment-index="4">Visual 'Side effect'
+                            <ul>
+                                <li><strong>No noise</strong> in unshadowed regions</li>
+                                <li><strong>Ensure unbiasness</strong> w.r.t. $f(\boldsymbol{\omega})$</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <aside class="notes">
+                        <!-- Make sure people understand that y is the SH maybe convert for tilde f -->
+                        Unfortunately, the analytical integration fails to account for parts of the rendering equation. <strong>*click*</strong> The first issue is the inability of the SH integral to account for shadowing as you can see on this image from our real-time demo. It is possible to bake the shadows into the SH decomposition but this is prohibitive and requires many coefficients. The second source of error is that the SH decomposition is an approximation of the true signal to integrate. <strong>*click*</strong><br /><br />
+
+                        We used control variate to overcome those bias. The idea here is to correct the closed-form integral with a Monte-Carlo estimator. <strong>*click*</strong><br /><br />
+
+                        There, the closed-form solution is corrected by a Monte-Carlo estimator that compute the difference between the spherical harmonics integral and the exact integrand noted f here. This later integrand contains the shadow and/or the correct BRDF. <strong>*click*</strong><br /><br />
+
+                        The target effet is to get a resulting radiance that is noise free in region where the SH decomposition has no bias. That is in unshadowed region we will get a large reduction in variance. Also, we can build an unbiased estimator when this criteria is critical.
+                    </aside>
+                </section>
+                <section>
+                    <h2>Application: Control Variates</h2>
+                    <ul>
+                        <li>Dragon scene</li>
+                    </ul>
+                    <object id="dragon_01" style="padding-top:30px;" data="./images/svg/variates/dragon_01.svg" width="100%"  type="image/svg+xml"></object>
+                    <div id="dragon_01_01" class="fragment"></div>
+                    <div id="dragon_01_02" class="fragment"></div>
+                    <aside class="notes">
+                        Here is the result of our method in a tuned Cornell box with a dragon asset in the middle. The cornell box contains two light sources, one that is a low frequency portal light. For this example, we converted the envmap behind the portal to spherical harmonics and used the SH convolution theorem to evaluate the product of the BRDF and lighting at every pixel. <strong>*click*</strong><br /><br />
+
+                        For an equal amount of time, our method permits to render noise free images in fully unshadowed regions.<strong>*click*</strong><br /><br />
+
+                        While having a noise level similar to an equal path tracer for shadowed regions.
+                    </aside>
+                    <script>
+                        Reveal.addEventListener('fragmentshown', function( event ) {
+                            var snap = Snap("#dragon_01");
+                            if(event.fragment.id == "dragon_01_01") {
+                                snap.select("#first").animate({ opacity:1}, 500);
+
+                            } else if(event.fragment.id == "dragon_01_02") {
+                                snap.select("#second").animate({ opacity:1 }, 500);
+                            }
+                        });
+                        Reveal.addEventListener('fragmenthidden', function( event ) {
+                            var snap = Snap("#dragon_01");
+                            if(event.fragment.id == "dragon_01_01") {
+                                snap.select("#first").animate({ opacity:0}, 500);
+
+                            } else if(event.fragment.id == "dragon_01_02") {
+                                snap.select("#second").animate({ opacity:0 }, 500);
+                            }
+                        });
+                    </script>
+                </section>
+                <section>
+                    <h2>Application: Control Variates</h2>
+                    <ul>
+                        <li>Fog scene</li>
+                    </ul>
+                    <object id="dragon_01" style="padding-top:30px;" data="./images/svg/variates/fog_portal_01.svg" width="100%"  type="image/svg+xml"></object>
+                    <aside class="notes">
+                        In this scene, we show our voumetric rendering method with a portal light. There, we evaluate the transmission at the center of the area light and multiply the closed-form integral by it. We incorporate the correct attenuation inside the control variate to compensate for the inaccuracy of this approximation. We found that this added very little noise in the control variate estimate.
+                    </aside>
+                </section>
+                <section>
+                    <h2>Application: Control Variates</h2>
+                    <ul>
+                        <li>San Miguel scene</li>
+                    </ul>
+                    <center style="padding-top:57px;">
+                        <object data="./images/svg/variates/variates.svg" width="100%"  type="image/svg+xml"></object>
+                    </center>
+                    <aside class="notes">
+                        Here is another example in the San Miguel hacienda. There as well the noise is remove from unoccluded regions and the noise level in the partially shadowed regions keeps a similar magnitude.
+
+                        Note that because of the stochastic correction, we will introduce some additional noise in regions that are fully or almost fully occluded. This is one of the drawbacks of control variate methods.
+                    </aside>
+                </section>
+
+                <!-- Spoiler -->
+                <!--
+                <section>
+                    <h2>Spoiler</h2>
+                    <aside class="notes">
+                    </aside>
+                </section>
+                -->
+
+
+                    <!-- Summary section -->
+                    <section>
+                            <h2>Summary</h2>
+                            <video style="position:absolute; top:0; left: 330px; margin: 0; border: none; box-shadow: none; max-width: 112%; max-height: 112%; z-index: -500;" height="120%" width="120%" data-autoplay loop src="./videos/realtime.mov"></video>
+                            <div style="position:absolute; top:0; left: 0px; margin: 0; max-width: 100%; max-height: 100%; z-index: -5; width: 720px; height:720px; background-color: #FFF "></div>
+                            <ul>
+                                <li class="fragment" style="padding:0px 0px 10px 0px;">We <strong>integrate</strong> Spherical Harmonics
+                                        <ul>
+                                                <li>over spherical polygons</li>
+                                                <li>with a closed-form expression</li>
+                                                <li>that is efficient (linear cost)</li>
+                                        </ul>
+                                    </li>
+                                    <li class="fragment" style="padding:0px 0px 10px 0px;">We <strong>apply</strong> this new tool
+                                        <ul>
+                                                <li>to surface and volume shading</li>
+                                                <li>to polygonal portal lights</li>
+                                                <li>to importance sampling</li>
+                                        </ul>
+                                    </li>
+                            </ul>
+                            <aside class="notes">
+                                To summarize, <strong>*click*</strong> I presented a new addition to the spherical integration toolbag that enables to integrate spherical harmonics decompositions over spherical polygons. We extract a closed-form expression that is efficient to compute thanks to computation sharing. <strong>*click*</strong> <br/><br/>
+
+                                We applied this new tool to many applications such as surface rendering, volume rendering and importance sampling.
+                            </aside>
+                        </section>
+
+                <!-- Conclusion -->
+                <section><h2>Thank you for your attention</h2>
+                    <center style="padding-top: 100px;">
+                    <table>
+                        <tr>
+                            <td style="padding-bottom: 0px; padding-right: 100px;"><img style="width: 200px; border: none; box-shadow: none; margin: 0px;" src="./images/png/end/paper.png" /></td>
+                            <td style="padding-bottom: 0px;"><img style="width: 200px; border: none; box-shadow: none; margin: 0px;" src="./images/png/end/code.png" /></td>
+                        </tr>
+                        <tr>
+                            <td style="padding-top: 0px; position:relative; left: 60px; font-size: 0.7em;">paper</td>
+                            <td style="padding-top: 0px; position:relative; left: 65px; font-size: 0.7em;">code</td>
+                        </tr>
+                    </table>
+                    </center>
+
+                    <center style="padding-top: 80px;">available at <a href="https://belcour.github.io/blog/research/2018/05/05/brdf-realtime-layered.html">belcour.github.io/blog</a></center>
+                    <aside class="notes">
+                        I encourage you to our paper and checkout our code available on github. Thank you for your attention.
+                    </aside>
+                </section>
+            </div>
+        </div>
+        <script>
+            Reveal.initialize({
+                  width: 1280,
+                  height: 720,
+                  margin: 0.0,
+                  history: true,
+                //   showNotes: true,
+                  controls: false,
+                  slideNumber: 'c/t',
+                  transition: 'fade',
+                  math: {
+		            mathjax: 'ext/mathjax/MathJax.js',
+		            config: 'TeX-AMS_SVG-full'  // See http://docs.mathjax.org/en/latest/config-files.html
+	            },
+
+                dependencies: [
+                    { src: 'ext/reveal.js/plugin/math/math.js', async: true },
+                    { src: 'ext/reveal.js/plugin/notes/notes.js', async: true },
+                    { src: 'ext/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+                ]
+            });
+
+            // Create WebGL canvas
+            createCanvas();
+
+
+            // Update the context to the current sldie
+            Reveal.addEventListener('slidechanged', function( event ) {
+                var element = $(event.currentSlide).find("div.webgl");
+                if(element.length > 0) {
+                    replaceElement(element, Reveal.getScale());
+                }
+
+            });
+        </script>
+    </body>
+</html>
+
