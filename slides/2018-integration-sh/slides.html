@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
 
-        <title></title>
+        <title>Integrating Clipped Spherical Harmonics</title>
 
         <meta name="description" content="Slides">
         <meta name="author" content="Laurent Belcour">
@@ -16,7 +16,7 @@
         <style>
             @font-face {
                     font-family: Purisa;
-                    src: url(./fonts/Purisa.ttf);
+                    src: url(fonts/Purisa.ttf);
             }
       </style>
 
@@ -27,7 +27,7 @@
         <script src="ext/webgl/scripts/shaders.js"></script>
         <script src="ext/webgl/scripts/utils.js"></script>
         <script src="ext/threejs/three.min.js"></script>
-        <script src="ext/threejs/EXRLoader.js"></script>
+        <!-- <script src="ext/threejs/EXRLoader.js"></script> -->
         <!-- <script src="ext/threejs/js/libs/OrbitControls.js"></script> -->
     </head>
     <body>
@@ -1009,7 +1009,7 @@ function ComputeIntegral(<span style="color:aquamarine;">flm</span>, <span style
                   height: 720,
                   margin: 0.0,
                   history: true,
-                //   showNotes: true,
+                  showNotes: true,
                   controls: false,
                   slideNumber: 'c/t',
                   transition: 'fade',
