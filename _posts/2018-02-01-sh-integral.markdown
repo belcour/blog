@@ -19,6 +19,9 @@ published: true
    <a href="https://github.com/belcour/IntegralSH/">
       <img src="{{ site.url | append: site.baseurl }}/data/images/icon_zip.png" height="32px">code
    </a>
+   <a href="https://belcour.github.io/blog/slides/2018-integration-sh/slides.html">
+      <img src="{{ site.url | append: site.baseurl }}/data/images/icon_slides.png" height="32px">slides
+   </a>
 </span><br />
 
 <h4>Project Summary</h4>

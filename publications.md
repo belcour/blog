@@ -80,8 +80,12 @@ simulation or to adapt the sampling budget locally.
       Laurent Belcour<br />
       <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2018, 37 (4)
       <a href="{{ site.url | append: site.baseurl }}/research/2018/05/05/brdf-realtime-layered.html">webpage</a>
-      <!--
-      <a href="https://hal.archives-ouvertes.fr/hal-01785457/document">pdf</a> <a href="https://hal.inria.fr/hal-01785457/file/supp.pdf">supp. pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01785457/bibtex">bib</a> <a href="https://hal.inria.fr/hal-01785457/file/suppl.zip">code</a> --><a href="https://youtu.be/wM5E-NJtaug">video</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-01785457/document">pdf</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-01785457v2/file/suppl.pdf">supp. pdf</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-01785457/bibtex">bib</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-01785457v2/file/suppl.zip">code</a>
+      <a href="https://youtu.be/wM5E-NJtaug">video</a>
+      <a href="https://belcour.github.io/blog/slides/2018-brdf-realtime-layered/slides.html">slides</a>
   </td>
 </tr>
 <tr>
@@ -90,7 +94,10 @@ simulation or to adapt the sampling budget locally.
       Laurent Belcour, Guofu Xie, Christophe Hery, Mark Meyer, Wojciech Jarosz, and Derek Nowrouzezahrai<br />
       <em>ACM Transactions on Graphics</em>, 2018
       <a href="{{ site.url | append: site.baseurl }}/research/2018/02/01/sh-integral.html">webpage</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-01695284/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01695284/bibtex">bib</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-01695284/document">pdf</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-01695284/bibtex">bib</a>
+      <a href="https://github.com/belcour/IntegralSH/">code</a>
+      <a href="https://belcour.github.io/blog/slides/2018-integration-sh/slides.html">slides</a>
   </td>
 </tr>
 <tr>
