@@ -12,8 +12,8 @@ published: true
 
 <span>
 <a href="https://hal.archives-ouvertes.fr/hal-01785457/document"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px">paper</a> &nbsp;
-<a href="https://hal.archives-ouvertes.fr/hal-01785457/file/suppl.pdf"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px"/>supp. pdf</a> &nbsp;
-<a href="https://hal.archives-ouvertes.fr/hal-01785457/file/suppl.zip"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_zip.png" height="32px">supp. code</a> &nbsp;
+<a href="https://hal.archives-ouvertes.fr/hal-01785457v2/file/suppl.pdf"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px"/>supp. pdf</a> &nbsp;
+<a href="https://hal.archives-ouvertes.fr/hal-01785457v3/file/suppl.zip"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_zip.png" height="32px">supp. code</a> &nbsp;
 <a href="https://hal.archives-ouvertes.fr/hal-01785457/bibtex"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_latex.png" height="32px">bib</a> &nbsp;
 <a href="https://youtu.be/wM5E-NJtaug">
 <img src="{{ site.url | append: site.baseurl }}/data/images/icon_video.png" height="32px">video</a> &nbsp;
