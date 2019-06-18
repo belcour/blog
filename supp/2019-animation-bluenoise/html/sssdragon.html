@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <title>sssDragon scene</title>
+   <link rel="stylesheet" href="css/main.css" />
+    <link href="css/twentytwenty.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+   <center>
+      <h1>sssDragon scene</h1>
+      <br />
+	  <br/>
+	  
+	  <div style="width:1024px;text-align:left;">
+	  In this scene rendered by path tracing, you can control the number of bounces of global illumination. 
+	  Note how our method achieves high-quality results regardless of the number of bounces.
+	  </div>
+	  
+      <br />
+      <button onclick="setNewFrame('sssdragon',  4);">frame  4</button>
+      <button onclick="setNewFrame('sssdragon',  5);">frame  5</button>
+      <button onclick="setNewFrame('sssdragon', 49);">frame 49</button>
+      <button onclick="setNewFrame('sssdragon', 50);">frame 50</button>
+      <br /><br />
+      <button onclick="setNewDim('sssdragon',  4);"> 4 bounces</button>
+      <button onclick="setNewDim('sssdragon', 10);">10 bounces</button>
+      <button onclick="setNewDim('sssdragon', 20);">20 bounces</button>
+      <br /><br />
+      <button onclick="setNewSPP('sssdragon',  1);"> 1 spp</button>
+      <button onclick="setNewSPP('sssdragon', 16);">16 spp </button>
+      <button onclick="setNewSPP('sssdragon', 32);">32 spp</button>
+      <br /><br />
+      <div class="twentytwenty-container" id="sssdragon">
+         <img class="img-responsive" src="./images/sssdragon/sssdragon_720p_4d_32spp/bluenoise/sssdragon_0004.png"  alt="Ours"/>
+         <img class="img-responsive" src="./images/sssdragon/sssdragon_720p_4d_32spp/whitenoise/sssdragon_0004.png" alt="Decorrelated Randomization"/>
+         <img class="img-responsive" src="./images/sssdragon/sssdragon_720p_4d_32spp/gf2016/sssdragon_0004.png"     alt="Georgiev and Fajardo [2016]"/>
+         <img class="img-responsive" src="./images/sssdragon/sssdragon_720p_4d_32spp/bluenoise/sssdragon_0004.png"  alt="Ours"/>
+   </div>
+   </center>
+
+   <script src="js/jquery.min.js"></script>
+   <script src="js/jquery.cycle2.min.js"></script>
+   <script src="js/bootstrap.min.js"></script>
+   <script src="js/utils.js"></script>
+   <script>
+   $(document).ready(function () {
+       $(".navbar-toggle").on("click", function () {
+           $(this).toggleClass("active");
+       });
+   });
+
+   setNewDim = function(id, dim) {
+      $("#" + id + " img").each(function(){
+         var filename = $(this).attr('src');
+         var newname = filename.replace(new RegExp("_[0-9]+d"), "_"+dim+"d");
+         $(this).attr('src', newname);
+      });
+   }
+
+   setNewFrame = function(id, frame) {
+      $("#" + id + " img").each(function(){
+         var filename = $(this).attr('src');
+         var newname = filename.replace(new RegExp(id+"_[0-9]+.png"), id+"_"+('000' + frame).slice(-4)+".png") ;
+         $(this).attr('src', newname);
+      });
+   }
+
+   setNewSPP = function(id, spp) {
+      $("#" + id + " img").each(function(){
+         var filename = $(this).attr('src');
+         var newname = filename.replace(new RegExp("[0-9]+spp"), spp+"spp") ;
+         $(this).attr('src', newname);
+      });
+   }
+   </script>
+
+   <script src="js/jquery.event.move.js"></script>
+   <script src="js/jquery.twentytwenty.js"></script>
+   <script>
+   $(window).load(function(){$(".twentytwenty-container").twentytwenty({default_offset_pct: 0.5});});
+   </script>
+</body>
+</html>

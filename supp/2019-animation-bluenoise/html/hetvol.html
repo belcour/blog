@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <title>HetVol scene</title>
+   <link rel="stylesheet" href="css/main.css" />
+    <link href="css/twentytwenty.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+   <center>
+      <h1>HetVol scene</h1>
+      <br />
+      <button onclick="setNewFrame('hetvol', 118);">frame 118</button>
+      <button onclick="setNewFrame('hetvol', 119);">frame 119</button>
+      <br /><br />
+      <button onclick="setNewSPP('hetvol', 32);">32 spp</button>
+      <br /><br />
+      <div class="twentytwenty-container" id="hetvol">
+         <img class="img-responsive" src="./images/hetvol/hetvol_32spp/bluenoise/hetvol_0119.png"  alt="Ours"/>
+         <img class="img-responsive" src="./images/hetvol/hetvol_32spp/whitenoise/hetvol_0119.png" alt="Decorrelated Randomization"/>
+   </div>
+   </center>
+
+   <script src="js/jquery.min.js"></script>
+   <script src="js/jquery.cycle2.min.js"></script>
+   <script src="js/bootstrap.min.js"></script>
+   <script src="js/utils.js"></script>
+   <script>
+   $(document).ready(function () {
+       $(".navbar-toggle").on("click", function () {
+           $(this).toggleClass("active");
+       });
+   });
+
+   setNewSPP = function(id, spp) {
+      $("#" + id + " img").each(function(){
+         var filename = $(this).attr('src');
+         var newname = filename.replace(new RegExp("[0-9]+spp"), spp+"spp");
+         $(this).attr('src', newname);
+      });
+   }
+
+   setNewFrame = function(id, frame) {
+      $("#" + id + " img").each(function(){
+         var filename = $(this).attr('src');
+         var newname = filename.replace(new RegExp(id+"_[0-9]+.png"), id+"_"+('000' + frame).slice(-4)+".png") ;
+         $(this).attr('src', newname);
+      });
+   }
+   </script>
+
+   <script src="js/jquery.event.move.js"></script>
+   <script src="js/jquery.twentytwenty.js"></script>
+   <script>
+   $(window).load(function(){$(".twentytwenty-container").twentytwenty({default_offset_pct: 0.5});});
+   </script>
+</body>
+</html>

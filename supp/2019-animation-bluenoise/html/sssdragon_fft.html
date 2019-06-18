@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <title>sssDragon scene</title>
+   <link rel="stylesheet" href="./css/main.css" />
+    <link href="./css/twentytwenty.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+   <center>
+      <h1>sssDragon scene</h1>
+      <button onclick="setNewFrame('sssdragon',  4);">frame  4</button>
+      <button onclick="setNewFrame('sssdragon',  5);">frame  5</button>
+      <button onclick="setNewFrame('sssdragon', 49);">frame 49</button>
+      <button onclick="setNewFrame('sssdragon', 50);">frame 50</button>
+      <br /><br />
+      <button onclick="setNewDim('sssdragon',  4);"> 4 bounces</button>
+      <button onclick="setNewDim('sssdragon', 10);">10 bounces</button>
+      <button onclick="setNewDim('sssdragon', 20);">20 bounces</button>
+      <br /><br />
+      <button onclick="setNewSPP('sssdragon',  1);"> 1 spp</button>
+      <button onclick="setNewSPP('sssdragon', 16);">16 spp </button>
+      <button onclick="setNewSPP('sssdragon', 32);">32 spp</button>
+      <br /><br />
+      <div id="sssdragon">
+      <canvas style = "transform-origin: top;" id="canvas_img"
+              src   = "./images/sssdragon/sssdragon_720p_4d_1spp/bluenoise/sssdragon_0004.png"
+              white = "./images/sssdragon/sssdragon_720p_4d_1spp/whitenoise/sssdragon_0004.png"
+              sa    = "./images/sssdragon/sssdragon_720p_4d_1spp/gf2016/sssdragon_0004.png"
+              ref   = "./images/sssdragon/sssdragon_720p_4d_ref_0004.png">
+      </canvas>
+
+      <!-- Ours -->
+      <canvas style="position:fixed; top: 30px; left: 20px; border: 1px solid black; width: 128px;" width="64" height="64" id="local-analysis-01-inset"></canvas>
+      <canvas style="position:fixed; top: 30px; left:158px; border: 1px solid black; width: 128px;" width="64" height="64" id="local-analysis-01-fft"></canvas>
+      <span   style="position:fixed; top:160px; left: 20px; font-size: 10px; width: 128px; text-shadow: 0px 0px 2px white;">Inset</span>
+      <span   style="position:fixed; top:160px; left:158px; font-size: 10px; width: 128px; text-shadow: 0px 0px 2px white;">Fourier Transform</span>
+      <span   style="position:fixed; top: 10px; left:140px; font-size: 12px; height: 128px; font-weight: bold; text-shadow: 0px 0px 2px white;">Ours</span>
+
+      <!-- White Noise -->
+      <canvas style="position:fixed; top:220px; left: 20px; border: 1px solid black; width: 128px;" width="64" height="64" id="local-analysis-02-inset"></canvas>
+      <canvas style="position:fixed; top:220px; left:158px; border: 1px solid black; width: 128px;" width="64" height="64" id="local-analysis-02-fft"></canvas>
+      <span   style="position:fixed; top:350px; left: 20px; font-size: 10px; width: 128px; text-shadow: 0px 0px 2px white;">Inset</span>
+      <span   style="position:fixed; top:350px; left:158px; font-size: 10px; width: 128px; text-shadow: 0px 0px 2px white;">Fourier Transform</span>
+      <span   style="position:fixed; top:200px; left:110px; font-size: 12px; height: 128px; font-weight: bold; text-shadow: 0px 0px 2px white;">Decorrelated Randomization</span>
+
+      <!-- Solid Angle -->
+      <canvas style="position:fixed; top:410px; left: 20px; border: 1px solid black; width: 128px;" width="64" height="64" id="local-analysis-03-inset"></canvas>
+      <canvas style="position:fixed; top:410px; left:158px; border: 1px solid black; width: 128px;" width="64" height="64" id="local-analysis-03-fft"></canvas>
+      <span   style="position:fixed; top:540px; left: 20px; font-size: 10px; width: 128px; text-shadow: 0px 0px 2px white;">Inset</span>
+      <span   style="position:fixed; top:540px; left:158px; font-size: 10px; width: 128px; text-shadow: 0px 0px 2px white;">Fourier Transform</span>
+      <span   style="position:fixed; top:390px; left: 70px; font-size: 12px; height: 128px; font-weight: bold; text-shadow: 0px 0px 2px white;">Georgiev and Fajardo [2016]</span>
+
+      <!-- Ref -->
+      <!--
+      <canvas style="position:fixed; top:600px; left:80px; border: 1px solid black; width: 128px;" width="64" height="64" id="local-analysis-04-inset"></canvas>
+      <span   style="position:fixed; top:580px; left:80px; font-size: 12px; height: 128px; font-weight: bold; text-shadow: 0px 0px 2px white;">Reference</span>
+      -->
+      </div>
+   </center>
+
+
+   <script src="./js/jquery.min.js"></script>
+   <script src="./js/utils.js"></script>
+   <script src="./js/fft.js"></script>
+
+
+   <script>
+   var img = new Image();
+   img.src = document.getElementById('canvas_img').getAttribute('src');
+   var white = new Image();
+   white.src = document.getElementById('canvas_img').getAttribute('white');
+   var sa = new Image();
+   sa.src = document.getElementById('canvas_img').getAttribute('sa');
+   var ref = new Image();
+   ref.src = document.getElementById('canvas_img').getAttribute('ref');
+
+   setNewFrame = function(id, frame) {
+       var filename = document.getElementById('canvas_img').getAttribute('src');
+       var newname = filename.replace(new RegExp(id+"_[0-9]+.png"), id+"_"+('000' + frame).slice(-4)+".png");
+       document.getElementById('canvas_img').setAttribute('src', newname);
+       img.src = newname;
+
+       var filename = document.getElementById('canvas_img').getAttribute('white');
+       var newname = filename.replace(new RegExp(id+"_[0-9]+.png"), id+"_"+('000' + frame).slice(-4)+".png");
+       document.getElementById('canvas_img').setAttribute('white', newname);
+       white.src = newname;
+
+       var filename = document.getElementById('canvas_img').getAttribute('sa');
+       var newname = filename.replace(new RegExp(id+"_[0-9]+.png"), id+"_"+('000' + frame).slice(-4)+".png");
+       document.getElementById('canvas_img').setAttribute('sa', newname);
+       sa.src = newname;
+
+       var filename = document.getElementById('canvas_img').getAttribute('ref');
+       var newname = filename.replace(new RegExp("ref_[0-9]+.png"), "ref_"+('000' + frame).slice(-4)+".png");
+       document.getElementById('canvas_img').setAttribute('ref', newname);
+       ref.src = newname;
+    }
+
+    setNewDim = function(id, dim) {
+       var filename = document.getElementById('canvas_img').getAttribute('src');
+       var newname = filename.replace(new RegExp("_[0-9]+d"), "_"+dim+"d");
+       document.getElementById('canvas_img').setAttribute('src', newname);
+       img.src = newname;
+
+       var filename = document.getElementById('canvas_img').getAttribute('white');
+       var newname = filename.replace(new RegExp("_[0-9]+d"), "_"+dim+"d");
+       document.getElementById('canvas_img').setAttribute('white', newname);
+       white.src = newname;
+
+       var filename = document.getElementById('canvas_img').getAttribute('sa');
+       var newname = filename.replace(new RegExp("_[0-9]+d"), "_"+dim+"d");
+       document.getElementById('canvas_img').setAttribute('sa', newname);
+       sa.src = newname;
+
+       var filename = document.getElementById('canvas_img').getAttribute('ref');
+       var newname = filename.replace(new RegExp("_[0-9]+d"), "_"+dim+"d");
+       document.getElementById('canvas_img').setAttribute('ref', newname);
+       ref.src = newname;
+   }
+
+    setNewSPP = function(id, spp) {
+       var filename = document.getElementById('canvas_img').getAttribute('src');
+       var newname = filename.replace(new RegExp("[0-9]+spp"), spp+"spp");
+       document.getElementById('canvas_img').setAttribute('src', newname);
+       img.src = newname;
+
+       var filename = document.getElementById('canvas_img').getAttribute('white');
+       var newname = filename.replace(new RegExp("[0-9]+spp"), spp+"spp");
+       document.getElementById('canvas_img').setAttribute('white', newname);
+       white.src = newname;
+
+       var filename = document.getElementById('canvas_img').getAttribute('sa');
+       var newname = filename.replace(new RegExp("[0-9]+spp"), spp+"spp");
+       document.getElementById('canvas_img').setAttribute('sa', newname);
+       sa.src = newname;
+    }
+
+   $(document).ready(function () {
+      var inset1 = {size:64, x:360, y:280, color: "#FF0000", canvas: "local-analysis-01-fft"};
+      var inset2 = {size:64, x:360, y:280, color: "#FF0000", canvas: "local-analysis-02-fft"};
+      var inset3 = {size:64, x:360, y:280, color: "#FF0000", canvas: "local-analysis-03-fft"};
+      var inset4 = {size:64, x:360, y:280, color: "#FF0000", canvas: "local-analysis-04-fft"};
+
+      var canvas = document.getElementById('canvas_img');
+      var canvasContext = canvas.getContext('2d');
+
+      sa.onload = function() {
+         canvas.width = img.width;
+         canvas.height = img.height;
+         canvasContext.drawImage(img, 0, 0);
+
+         if(img.height > window.innerHeight) {
+            var elem = $('#canvas_img');
+            canvas.style.transform = "scale(" + ((window.innerHeight)/img.height) + ")";
+         }
+
+         canvasContext.strokeStyle = "red";
+         canvasContext.rect(inset1.x, inset1.y, inset1.size, inset1.size);
+         canvasContext.stroke();
+
+         // Draw the inset
+         inset1.canvas.width = inset1.size;
+         inset1.canvas.height = inset1.size;
+         var fft_img = document.getElementById('local-analysis-01-inset');
+         var fft_ctx = fft_img.getContext('2d');
+         var ffth  = fft_img.width;
+         var fftw  = fft_img.height;
+         fft_ctx.drawImage(img, inset1.x, inset1.y, inset1.size, inset1.size, 0, 0, fftw, ffth);
+         updateLocalAnalysis(img, ref, inset1);
+
+         var fft_img = document.getElementById('local-analysis-02-inset');
+         var fft_ctx = fft_img.getContext('2d');
+         var ffth  = fft_img.width;
+         var fftw  = fft_img.height;
+         fft_ctx.drawImage(white, inset1.x, inset1.y, inset1.size, inset1.size, 0, 0, fftw, ffth);
+         updateLocalAnalysis(white, ref, inset2);
+
+         var fft_img = document.getElementById('local-analysis-03-inset');
+         var fft_ctx = fft_img.getContext('2d');
+         var ffth  = fft_img.width;
+         var fftw  = fft_img.height;
+         fft_ctx.drawImage(sa, inset1.x, inset1.y, inset1.size, inset1.size, 0, 0, fftw, ffth);
+         updateLocalAnalysis(sa, ref, inset3);
+
+         /*
+         var fft_img = document.getElementById('local-analysis-04-inset');
+         var fft_ctx = fft_img.getContext('2d');
+         var ffth  = fft_img.width;
+         var fftw  = fft_img.height;
+         fft_ctx.drawImage(ref, inset1.x, inset1.y, inset1.size, inset1.size, 0, 0, fftw, ffth);
+         */
+
+         $('#canvas_img').data('moveBox', false);
+         $('#canvas_img').mousemove(function(event) {
+            if($('#canvas_img').data('moveBox')) {
+               var ctx = this.getContext("2d");
+               ctx.clearRect(0,0,$(this).width(),$(this).height());
+               ctx.drawImage(img, 0, 0);
+
+               var scale = img.height / img.naturalHeight;
+
+               // Draw the inset
+               inset1.canvas.width = inset1.size;
+               inset1.canvas.height = inset1.size;
+
+               inset1.x = event.offsetX - inset1.size/2;
+               inset1.y = event.offsetY - inset1.size/2;
+               inset2.x = inset1.x;
+               inset2.y = inset1.y;
+               inset3.x = inset1.x;
+               inset3.y = inset1.y;
+               inset4.x = inset1.x;
+               inset4.y = inset1.y;
+
+               ctx.strokeRect(inset1.x, inset1.y, scale*inset1.size, scale*inset1.size);
+
+               var fft_img = document.getElementById('local-analysis-01-inset');
+               var fft_ctx = fft_img.getContext('2d');
+               var ffth  = fft_img.width;
+               var fftw  = fft_img.height;
+               fft_ctx.drawImage(img, inset1.x, inset1.y, inset1.size, inset1.size, 0, 0, fftw, ffth);
+               updateLocalAnalysis(img, ref, inset1);
+
+               var fft_img = document.getElementById('local-analysis-02-inset');
+               var fft_ctx = fft_img.getContext('2d');
+               fft_ctx.drawImage(white, inset1.x, inset1.y, inset1.size, inset1.size, 0, 0, fftw, ffth);
+               updateLocalAnalysis(white, ref, inset2);
+
+               var fft_img = document.getElementById('local-analysis-03-inset');
+               var fft_ctx = fft_img.getContext('2d');
+               fft_ctx.drawImage(sa, inset1.x, inset1.y, inset1.size, inset1.size, 0, 0, fftw, ffth);
+               updateLocalAnalysis(sa, ref, inset3);
+
+               /*
+               var fft_img = document.getElementById('local-analysis-04-inset');
+               var fft_ctx = fft_img.getContext('2d');
+               var ffth  = fft_img.width;
+               var fftw  = fft_img.height;
+               fft_ctx.drawImage(ref, inset1.x, inset1.y, inset1.size, inset1.size, 0, 0, fftw, ffth);
+               */
+            }
+         });
+
+         $('#canvas_img').mousedown(function(event){
+            $('#canvas_img').data('moveBox', true);
+         });
+         $('#canvas_img').mouseup(function(event){
+            $('#canvas_img').data('moveBox', false);
+         });
+      };
+   });
+   </script>
+</body>
+</html>

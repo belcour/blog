@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <title>Teapot scene</title>
+   <link rel="stylesheet" href="css/main.css" />
+    <link href="css/twentytwenty.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+   <center>
+      <h1>Teapot scene</h1>
+      <br />
+      <button onclick="setNewFrame('teapot', 15);">frame 15</button>
+      <button onclick="setNewFrame('teapot', 16);">frame 16</button>
+      <button onclick="setNewFrame('teapot', 30);">frame 30</button>
+      <button onclick="setNewFrame('teapot', 31);">frame 31</button>
+      <br /><br />
+      <button onclick="setNewSPP('teapot', 1);">1 spp</button>
+      <button onclick="setNewSPP('teapot', 4);">4 spp</button>
+      <button onclick="setNewSPP('teapot', 8);">8 spp</button>
+      <button onclick="setNewSPP('teapot', 16);">16 spp</button>
+      <button onclick="setNewSPP('teapot', 32);">32 spp</button>
+      <button onclick="setNewSPP('teapot', 32);">64 spp</button>
+      <br /><br />
+      <div class="twentytwenty-container" id="teapot">
+         <img class="img-responsive" src="./images/teapot/teapot_1spp/bluenoise/teapot_0015.png"  alt="Ours"/>
+         <img class="img-responsive" src="./images/teapot/teapot_1spp/whitenoise/teapot_0015.png" alt="Decorrelated Randomization"/>
+         <img class="img-responsive" src="./images/teapot/teapot_1spp/gf2016/teapot_0015.png"     alt="Georgiev and Fajardo [2016]"/>
+         <img class="img-responsive" src="./images/teapot/teapot_1spp/bluenoise/teapot_0015.png"  alt="Ours"/>
+   </div>
+   </center>
+
+   <script src="js/jquery.min.js"></script>
+   <script src="js/jquery.cycle2.min.js"></script>
+   <script src="js/bootstrap.min.js"></script>
+   <script src="js/utils.js"></script>
+   <script>
+   $(document).ready(function () {
+       $(".navbar-toggle").on("click", function () {
+           $(this).toggleClass("active");
+       });
+   });
+
+   setNewSPP = function(id, spp) {
+      $("#" + id + " img").each(function(){
+         var filename = $(this).attr('src');
+         var newname = filename.replace(new RegExp("[0-9]+spp"), spp+"spp");
+         $(this).attr('src', newname);
+      });
+   }
+
+   setNewFrame = function(id, frame) {
+      $("#" + id + " img").each(function(){
+         var filename = $(this).attr('src');
+         var newname = filename.replace(new RegExp(id+"_[0-9]+.png"), id+"_"+('000' + frame).slice(-4)+".png") ;
+         $(this).attr('src', newname);
+      });
+   }
+   </script>
+
+   <script src="js/jquery.event.move.js"></script>
+   <script src="js/jquery.twentytwenty.js"></script>
+   <script>
+   $(window).load(function(){$(".twentytwenty-container").twentytwenty({default_offset_pct: 0.5});});
+   </script>
+</body>
+</html>

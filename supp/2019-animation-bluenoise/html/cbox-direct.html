@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <title>Cornel Box scene</title>
+   <link rel="stylesheet" href="css/main.css" />
+    <link href="css/twentytwenty.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+   <center>
+      <h1>Cornell Box: direct illumination</h1>
+	  <br/>
+	  
+	  <div style="width:1024px;text-align:left;">
+	  In this scene rendered under direct illumination, the rendering integral is only 2-dimensional. At 1 spp, it provides the optimal conditions for Georgiev and Fajardo's BNDS [2016] that outperforms our method. However, as the sample count increases, the blue-noise distribution of BNDS vanish and our method achieves superior results.
+	  </div>
+	  
+      <br />
+	  <br />
+      <button onclick="setNewFrame('cbox', 4);">frame 4</button>
+      <button onclick="setNewFrame('cbox', 28);">frame 28</button>
+      <br /><br />
+      <button onclick="setNewSPP('cbox', 1);">1 spp</button>
+      <button onclick="setNewSPP('cbox', 4);">4 spp</button>
+      <button onclick="setNewSPP('cbox', 8);">8 spp</button>
+      <button onclick="setNewSPP('cbox', 16);">16 spp</button>
+      <button onclick="setNewSPP('cbox', 32);">32 spp</button>
+      <button onclick="setNewSPP('cbox', 64);">64 spp</button>
+      <br /><br />
+      <div class="twentytwenty-container" id="cbox">
+         <img class="img-responsive" src="./images/cbox-direct/cbox_1spp/bluenoise/cbox_0004.png"  alt="Ours"/>
+         <img class="img-responsive" src="./images/cbox-direct/cbox_1spp/whitenoise/cbox_0004.png" alt="Decorrelated Randomization"/>
+         <img class="img-responsive" src="./images/cbox-direct/cbox_1spp/gf2016/cbox_0004.png"     alt="Georgiev and Fajardo [2016]"/>
+         <img class="img-responsive" src="./images/cbox-direct/cbox_1spp/bluenoise/cbox_0004.png"  alt="Ours"/>
+   </div>
+   </center>
+
+   <script src="js/jquery.min.js"></script>
+   <script src="js/jquery.cycle2.min.js"></script>
+   <script src="js/bootstrap.min.js"></script>
+   <script src="js/utils.js"></script>
+   <script>
+   $(document).ready(function () {
+       $(".navbar-toggle").on("click", function () {
+           $(this).toggleClass("active");
+       });
+   });
+
+   setNewSPP = function(id, spp) {
+      $("#" + id + " img").each(function(){
+         var filename = $(this).attr('src');
+         var newname = filename.replace(new RegExp("[0-9]+spp"), spp+"spp");
+         $(this).attr('src', newname);
+      });
+   }
+
+   setNewFrame = function(id, frame) {
+      $("#" + id + " img").each(function(){
+         var filename = $(this).attr('src');
+         var newname = filename.replace(new RegExp(id+"_[0-9]+.png"), id+"_"+('000' + frame).slice(-4)+".png") ;
+         $(this).attr('src', newname);
+      });
+   }
+   </script>
+
+   <script src="js/jquery.event.move.js"></script>
+   <script src="js/jquery.twentytwenty.js"></script>
+   <script>
+   $(window).load(function(){$(".twentytwenty-container").twentytwenty({default_offset_pct: 0.5});});
+   </script>
+</body>
+</html>

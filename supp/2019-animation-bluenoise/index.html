@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <style>
+img {
+  width: 256px;
+  height: 256px;
+  object-fit: cover; /* Do not scale the image */
+  object-position: center; /* Center the image within the element */
+  border: 1px solid black;
+}
+   </style>
+</head>
+<body>
+**Supplemental Material**
+
+
+# Image comparison
+
+Here you can access at the different scenes we generated to validate our
+method. For each scene, we compare a decorrelated randomization, Georgiev and Fajardo's Blue-Noise Dithered Sampling [<a href="">2016</a>], and our method.
+
+In the following scenes, you will be able to modify the frame and sample count
+of the animation.
+<center>
+   <table>
+      <tr>
+         <td><a href="./html/cbox-direct.html"><img height="256" src="./html/images/cbox-direct/cbox_4spp/bluenoise/cbox_0028.png"/></a></td>
+         <td><a href="./html/cbox.html"><img height="256" src="./html/images/cbox/cbox_4spp/bluenoise/cbox_0028.png"/></a></td>
+      </tr>
+      <tr>
+         <td style="text-align: center;">Cornell Box: direct illumination</td>
+         <td style="text-align: center;">Cornell Box: path tracing</td>
+      </tr>
+   </table><br />
+   <table>
+      <tr>
+         <td><a href="./html/hetvol.html"><img height="256" src="./html/images/hetvol/hetvol_32spp/bluenoise/hetvol_0119.png"/></a></td>
+         <td><a href="./html/teapot.html"><img height="256" src="./html/images/teapot/teapot_32spp/bluenoise/teapot_0030.png"/></a></td>
+      </tr>
+      <tr>
+         <td style="text-align: center;">Hetvol</td>
+         <td style="text-align: center;">Teapot</td>
+      </tr>
+   </table>
+</center>
+
+In this scene, you will be able to modify the frame and the maximum
+depth of the pathtracer. This enable to see the impact of the dimensionality
+on the quality of the image.
+<center>
+   <table>
+      <tr>
+         <td><a href="./html/sssdragon.html"><img height="256" src="./html/images/sssdragon/sssdragon_720p_20d_32spp/bluenoise/sssdragon_0004.png"/></a></td>
+      </tr>
+      <tr>
+         <td style="text-align: center;">sssDragon</td>
+      </tr>
+   </table>
+</center>
+
+In this scene, you will be able to apply a denoiser on the results.
+<center>
+   <table>
+      <tr>
+         <td><a href="./html/cbox-denoised.html"><img height="256" src="./html/images/cbox-denoised/cbox_8spp/bluenoise_denoised/cbox_0360.png"/></a></td>
+      </tr>
+      <tr>
+         <td style="text-align: center;">Cornell Box: denoising</td>
+      </tr>
+   </table>
+</center>
+
+<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="./html/js/markdeep.min.js" charset="utf-8"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+</body>
+</html>
