@@ -128,7 +128,7 @@ simulation or to adapt the sampling budget locally.
   <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_MatCaps.png" alt="chopper_cov" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
   <td style="vertical-align:top;"><b>MatCap Decomposition for Dynamic Appearance Manipulation</b> <br />
       Carlos Jorge Zubiaga, Adolfo Muñoz, Laurent Belcour, Carles Bosch and Pascal Barla <br />
-      <em>Proceedings of  the Eurographics Symposium on Rendering (EI&I track)</em>, 2015
+      <em>Proceedings of the Eurographics Symposium on Rendering (EI&I track)</em>, 2015
       <a href="https://hal.archives-ouvertes.fr/hal-01164590/document">pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01164590/bibtex">bib</a> <a href="https://vimeo.com/132005080">video</a>
   </td>
 </tr>
@@ -168,6 +168,34 @@ simulation or to adapt the sampling budget locally.
 
 ### Sampling
 <table>
+<tr>
+  <td><a href="{{ site.url | append: site.baseurl }}/research/2019/06/17/sampling-bluenoise.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_AnimationBlueNoise.png" alt="Sampling Blue-Noise" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
+  <td style="vertical-align:top;"><b>Distributing Monte Carlo Errors as a Blue Noise in Screen Space by Permuting Pixel Seeds Between Frames</b> <br />
+      Eric Heitz, Laurent Belcour<br />
+      <em>Eurographics Symposium on Rendering</em> 2019
+      <a href="{{ site.url | append: site.baseurl }}/research/2019/06/18/animation-bluenoise.html">webpage</a>
+      <a href="https://drive.google.com/open?id=1znhbmKGeHphfae1tz3YnroOzOA5-sYcd">pdf</a>
+      <!-- <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/supplemental.zip">supp. doc</a> -->
+      <!-- <a href="https://hal.archives-ouvertes.fr/hal-02150657/bibtex">bib</a> -->
+      <!-- <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerCPP.zip">code</a> -->
+      <!-- <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerBlueNoiseErrors2019_video.mp4">video</a> -->
+      <!-- <a href="https://belcour.github.io/blog/slides/2018-brdf-realtime-layered/slides.html">slides</a> -->
+  </td>
+</tr>
+<tr>
+  <td><a href="{{ site.url | append: site.baseurl }}/research/2019/06/17/sampling-bluenoise.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_SamplingBlueNoise.png" alt="Sampling Blue-Noise" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
+  <td style="vertical-align:top;"><b>A Low-Discrepancy Sampler that Distributes Monte Carlo Errors as a Blue Noise in Screen Space</b> <br />
+      Eric Heitz, Laurent Belcour, Victor Ostromoukhov, David Coeurjolly, and Jean-Claude Iehl<br />
+      <em>ACM SIGGRAPH Talk</em> 2019
+      <a href="{{ site.url | append: site.baseurl }}/research/2019/06/17/sampling-bluenoise.html">webpage</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-02150657/document">pdf</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/supplemental.zip">supp. doc</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-02150657/bibtex">bib</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerCPP.zip">code</a>
+      <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerBlueNoiseErrors2019_video.mp4">video</a>
+      <!-- <a href="https://belcour.github.io/blog/slides/2018-brdf-realtime-layered/slides.html">slides</a> -->
+  </td>
+</tr>
 <tr>
   <td><a href="https://drive.google.com/file/d/1gmwg0Qh5UkAvfAJRwGKA2Hqcl_psE4CA/view?usp=sharing"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_TrackLength.png" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
   <td style="vertical-align:top;"><b>A note on track-length sampling with non-exponential distributions </b> <br />

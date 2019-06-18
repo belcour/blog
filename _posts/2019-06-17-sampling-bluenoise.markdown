@@ -2,7 +2,7 @@
 layout: post
 title:  "A Low-Discrepancy Sampler that Distributes Monte Carlo Errors as a Blue Noise in Screen Space"
 author: "Eric Heitz, Laurent Belcour, Victor Ostromoukhov, David Coeurjolly, and Jean-Claude Iehl"
-journal: "SIGGRAPH Talk 2019"
+journal: "ACM SIGGRAPH Talk 2019"
 date:   2019-06-17
 categories: research
 published: true
