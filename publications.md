@@ -190,6 +190,7 @@ simulation or to adapt the sampling budget locally.
       <a href="{{ site.url | append: site.baseurl }}/research/2019/06/17/sampling-bluenoise.html">webpage</a>
       <a href="https://hal.archives-ouvertes.fr/hal-02150657/document">pdf</a>
       <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/supplemental.zip">supp. doc</a>
+      <a href="{{ site.url | append: site.baseurl }}/supp/2019-sampling-bluenoise/index.html">supp. html</a>
       <a href="https://hal.archives-ouvertes.fr/hal-02150657/bibtex">bib</a>
       <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerCPP.zip">code</a>
       <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerBlueNoiseErrors2019_video.mp4">video</a>

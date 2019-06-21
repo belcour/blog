@@ -14,6 +14,7 @@ published: true
 <a href="https://hal.archives-ouvertes.fr/hal-02150657/document"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px">paper</a> &nbsp;
 <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerCPP.zip"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_zip.png" height="32px"/>supp. code</a> &nbsp;
 <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/supplemental.zip"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_zip.png" height="32px">supp. material</a> &nbsp;
+<a href="{{ site.url | append: site.baseurl }}/supp/2019-sampling-bluenoise/index.html"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_html.png" height="32px">supp. material</a> &nbsp;
 <a href="https://hal.archives-ouvertes.fr/hal-02150657/bibtex"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_latex.png" height="32px">bib</a> &nbsp;
 <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerBlueNoiseErrors2019_video.mp4">
 <img src="{{ site.url | append: site.baseurl }}/data/images/icon_video.png" height="32px">video</a> &nbsp;
