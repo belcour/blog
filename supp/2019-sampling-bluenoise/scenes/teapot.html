@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <title>teapot scene</title>
+   <link rel="stylesheet" href="../css/main.css" />
+    <link href="../css/twentytwenty.css" rel="stylesheet" type="text/css" />    
+</head>
+<body>
+
+   <center>
+      <h1>Teapot scene</h1>
+      <br /><br />
+
+      <button onclick="setNewSPP('teapot', 1);">1 spp</button>
+      <button onclick="setNewSPP('teapot', 4);">4 spp</button>
+      <button onclick="setNewSPP('teapot', 8);">8 spp</button>
+      <button onclick="setNewSPP('teapot', 16);">16 spp</button>
+      <button onclick="setNewSPP('teapot', 32);">32 spp</button>
+      <button onclick="setNewSPP('teapot', 64);">64 spp</button>
+      <button onclick="setNewSPP('teapot', 128);">128 spp</button>
+      <br />
+      <br />
+      <div class="twentytwenty-container" id="teapot">
+         <img src="../images/teapot/teapot_spp=1_SequenceSamplerBlueNoiseErrorDistributionProgressive.jpg" alt="Ours (progressive)" class="img-responsive"/>
+         <img src="../images/teapot/teapot_spp=1_SequenceSamplerBlueNoiseErrorDistribution.jpg" alt="Ours (target SPP)" class="img-responsive"/>
+         <img src="../images/teapot/teapot_spp=1_SequenceSamplerWhiteNoiseErrorDistribution.jpg" alt="Random scrambling" class="img-responsive"/>
+         <img src="../images/teapot/teapot_spp=1_SequenceSamplerSolidAngleCPR.jpg" alt="[Georgiev and Fajardo 2016]" class="img-responsive"/>
+   </div>
+   </center>
+
+   <script src="../js/jquery.min.js"></script>
+   <script src="../js/jquery.cycle2.min.js"></script>
+   <script src="../js/bootstrap.min.js"></script>
+   <script src="../js/utils.js"></script>
+   <script>
+   $(document).ready(function () {
+       $(".navbar-toggle").on("click", function () {
+           $(this).toggleClass("active");
+       });
+   });
+   </script>
+
+   <script src="../js/jquery.event.move.js"></script>
+   <script src="../js/jquery.twentytwenty.js"></script>
+   <script>
+   $(window).load(function(){$(".twentytwenty-container").twentytwenty({default_offset_pct: 0.5});});
+   </script>  
+</body>
+</html>

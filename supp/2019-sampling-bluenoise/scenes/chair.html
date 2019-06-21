@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <title>Chair scene</title>
+   <link rel="stylesheet" href="../css/main.css" />
+    <link href="../css/twentytwenty.css" rel="stylesheet" type="text/css" />    
+</head>
+<body>
+   <script>
+      setNewSPP = function(id, spp) {
+         $("#" + id + " img").each(function(){
+            // var elem_id  = $(this).attr('id');
+            var filename = $(this).attr('src');
+            var newname = filename.replace(new RegExp("spp\=[0-9]+"), "spp="+spp);
+            $(this).attr('src', newname);
+         });
+      }
+   </script>
+
+   <center>
+      <h1>Chair scene</h1>
+      <br /><br />
+
+      <button onclick="setNewSPP('chair', 1);">1 spp</button>
+      <button onclick="setNewSPP('chair', 4);">4 spp</button>
+      <button onclick="setNewSPP('chair', 8);">8 spp</button>
+      <button onclick="setNewSPP('chair', 16);">16 spp</button>
+      <button onclick="setNewSPP('chair', 32);">32 spp</button>
+      <button onclick="setNewSPP('chair', 64);">64 spp</button>
+      <button onclick="setNewSPP('chair', 128);">128 spp</button>
+      <br />
+      <br />
+      <div class="twentytwenty-container" id="chair">
+         <img src="../images/chair/chair_spp=1_SequenceSamplerBlueNoiseErrorDistributionProgressive.jpg" alt="Ours (progressive)" class="img-responsive"/>
+         <img src="../images/chair/chair_spp=1_SequenceSamplerBlueNoiseErrorDistribution.jpg" alt="Ours (target SPP)" class="img-responsive"/>
+         <img src="../images/chair/chair_spp=1_SequenceSamplerWhiteNoiseErrorDistribution.jpg" alt="Random scrambling" class="img-responsive"/>
+         <img src="../images/chair/chair_spp=1_SequenceSamplerSolidAngleCPR.jpg" alt="[Georgiev and Fajardo 2016]" class="img-responsive"/>
+	</div>
+   </center>
+
+   <script src="../js/jquery.min.js"></script>
+   <script src="../js/jquery.cycle2.min.js"></script>
+   <script src="../js/bootstrap.min.js"></script>
+   <script src="../js/utils.js"></script>
+   <script>
+   $(document).ready(function () {
+       $(".navbar-toggle").on("click", function () {
+           $(this).toggleClass("active");
+       });
+   });
+   </script>
+
+   <script src="../js/jquery.event.move.js"></script>
+   <script src="../js/jquery.twentytwenty.js"></script>
+   <script>
+   $(window).load(function(){$(".twentytwenty-container").twentytwenty({default_offset_pct: 0.5});});
+   </script>  
+</body>
+</html>

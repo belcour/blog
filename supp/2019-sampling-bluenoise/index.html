@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <style>
+img {
+  width: 256px;
+  height: 256px;
+  object-fit: cover; /* Do not scale the image */
+  object-position: center; /* Center the image within the element */
+  border: 1px solid black;
+}      
+   </style>
+</head>
+<body>
+**Supplemental Material**
+
+# Image comparison
+
+With this supplemental material, for different scenes you will be able to compare 
+<ul>
+  <li>Our method "progressive". In this setting, we optimized the sampler for a value N that is always larger than the maximal sample count, so that it can be used in a progressive renderer. In these examples, we set N=256.  </li>
+  <li>Our method "target SPP". In this setting, we optimized for a value N that is exactly the sample count used to compute the image. This setting achieves a blue-noise error distribution slightly better than the progressive setting but cannot be used in a progressive renderer.   </li>
+  <li>Random scrambling. We use the same Owen-scrambled Sobol sequence as in our method with a random per-pixel scrambling. The error is statistically the same as in our methods but it is distributed as a white noise in screen space, which makes it visually worse.</li>
+  <li>[<a href="https://dl.acm.org/citation.cfm?id=2927430">Georgiev and Fajardo 2016</a>]. We apply their dithering mask to the same Owen-scrambled Sobol sequence as in our method. The error is distributed as a blue noise only for low sample counts. In some cases, the renders exhibit more noise than the three other methods as the sample count increases. This is because the toroidal shifts break the stratification of the sequence and lower its convergence. </li>
+</ul>
+
+The four methods have the same performance. 
+
+<font color="red">Note that due to the 50MB restriction for supplementary files we could only showcase 5 scenes and had to compress the images.</font>
+
+   <center>
+   <table>
+         <tr>
+            <td><a href="scenes/boxed3.html"><img height="256" src="images/boxed3/boxed3_spp=128_SequenceSamplerBlueNoiseErrorDistributionProgressive.jpg"/></a></td>
+            <td><a href="scenes/teapot.html"><img height="256" src="images/teapot/teapot_spp=128_SequenceSamplerBlueNoiseErrorDistributionProgressive.jpg"/></a></td>
+            <td><a href="scenes/cbox.html"><img height="256" src="images/cbox/cbox_spp=128_SequenceSamplerBlueNoiseErrorDistributionProgressive.jpg"/></a></td>
+         </tr>
+         <tr>
+            <td style="text-align: center;">Boxed3</td>
+            <td style="text-align: center;">Teapot</td>
+            <td style="text-align: center;">Cornell Box</td>
+         </tr>
+   </table><br />
+
+   <table>
+      <tr>
+         <td><a href="scenes/chair.html"><img height="256" src="images/chair/chair_spp=128_SequenceSamplerBlueNoiseErrorDistributionProgressive.jpg"/></a></td>
+         <td><a href="scenes/veach_mis.html"><img height="256" src="images/veach_mis/veach_mis_spp=128_SequenceSamplerBlueNoiseErrorDistributionProgressive.jpg"/></a></td>
+      </tr>
+      <tr>
+         <td style="text-align: center;">Chair</td>
+         <td style="text-align: center;">Veach MIS</td>
+      </tr>
+   </table><br />
+</center>
+
+   <!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="js/markdeep.min.js" charset="utf-8"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+</body>
+</html>
