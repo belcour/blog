@@ -18,7 +18,7 @@ published: true
 <a href="https://hal.archives-ouvertes.fr/hal-02150657/bibtex"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_latex.png" height="32px">bib</a> &nbsp;
 <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerBlueNoiseErrors2019_video.mp4">
 <img src="{{ site.url | append: site.baseurl }}/data/images/icon_video.png" height="32px">video</a> &nbsp;
-<!-- <a href="https://belcour.github.io/blog/slides/2018-brdf-realtime-layered/slides.html"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_slides.png" height="32px">slides</a> -->
+<a href="https://belcour.github.io/blog/slides/2019-sampling-bluenoise/index.html"><img src="{{ site.url | append: site.baseurl }}/data/images/icon_slides.png" height="32px">slides</a>
 </span><br />
 
 
