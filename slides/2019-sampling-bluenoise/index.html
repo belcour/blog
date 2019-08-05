@@ -1,0 +1,3061 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>A Low-Discrepancy Sampler that Distributes Monte Carlo Errors as a Blue Noise in Screen Space</title>
+
+		<link rel="stylesheet" href="ext/reveal.js/css/reset.css" type="text/css" />
+		<link rel="stylesheet" href="ext/reveal.js/css/reveal.css" type="text/css" />
+		<link rel="stylesheet" href="ext/reveal.js/css/theme/white.css" type="text/css" />
+		<link rel="stylesheet" href="css/twentytwenty.css" type="text/css" />
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="ext/reveal.js/lib/css/monokai.css" type="text/css" />
+
+		<!-- Printing and PDF exports -->
+		<!-- <script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script> -->
+
+		<!-- Scripts to load images and animate -->
+		<script src="ext/reveal.js/js/reveal.js"></script>
+		<!-- <script src="ext/jquery/jquery.js"></script> -->
+		<script src="ext/snap.svg/snap.svg-min.js"></script>
+		<script src="scripts/canvas2video.js"></script>
+		<script src="scripts/sobol.js"></script>
+		<script src="scripts/fft.js"></script>
+        <script src="scripts/utils.js"></script>
+        <script src="scripts/dithermask.js"></script>
+		<script src="scripts/jquery.min.js"></script>
+		<script src="scripts/jquery.cycle2.min.js"></script>
+		<script src="scripts/bootstrap.min.js"></script>
+		<script>
+		$(document).ready(function () {
+			$(".navbar-toggle").on("click", function () {
+				$(this).toggleClass("active");
+			});
+		});
+		</script>
+		<script src="scripts/jquery.event.move.js"></script>
+		<script src="scripts/jquery.twentytwenty.js"></script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+
+				<section class="title" data-background="images/background/title.png">
+					<h1 style="font-size:1.2em;">A Low-Discrepancy Sampler that Distributes Monte Carlo Errors <br /> as a Blue Noise in Screen Space</h1>
+					<br /> <br />
+					<div style="display:flex; justify-content: space-evenly; font-size:0.8em;">
+						<div style="width:30%;">
+							<div style="display:flex; justify-content: space-evenly;">
+								<div>Eric Heitz</div>
+								<div>Laurent Belcour</div>
+							</div>
+							<div>
+								<hr /><br />
+								<center>Unity Technologies</center>
+							</div>
+						</div>
+						<div style="width:50%;">
+							<div style="display:flex; justify-content: space-evenly;">
+								<div>Victor Ostromoukhov</div>
+								<div>David Coeurjolly</div>
+								<div>Jean-Claude Iehl</div>
+							</div>
+							<div>
+								<hr /><br />
+								<center>Universite Lyon I</center>
+							</div>
+						</div>
+					</div>
+					<aside class="notes">
+						In this talk, I will describe our new screen-space sampler that aims to distribute Monte-Carlo error as a blue-noise in screen-space.
+					</aside>
+				</section>
+
+				<section data-background="black" id="section_video_tokyo_spp">
+						<div style="width:100%; height:100%; position:absolute; top:0px;" id="video_tokyo_spp_frame">
+							<canvas id="video_tokyo_source_1spp" style="position:absolute;top:0;left:0;z-index:-1; width:1280px; height:720px; transition: opacity 1s" width="1280" height="720">
+							</canvas>
+							<p style="position:absolute; left:-10px  ;top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;" id="video_tokyo_spp_01" data-fragment-index='1' class="fragment fade-out">LittlestTokyo - 1 spp</p>
+							<p style="position:absolute; left:-10px  ;top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;" id="video_tokyo_spp_01" data-fragment-index='1' class="fragment fade-in-then-out">LittlestTokyo - 2 spp</p>
+							<p style="position:absolute; left:-10px  ;top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;" id="video_tokyo_spp_02" data-fragment-index='2' class="fragment fade-in-then-out">LittlestTokyo - 3 spp</p>
+							<p style="position:absolute; left:-10px  ;top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;" id="video_tokyo_spp_03" data-fragment-index='3' class="fragment fade-in">LittlestTokyo - 4 spp</p>
+							<p style="position:absolute; left:-10px  ;top:650px; color:azure; text-shadow:1px 1px 2px black;">Random scrambling</p>
+
+							<p style="position:absolute; left:1060px;top:665px; color:azure; text-shadow:1px 1px 2px black; font-size:0.5em;">3D model by <a href="https://www.artstation.com/glenatron">Glen Fox</a></p>
+						</div>
+						<div class="fragment" id="video_tokyo_spp_04" style="position:absolute; left:0px; top:300px; width:100%; text-align:center;">
+							<h2 style="color:white; text-shadow:1px 1px 2px black;">A <em>screen-space</em> sampler ? <div style="font-size: 4.0em;">🤨</div></h2>
+						</div>
+						<script>
+							// Load the Littlest-Tokyo animation
+							var canvas   = document.getElementById('video_tokyo_source_1spp');
+							canvas.One   = new Array();
+							canvas.Two   = new Array();
+							canvas.Three = new Array();
+							canvas.Four  = new Array();
+							canvas.frames= canvas.One;
+							var filenames = list_files('./videos/littlest-tokyo_1spp/whitenoise/littlest-tokyo_0000.png',  50, 51);
+							loadImagesInCanvas('video_tokyo_source_1spp', filenames, canvas.One);
+							filenames = list_files('./videos/littlest-tokyo_2spp/whitenoise/littlest-tokyo_0000.png',  50, 51);
+							loadImagesInCanvas('video_tokyo_source_1spp', filenames, canvas.Two);
+							filenames = list_files('./videos/littlest-tokyo_3spp/whitenoise/littlest-tokyo_0000.png',  50, 51);
+							loadImagesInCanvas('video_tokyo_source_1spp', filenames, canvas.Three);
+							filenames = list_files('./videos/littlest-tokyo_4spp/whitenoise/littlest-tokyo_0000.png',  50, 51);
+							loadImagesInCanvas('video_tokyo_source_1spp', filenames, canvas.Four);
+
+							// Launch an animation
+							canvas.step  = 1;
+							canvas.frame = 0;
+							canvas.timeId = undefined;
+							canvas.refresh = function()
+							{
+								var canvas   = document.getElementById('video_tokyo_source_1spp');
+								canvas.frame = canvas.frame + canvas.step;
+								if(canvas.frame == 0) {
+									canvas.step = 1;
+								} else if(canvas.frame == canvas.frames.length-1) {
+									canvas.step = -1;
+								}
+								var context = canvas.getContext('2d');
+								context.drawImage(canvas.frames[canvas.frame % canvas.frames.length], 0, 0, canvas.width, canvas.height);
+							}
+
+							Reveal.addEventListener( 'slidechanged', function( event ) {
+								var canvas   = document.getElementById('video_tokyo_source_1spp');
+								if(event.previousSlide && event.previousSlide.id == 'section_video_tokyo_spp')
+								{
+									window.clearInterval(canvas.timerId);
+								}
+								else if(event.currentSlide && event.currentSlide.id == 'section_video_tokyo_spp')
+								{
+									canvas.timerId = window.setInterval(canvas.refresh, 1000.0/15.0);
+								}
+							} );
+
+							Reveal.addEventListener( 'fragmentshown', function( event ) {
+								var tokyo_cnv = document.getElementById("video_tokyo_source_1spp");
+								if(event.fragment.id == "video_tokyo_spp_01") {
+									tokyo_cnv.frames = tokyo_cnv.Two;
+								}
+								else if(event.fragment.id == "video_tokyo_spp_02") {
+									tokyo_cnv.frames = tokyo_cnv.Three;
+								}
+								else if(event.fragment.id == "video_tokyo_spp_03") {
+									tokyo_cnv.frames = tokyo_cnv.Four;
+								}
+								else if(event.fragment.id == "video_tokyo_spp_04") {
+									$('#video_tokyo_spp_frame').css('filter', 'blur(10.0px)');
+								}
+							});
+							Reveal.addEventListener( 'fragmenthidden', function( event ) {
+								var tokyo_cnv = document.getElementById("video_tokyo_source_1spp");
+								if(event.fragment.id == "video_tokyo_spp_01") {
+									tokyo_cnv.frames = tokyo_cnv.One;
+								}
+								else if(event.fragment.id == "video_tokyo_spp_02") {
+									tokyo_cnv.frames = tokyo_cnv.Two;
+								}
+								else if(event.fragment.id == "video_tokyo_spp_03") {
+									tokyo_cnv.frames = tokyo_cnv.Three;
+								}
+								else if(event.fragment.id == "video_tokyo_spp_04") {
+									tokyo_cnv.frames = tokyo_cnv.Four;
+									$('#video_tokyo_spp_frame').css('filter', 'none');
+								}
+							});
+						</script>
+						<aside class="notes">
+							Traditionnally, when people think of samplers, they are interested in their convergence properties. That is how much the magnitude of the error is reduced as one increase the sample count.
+							<strong>*click* *click* *click*</strong>. For example, how fast is the error reduced when we go
+							from 1 spp to 4 spp ?
+							<br /><br />
+
+							<strong>*click*</strong> In this talk, I will present a screen-space sampler. The focus will not
+							be on the magnitude of the error, but rather on its distribution in screen-space.
+						</aside>
+					</section>
+
+				<section data-background="black" id="section_video_tokyo">
+					<!-- Rendering video in canvas -->
+					<div id="video_tokyo_border" style="position:absolute;top:-2px;left:-2px;z-index:1; width:1282px; height:100%; transition: width 2s; border-right: solid 2px white;" ></div>
+					<canvas id="video_tokyo_source_white" style="position:absolute;top:0;left:0;z-index:-1; width:1280px; height:720px; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); transition: clip-path 2s;" width="1280" height="720"></canvas>
+					<canvas id="video_tokyo_source_blue"  style="position:absolute;top:0;left:0;z-index:-2; width:1280px; height:720px;" width="1280" height="720"></canvas>
+
+					<!-- Labels -->
+					<p style="position:absolute; left:-10px; top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;">LittlestTokyo - 4 spp</p>
+					<p style="position:absolute; left:-10px; top:650px; color:azure; text-shadow:1px 1px 2px black;" class="fragment fade-out" data-fragment-index="1" id="video_littlest_tokyo_01">Random scrambling</p>
+					<div style="position:absolute; left:-10px; top:650px; text-shadow:1px 1px 2px black;" class="fragment fade-in-then-out"  data-fragment-index="1">
+						<p style="color:deepskyblue;">Correlated scrambling </p>
+						<p style="color:orangered; font-size: 0.7em">&#9888; not practical</p>
+					</div>
+
+					<div style="position:absolute; left:900px; top:650px; text-shadow:1px 1px 2px black;" class="fragment fade-in-then-out"  data-fragment-index="2" id="video_littlest_tokyo_02">
+						<p style="color:deepskyblue;">Correlated scrambling </p>
+						<p style="color:orangered; font-size: 0.7em">&#9888; not practical</p>
+					</div>
+					<p style="position:absolute; left:-10px; top:650px; color:azure; text-shadow:1px 1px 2px black;" class="fragment fade-in-then-out" data-fragment-index="2">Random scrambling</p>
+					<p style="position:absolute; left:-10px; top:650px; color:azure; text-shadow:1px 1px 2px black;" class="fragment" data-fragment-index="3" id="video_littlest_tokyo_03" data-fragment-index="1">Random scrambling</p>
+
+					<script>
+						var filenames_white = list_files('./videos/littlest-tokyo_4spp/whitenoise/littlest-tokyo_0000.png', 50, 51);
+						var filenames_blue  = list_files('./videos/littlest-tokyo_4spp/bluenoise_gt/littlest-tokyo_0000.png',  50, 51);
+						canvas2video('video_tokyo_source_white', filenames_white);
+						canvas2video('video_tokyo_source_blue',  filenames_blue);
+
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if(event.previousSlide && event.previousSlide.id == 'section_video_tokyo')
+							{
+								var canvas   = document.getElementById('video_tokyo_source_white');
+								var previous = document.getElementById("video_tokyo_source_1spp");
+								var timerId  = canvas.timerId;
+								previous.frame = canvas.frame;
+								previous.step  = canvas.step;
+								window.clearInterval(timerId);
+							}
+							else if(event.currentSlide && event.currentSlide.id == 'section_video_tokyo')
+							{
+								var canvas   = document.getElementById('video_tokyo_source_white');
+								var blue     = document.getElementById('video_tokyo_source_blue');
+								var previous = document.getElementById("video_tokyo_source_1spp");
+								canvas.frame = previous.frame;
+								blue.frame   = previous.frame;
+								blue.step    = previous.step;
+								canvas.step  = previous.step;
+
+								canvas.refresh = function()
+								{
+									canvas.frame = canvas.frame + canvas.step;
+									blue.frame = canvas.frame;
+									if(canvas.frame == 0) {
+										canvas.step = 1;
+									} else if(canvas.frame == canvas.images.length-1) {
+										canvas.step = -1;
+									}
+
+									canvas.getContext('2d', { alpha: false }).drawImage(canvas.images[canvas.frame % canvas.images.length], 0, 0, canvas.width, canvas.height);
+									blue.getContext('2d', { alpha: false }).drawImage(blue.images[canvas.frame % blue.images.length], 0, 0, blue.width, blue.height);
+								}
+
+								canvas.timerId = window.setInterval(canvas.refresh, 1000.0/15.0);
+							}
+						} );
+
+						Reveal.addEventListener( 'fragmentshown', function( event ) {
+							if(event.fragment.id == "video_littlest_tokyo_01") {
+								var canvas = document.getElementById("video_tokyo_source_white");
+								canvas.style.clipPath = 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)';
+								$('#video_tokyo_border').css('width', '0%');
+							}
+							else if(event.fragment.id == "video_littlest_tokyo_02") {
+								var canvas = document.getElementById("video_tokyo_source_white");
+								canvas.style.clipPath = 'polygon(0% 0%, 50% 0%, 50% 100%, 0% 100%)';
+								$('#video_tokyo_border').css('width', '50%');
+							}
+							else if(event.fragment.id == "video_littlest_tokyo_03") {
+								var bluenoise  = document.getElementById("video_tokyo_source_blue");
+								var whitenoise = document.getElementById("video_tokyo_source_white");
+								whitenoise.style.clipPath = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)';
+								$('#video_tokyo_border').css('width', '1282px');
+								var white = document.getElementById('video_tokyo_source_white');
+								window.clearInterval(white.timerId);
+							}
+						});
+						Reveal.addEventListener( 'fragmenthidden', function( event ) {
+							if(event.fragment.id == "video_littlest_tokyo_01") {
+								var canvas = document.getElementById("video_tokyo_source_white");
+								canvas.style.clipPath = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)';
+								$('#video_tokyo_border').css('width', '1282px');
+							}
+							else if(event.fragment.id == "video_littlest_tokyo_02") {
+								var canvas = document.getElementById("video_tokyo_source_white");
+								canvas.style.clipPath = 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)';
+								$('#video_tokyo_border').css('width', '0%');
+							}
+							else if(event.fragment.id == "video_littlest_tokyo_03") {
+								var canvas = document.getElementById("video_tokyo_source_white");
+								canvas.style.clipPath = 'polygon(0% 0%, 50% 0%, 50% 100%, 0% 100%)';
+								$('#video_tokyo_border').css('width', '50%');
+							}
+						});
+					</script>
+					<aside class="notes">
+                        Let's look at the example of this rendered animation. Here, I randomly selected a different
+                        sampling sequences to compute the light transport integral in each pixel. I did that without
+                        any account for neighboring pixels.
+						<br /><br />
+
+                        <strong>*click*</strong>
+                        But, what we can do instead is to correlate the random sequences in neighboring pixels so that when one pixel has a high error, the next pixel has a low error.
+                        While this image is also rendered at four samples per pixels, we optimized it making sure that two consecutive pixels had different noise level.
+                        What we have here is not the method I am going to present, but a kind of reference that illustrates well what we want to acheive.
+						<br /><br />
+
+						<strong>*click*</strong> Looking at both renderings side-by-side, maybe you see that the new rendering is more converged. Well, it isn't! The magnitude of the error between those images is almost unchanged.
+
+						<strong>*click*</strong> Let's have a look at what changed.
+					</aside>
+				</section>
+                <section data-background="black" id="introduction_sampling">
+					<!-- Full image canvas with  small inset -->
+					<canvas id="canvas_tokyo_intro_full"  style="position:absolute; top:  0px; left: 0px; z-index:-2; width:1280px; height:720px;" width="1280" height="720"></canvas>
+					<div style="position:absolute; top:100px; left:660px; width:64px; height:64px; border:solid 2px red;"></div>
+
+					<!-- Big Inset -->
+					<div style="position:absolute; top: 20px; left:1020px; width:200px; height:200px;">
+						<canvas id="canvas_tokyo_intro_inset" style="width:100%; height:100%; border:solid 2px red;" width="64" height="64"></canvas>
+						<div style="width:100%; text-align:center; font-size:0.7em; color:white; text-shadow:1px 1px 2px black;">Inset</div>
+					</div>
+
+					<!-- Labels -->
+					<p style="position:absolute; left:-10px; top:600px; color:azure; font-size: 1.5em; font-variant-caps: small-caps; text-shadow:1px 1px 2px black;">LittlestTokyo - 4 spp</p>
+					<p style="position:absolute; left:-10px; top:650px; color:azure; text-shadow:1px 1px 2px black;" class="fragment fade-out" data-fragment-index="1" id="intro_littlest_tokyo_01">Random scrambling</p>
+					<div style="position:absolute; left:-10px; top:650px; text-shadow:1px 1px 2px black;" class="fragment fade-in" data-fragment-index="1">
+						<p style="color:deepskyblue;">Correlated scrambling </p>
+						<p style="color:orangered; font-size: 0.7em">&#9888; not practical</p>
+					</div>
+
+					<!-- Power Spectrum -->
+					<div class="fragment" data-fragment-index="2" style="position:absolute; top:300px; left:1020px; width:200px; height:200px" >
+						<canvas id="canvas_tokyo_intro_fft" style="width:100%; height:100%; border:solid 2px red;" width="64" height="64"></canvas>
+						<div style="width:100%; text-align:center; font-size:0.7em; color:white; text-shadow:1px 1px 2px black;">Power Spectrum</div>
+					</div>
+
+					<script>
+						var tokyo_intro_set = false;
+						Reveal.addEventListener( 'ready', function( event ) {
+							if(event.currentSlide && event.currentSlide.id == 'introduction_sampling')
+							{
+								$('#video_tokyo_source_white').ready(function() {
+									tokyo_intro_set = true;
+									var canvas = document.getElementById('canvas_tokyo_intro_full');
+									var ctx    = canvas.getContext('2d');
+									ctx.drawImage(document.getElementById('video_tokyo_source_white'), 0, 0);
+
+									var canvas = document.getElementById('canvas_tokyo_intro_inset');
+									var ctx2    = canvas.getContext('2d');
+									ctx2.drawImage(document.getElementById('canvas_tokyo_intro_full'), 660, 100, 64, 64, 0, 0, 64, 64);
+
+									var canvas = document.getElementById('canvas_tokyo_intro_fft');
+									var ctx2    = canvas.getContext('2d');
+									ctx2.drawImage(document.getElementById('canvas_tokyo_intro_inset'), 0, 0);
+									canvasFFT(canvas, 100);
+								});
+							}
+						});
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if(event.currentSlide && event.currentSlide.id == 'introduction_sampling')
+							{
+								tokyo_intro_set = true;
+								var canvas = document.getElementById('canvas_tokyo_intro_full');
+								var ctx    = canvas.getContext('2d');
+								if(!event.previousSlide) {
+									ctx.drawImage(document.getElementById('video_tokyo_source_white'), 0, 0);
+								} else if(event.previousSlide.id == 'section_video_tokyo') {
+									ctx.drawImage(document.getElementById('video_tokyo_source_white'), 0, 0);
+								} else {
+									ctx.drawImage(document.getElementById('video_tokyo_source_blue'), 0, 0);
+								}
+
+								var canvas = document.getElementById('canvas_tokyo_intro_inset');
+								var ctx2    = canvas.getContext('2d');
+								ctx2.drawImage(document.getElementById('canvas_tokyo_intro_full'), 660, 100, 64, 64, 0, 0, 64, 64);
+
+								var canvas = document.getElementById('canvas_tokyo_intro_fft');
+								var ctx2   = canvas.getContext('2d');
+								ctx2.drawImage(document.getElementById('canvas_tokyo_intro_inset'), 0, 0);
+								canvasFFT(canvas, 100);
+
+							}
+						} );
+						Reveal.addEventListener( 'fragmentshown', function( event ) {
+							if(event.fragment.id == "intro_littlest_tokyo_01") {
+								var canvas = document.getElementById('canvas_tokyo_intro_full');
+								var ctx    = canvas.getContext('2d');
+								ctx.drawImage(document.getElementById('video_tokyo_source_blue'), 0, 0);
+
+								var canvas = document.getElementById('canvas_tokyo_intro_inset');
+								var ctx2    = canvas.getContext('2d');
+								ctx2.drawImage(document.getElementById('canvas_tokyo_intro_full'), 660, 100, 64, 64, 0, 0, 64, 64);
+
+								var canvas = document.getElementById('canvas_tokyo_intro_fft');
+								var ctx2    = canvas.getContext('2d');
+								ctx2.drawImage(document.getElementById('canvas_tokyo_intro_inset'), 0, 0);
+								canvasFFT(canvas, 100);
+
+								tokyo_denoising_load();
+							}
+						});
+						Reveal.addEventListener( 'fragmenthidden', function( event ) {
+							if(event.fragment.id == "intro_littlest_tokyo_01") {
+								var canvas = document.getElementById('canvas_tokyo_intro_full');
+								var ctx    = canvas.getContext('2d');
+								ctx.drawImage(document.getElementById('video_tokyo_source_white'), 0, 0);
+
+								var canvas = document.getElementById('canvas_tokyo_intro_inset');
+								var ctx2    = canvas.getContext('2d');
+								ctx2.drawImage(document.getElementById('canvas_tokyo_intro_full'), 660, 100, 64, 64, 0, 0, 64, 64);
+
+								var canvas = document.getElementById('canvas_tokyo_intro_fft');
+								var ctx2    = canvas.getContext('2d');
+								ctx2.drawImage(document.getElementById('canvas_tokyo_intro_inset'), 0, 0);
+								canvasFFT(canvas);
+							}
+						});
+					</script>
+					<aside class="notes">
+                        Lets concentrate on this red inset where the wall should be uniform.
+                        We see that random scrambling creates patterns, clusters of brighter or darker pixels.
+						<br /><br />
+
+						<strong>*click*</strong> While the optimized scrambling does not produce clusters.
+						<br /><br />
+
+						<strong>*click*</strong> This pattern viewed in the Fourier domain has a characteristic power
+						spectrum. Low frequencies have a small magnitude. This is what we call a blue-noise spectrum.
+						This is nice. But this isn't the end of the story. We cannot simply render noisy images or wait for full convergence. In practice we have to denoise renderings.
+					</aside>
+				</section>
+				<section data-background="black" id="introduction_denoising">
+					<div id="introduction_denoising_02" class="fragment" data-fragment-index="2" style="position:absolute; top:100px; left:100px; width:1080px; height:520px; background-color:white;">
+                        <div class="fragment" data-fragment-index="3">
+                            <h2>Our goal</h2>
+                            <ul>
+                                <li>Distributes error as a <strong>blue-noise</strong> in screen-space
+                                    <ul>
+                                        <li>Reduces the visual error</li>
+                                        <li>Reduces the error after denoising</li>
+                                    </ul>
+                                </li>
+
+                                <li class="fragment"><strong>State-of-the-art</strong> sampler
+                                    <ul>
+                                        <li>Compatible with Owen scrambling [<a href="http://finmath.stanford.edu/~owen/reports/snxs.ps">Owen 1998</a>]</li>
+                                        <li>Compatible with pmj02 [<a href="https://graphics.pixar.com/library/ProgressiveMultiJitteredSampling">Christensen et al. 2018</a>]</li>
+                                    </ul>
+                                </li>
+
+                                <li class="fragment"><strong>Lean</strong> &amp; <strong>efficient</strong>
+                                    <ul>
+                                        <li>Take two textures as input</li>
+                                        <li>Additional cost : two fetches &amp; XORs</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+					<div id="introduction_denoising_blur" style="transition: filter 0.5s, opacity 0.5s;">
+						<!-- Full image canvas with  small inset -->
+						<canvas id="canvas_tokyo_denoising_full"  style="position:absolute; top:  0px; left: 0px; z-index:-2; width:1280px; height:720px;" width="1280" height="720"></canvas>
+						<div style="position:absolute; top:100px; left:660px; width:64px; height:64px; border:solid 1.5px red;"></div>
+
+						<!-- Big Inset -->
+						<div style="position:absolute; top: 20px; left:1020px; width:200px; height:200px;">
+							<canvas id="canvas_tokyo_denoising_inset" style="width:100%; height:100%; border:solid 2px red;" width="64" height="64"></canvas>
+							<div style="width:100%; text-align:center; font-size:0.7em; color:white; text-shadow:1px 1px 2px black;">Inset</div>
+						</div>
+
+						<!-- Power Spectrum -->
+						<div style="position:absolute; top:300px; left:1020px; width:200px; height:200px" >
+							<canvas id="canvas_tokyo_denoising_fft" style="width:100%; height:100%; border:solid 2px red;" width="64" height="64"></canvas>
+							<div style="width:100%; text-align:center; font-size:0.7em; color:white; text-shadow:1px 1px 2px black;">Power Spectrum</div>
+						</div>
+
+						<!-- Labels -->
+						<p style="position:absolute; left:-10px; top:600px; color:azure; font-size: 1.5em; font-variant-caps: small-caps; text-shadow:1px 1px 2px black;">LittlestTokyo - 4 spp + Denoising</p>
+						<p style="position:absolute; left:-10px; top:650px; color:azure; text-shadow:1px 1px 2px black;" class="fragment fade-in" id="introduction_denoising_01" data-fragment-index="1">Random scrambling</p>
+						<div style="position:absolute; left:-10px; top:650px; text-shadow:1px 1px 2px black;" class="fragment fade-out" data-fragment-index="1">
+							<p style="color:deepskyblue;">Correlated scrambling </p>
+							<p style="color:orangered; font-size: 0.7em">&#9888; not practical</p>
+						</div>
+					</div>
+
+					<script>
+						function tokyo_denoising_load() {
+							// Allocate buffer with the bluenoise and whitenoise denoised images
+							// We store everything in the full-frame rendering canvas
+							var cnv  = document.getElementById('canvas_tokyo_denoising_full');
+							cnv.images = new Array();
+							cnv.images[0] = new Image(); // Blue noise image
+							cnv.images[1] = new Image(); // White noise image
+
+							// Load the bluenoise image
+							var elem = document.getElementById('video_tokyo_source_blue');
+							var frame = elem.frame;
+							var fname = elem.images[0].src;
+							fname = fname.replace(/_([0-9]{4})/i, '_denoised_$1');
+							cnv.images[0].src = fname;
+
+							// Load the whitenoise image
+							var elem  = document.getElementById('video_tokyo_source_white');
+							var frame = elem.frame;
+							var fname = elem.images[0].src;
+							fname = fname.replace(/_([0-9]{4})/i, '_denoised_$1');
+							cnv.images[1].src = fname;
+
+							// Once the bluenoise image is loaded, use it in the webpage
+							cnv.images[0].onload = function() {
+
+								var ctx = cnv.getContext('2d');
+								ctx.drawImage(cnv.images[0], 0, 0);
+
+								var inset_cnv = document.getElementById('canvas_tokyo_denoising_inset');
+								var inset_ctx = inset_cnv.getContext('2d');
+								inset_ctx.drawImage(cnv, 660, 100, 64, 64, 0, 0, 64, 64);
+
+								var fft_cnv = document.getElementById('canvas_tokyo_denoising_fft');
+								var fft_ctx = fft_cnv.getContext('2d');
+								fft_ctx.drawImage(inset_cnv, 0, 0);
+								canvasFFT(fft_cnv, 100);
+							};
+						}
+
+						var tokyo_denoising_once = true;
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if(tokyo_denoising_once && event.currentSlide && event.currentSlide.id == 'introduction_denoising')
+							{
+								tokyo_denoising_once = false;
+								tokyo_denoising_load();
+							}
+						} );
+						Reveal.addEventListener( 'fragmentshown', function( event ) {
+							if(event.fragment.id == "introduction_denoising_01") {
+								var cnv = document.getElementById('canvas_tokyo_denoising_full');
+								var img = cnv.images[1];
+								var ctx = cnv.getContext('2d');
+								ctx.drawImage(img, 0, 0);
+
+								var inset_cnv = document.getElementById('canvas_tokyo_denoising_inset');
+								var inset_ctx = inset_cnv.getContext('2d');
+								inset_ctx.drawImage(cnv, 660, 100, 64, 64, 0, 0, 64, 64);
+
+								var fft_cnv = document.getElementById('canvas_tokyo_denoising_fft');
+								var fft_ctx = fft_cnv.getContext('2d');
+								fft_ctx.drawImage(inset_cnv, 0, 0);
+								canvasFFT(fft_cnv, 100);
+							}
+							else if(event.fragment.id == "introduction_denoising_02") {
+								var div = document.getElementById('introduction_denoising_blur');
+								div.style.filter  = 'blur(20px)';
+								div.style.opacity = 0.5;
+							}
+						});
+						Reveal.addEventListener( 'fragmenthidden', function( event ) {
+							if(event.fragment.id == "introduction_denoising_01") {
+								var cnv = document.getElementById('canvas_tokyo_denoising_full');
+								var img = cnv.images[0];
+								var ctx = cnv.getContext('2d');
+								ctx.drawImage(img, 0, 0);
+
+								var inset_cnv = document.getElementById('canvas_tokyo_denoising_inset');
+								var inset_ctx = inset_cnv.getContext('2d');
+								inset_ctx.drawImage(cnv, 660, 100, 64, 64, 0, 0, 64, 64);
+
+								var fft_cnv = document.getElementById('canvas_tokyo_denoising_fft');
+								var fft_ctx = fft_cnv.getContext('2d');
+								fft_ctx.drawImage(inset_cnv, 0, 0);
+								canvasFFT(fft_cnv, 100);
+							}
+							else if(event.fragment.id == "introduction_denoising_02") {
+								var div = document.getElementById('introduction_denoising_blur');
+								div.style.filter  = 'none';
+								div.style.opacity = 1.0;
+							}
+						});
+					</script>
+					<aside class="notes">
+                        Here is what happens when we apply a cross-bilateral denoiser on the correlated sampler.
+                        Denoisers are low pass filters that remove high frequency noise.
+                        But since this rendering's error has no energy in the low frequencies, most of the noise is cancelled.
+						<br /><br />
+
+                        <strong>*click*</strong> When we look at the random scrambled rendering, we see that a low frequency pattern persits after denoising. This is due to the low frequency part of the noise not being removed by the denoiser.
+						<br /><br />
+
+						Because of that, the correlated scrambling once denoised has a lower error compared to random scrambling.
+						<br /><br />
+
+						<strong>*click*</strong>
+						This was a fundemental motivation for us.
+
+						<strong>*click*</strong>
+						So when we started this project, we defined that our goals were to achieve a blue-noise distribution
+						of the error that would both reduce the perception of noise at low sample rates, but also
+						reduce the error after denoising for higher sampler rate scenarios.
+						<br /><br />
+
+						<strong>*click*</strong>
+						We wanted to avoid any sacrifice regarding the convergence of individual pixels and worked
+						with state-of-the-art sequences in mind such as Sobol with Owen scrambling or pmj02.
+
+						<strong>*click*</strong>
+						We also wanted to keep our method lean and efficient: as a result our new sampler only
+						requires two low resolution textures as input and increase the cost of evaluating
+						the sample by only two texture fetches and two xors.
+					</aside>
+				</section>
+
+
+				<!-- Georgiev and Fajardo -->
+				<section id="section_bnds_paper">
+					<h2>Blue-Noise Dithered Sampling</h2>
+					<div style="display:flex;">
+						<ul style="width:35%">
+						</ul>
+						<div style="width:60%; padding-top:30px;">
+							<center>
+								<img height="400px" src="images/gf2016/paper.png" />
+								<p style="font-size:0.7em;">Georgiev and Fajardo [<a href="https://www.iliyan.com/publications/DitheredSampling">2016</a>]</p>
+							</center>
+						</div>
+					</div>
+					<aside class="notes">
+						Our work is heavily inspired by the Blue-Noise Dithered Sampling method of Ilyian Georgiev and Marcos Fajardo. BNDS was the first practical way to achieve blue-noise distribution of the rendering noise.
+					</aside>
+				</section>
+				<section id="section_bnds_summary">
+					<h2>Blue-Noise Dithered Sampling</h2>
+					<div style="display:flex;">
+						<ul style="width:35%">
+							<li>Builds on research in Dithering
+								<ul>
+									<li>Distribute quantization error</li>
+									<li class="fragment" data-fragment-index="3">Blue-noise is <strong>perceptually</strong> better</li>
+								</ul>
+							</li>
+
+							<li class="fragment" data-fragment-index="4">Extending dither masks
+								<ul>
+									<li>nD dither mask</li>
+									<li class="fragment" data-fragment-index="7">using Simulated Annealing</li>
+								</ul>
+							</li>
+
+							<li class="fragment" data-fragment-index="8">Scramble sequences
+								<ul>
+									<li>using <em>Cranley-Patterson Rotations</em></li>
+									<li>Offset sample $k$ with dither at pixel $i,j$
+
+									$$ \mu_{k,i,j} = \mbox{mod}\left(\epsilon_k +  d_{i,j}\right) $$
+
+									</li>
+								</ul>
+							</li>
+						</ul>
+						<div style="width:60%; padding-top:30px; filter: blur(5px);">
+							<center>
+								<img height="400px" style="image-rendering:optimizeQuality;" src="images/gf2016/paper.png" />
+								<p style="font-size:0.7em;">Georgiev and Fajardo [<a href="https://www.iliyan.com/publications/DitheredSampling">2016</a>]</p>
+							</center>
+						</div>
+					</div>
+
+
+					<div style="position: absolute; top:200px; left: 700px; width:400px;">
+						<center style="position: absolute; top:0px; left:0px;" class="fragment fade-in-then-out" data-fragment-index="1">
+							<img style="width:100%;" src="images/dithering/epagneul_low.png"><br />
+							<p style="margin:0px; font-size:0.7em;">Density</p>
+							$$ d(i,j) $$
+						</center>
+						<center style="position: absolute; top:0px; left:0px;" class="fragment fade-in-then-out" data-fragment-index="2">
+							<img style="width:100%;" src="images/dithering/random_low.png"><br />
+							<p style="margin:0px; font-size:0.7em;">Random Dithering</p>
+							$$ d(i,j) > \mbox{rand}(i,j) $$
+                        </center>
+						<center style="position: absolute; top:0px; left:0px;" class="fragment fade-in-then-out" data-fragment-index="3">
+							<img style="width:100%;" src="images/dithering/bluenoise_low.png">
+							<p style="margin:0px; font-size:0.7em;">Blue-Noise Dithering</p>
+							$$ d(i,j) > bn(i,j) $$
+						</center>
+                        <center style="position: absolute; top:-70px; left:-140px; z-index:10;" class="fragment fade-in-then-out" data-fragment-index="3">
+                            <img id="ditherMaskPng" class="pixelated" height="200px" src="images/dithering/dither2.png"><br />
+                            <p style="margin:0px; font-size:0.6em; text-shadow: 1px 1px 1px white;">$bn(i,j)$</p>
+                        </center>
+					</div>
+
+					<div style="position: absolute; top:150px; left: 700px; width:400px;">
+						<center style="position: absolute; top:0px; left:0px;" class="fragment fade-in-then-out" data-fragment-index="5">
+							<img class="pixelated" width="400px" src="images/bnds_dimensionality/dither_d1.png"><br />
+							<p style="margin:0px; font-size:0.7em;">1D Dither Mask</p>
+						</center>
+						<center style="position: absolute; top:0px; left:0px;" class="fragment fade-in" data-fragment-index="6">
+							<div class="fragment fade-out" data-fragment-index="8">
+								<img class="pixelated" width="400px" src="images/bnds_dimensionality/dither_nd.png"><br />
+								<p style="margin:0px; font-size:0.7em;">3D Dither Mask</p>
+							</div>
+						</center>
+					</div>
+					<aside class="notes">
+						They brought ideas from the dithering &amp; half-toning litterature into Monte-Carlo rendering.
+						<br /><br />
+
+						<strong>*click*</strong>
+						One goal in this field is to quantize densities in perceptual pleasing way.
+                        If we want to quantize this image using only two pixel values, that are either zero or one.
+                        How can we maximize the perception of the input density ?
+						<br /><br />
+
+						<strong>*click*</strong>
+						One possible way is to randomly threeshold pixel values independently. The issue here is that we've lost some
+						of the information about the image. For example, the background pattern.
+						<br /><br />
+
+						<strong>*click*</strong>
+                        Now, we can use an blue-noise image to do the threesholding. Those blue-noise images are called dither masks.
+                        With this method, we obtain a much more pleasing result. For example, the background pattern is distinctible.
+						<br /><br />
+
+						<strong>*click*</strong>
+						In their work, Ilyian and Marcos extended the notion of dither mask to sampling. <strong>*click*</strong>
+						While density threesholding only requires grayscale dither masks, sampling is defined in a higher
+						dimensional space and <strong>*click*</strong> requires high dimensional dither masks.
+						<strong>*click*</strong> And so, they generated those masks using simulated annealing ...
+
+						<br /><br />
+						<strong>*click*</strong> and plugged their value in a fixed sequence using Cranley-Patterson rotations.
+						CPR are simply a shift modulo one of samples in order to randomize them across pixels.
+					</aside>
+				</section>
+				<section id="bnds_pipeline">
+                    <div id="bnds_pipeline_blur" style="position:absolute; top:0px; left:0px; width:100%; height:100%; transition:filter 2s, opacity 2s;">
+					<h2>Blue-Noise Dithered Sampling</h2>
+
+					<center style="width:100%; position:absolute; top:100px;">
+						<object id="bnds_pipeline_svg" class="pixelated" width="1100px" data="images/gf2016/pipeline.svg" type="image/svg+xml"></object>
+                    </center>
+                    </div>
+
+					<div class="fragment" data-fragment-index="1" id="bnds_pipeline_01"></div>
+					<div class="fragment" data-fragment-index="2" id="bnds_pipeline_02"></div>
+					<center class="fragment" id="bnds_pipeline_03" data-fragment-index="3" style="position:absolute; top:200px; left:200px; width:880px; height:320px; background-color:#FFF8;">
+                        <h2 style="padding-top:20px;">Problem solved ?</h2>
+                        <div style="width:75%;">
+                        <ol style="padding-top:40px;">
+                            <li class="fragment" data-fragment-index="4">How to generate different sequences?    <span style="color:red;" class="fragment" data-fragment-index="6">&#10007;</span></li>
+                            <li class="fragment" data-fragment-index="5">How to distribute them in screen-space? <span style="color:red;" class="fragment" data-fragment-index="6">&#10007;</span></li>
+                        </ol>
+                        </div>
+                    </center>
+					<script>
+						var bnds_pipeline_once = true;
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if(event.currentSlide.id == 'bnds_pipeline' && bnds_pipeline_once)
+							{
+								bnds_pipeline_once = false;
+								var snap = Snap('#bnds_pipeline_svg');
+								var unit = snap.select('#unit_samples');
+								var bbox = unit.getBBox();
+								var mask = unit.select('rect');
+								var g    = snap.group();
+
+								var R = 0.6;
+								var G = 0.6;
+								var B = 0.6;
+								var ci = Snap.rgb(255.0*R, 255.0*G, 255.0*B);
+
+								for(var i=0; i<8; ++i){
+									var u = sobol.sample(i, 0);
+									var v = sobol.sample(i, 1);
+
+									var xi = unit.circle(u*bbox.width, v*bbox.height, 1.0);
+									xi.attr({ fill: 'white', stroke: ci, strokeWidth: 1.0 });
+									g.add( xi );
+								}
+								g.attr({ id: 'samples' });
+								unit.g(g).attr({ clip: mask.clone() });
+
+
+								// Duplicate the elements in the warped region
+								var R = 0.8;
+								var G = 0.4;
+								var B = 0.4;
+								var ci = Snap.rgb(255.0*R, 255.0*G, 255.0*B);
+
+								var children = g.children();
+								var g        = snap.group();
+								children.forEach(element => {
+									var x0 = element.clone();
+									x0.attr({ stroke: ci });
+									g.append(x0);
+
+									var x1 = x0.clone();
+									x1.attr({ transform: 't' + '0' + ',' + -bbox.height });
+									g.append(x1);
+
+									var x1 = x0.clone();
+									x1.attr({ transform: 't' + bbox.width + ',' + '0' });
+									g.append(x1);
+
+									var x1 = x0.clone();
+									x1.attr({ transform: 't' + bbox.width + ',' + -bbox.height });
+									g.append(x1);
+								});
+
+								g.attr({ id: 'samples_warped', opacity: 0.0 });
+								unit.g(g).attr({ clip: mask.clone() });
+							}
+						});
+
+						Reveal.addEventListener( 'fragmentshown', function( event ) {
+							if(event.fragment.id == "bnds_pipeline_01") {
+								var snap   = Snap('#bnds_pipeline_svg');
+								snap.select('#samples_warped').animate({transform : 't-5,10'}, 500);
+								snap.select('#samples_warped').animate({opacity : 1.0}, 10);
+								snap.select('#samples').animate({opacity: 0.1}, 500);
+							}
+							else if(event.fragment.id == "bnds_pipeline_02") {
+								var snap   = Snap('#bnds_pipeline_svg');
+								snap.select('#correlation').animate({opacity : 1.0}, 10);
+                            }
+                            else if(event.fragment.id == "bnds_pipeline_03") {
+                                var elem = document.getElementById('bnds_pipeline_blur');
+                                elem.style.filter = 'blur(10px)';
+                                elem.style.opacity = '0.5';
+                            }
+						});
+						Reveal.addEventListener( 'fragmenthidden', function( event ) {
+							if(event.fragment.id == "bnds_pipeline_01") {
+								var snap   = Snap('#bnds_pipeline_svg');
+								snap.select('#samples_warped').animate({transform : 't0,0'}, 500);
+								snap.select('#samples').animate({opacity: 1.0}, 500);
+								snap.select('#samples_warped').animate({opacity : 0.0}, 500);
+							}
+							else if(event.fragment.id == "bnds_pipeline_02") {
+								var snap   = Snap('#bnds_pipeline_svg');
+								snap.select('#correlation').animate({opacity : 0.0}, 10);
+							}
+                            else if(event.fragment.id == "bnds_pipeline_03") {
+                                var elem = document.getElementById('bnds_pipeline_blur');
+                                elem.style.filter = 'none';
+                                elem.style.opacity = '1.0';
+                            }
+						});
+					</script>
+					<aside class="notes">
+                        If we put those concepts together, we obtain the following algorithm. To obtain the samples for the pixel highlighted here with BNDS, we fetch the dither mask and get a N dimensinonal vector.
+                        <strong>*click*</strong> In the unit hypercube, we shift modulo one the random numbers of the initial sequence and hit the rendering button.
+						<br /><br />
+
+						<strong>*click*</strong>
+						By doing so, BNDS makes the leap of faith that the blue-noise properties of the dither mask will be transfered into the rendering.
+						<br /><br />
+
+						<strong>*click*</strong>
+						And you could think that the problem is solved. BNDS seems to solve the two fundemental questions requires to our acheive blue-noise distribution that are: <strong>*click*</strong> how can generate many different sequences out of a single sequence. And <strong>*click*</strong> how do we distribute them in screen-space to acheive blue-noise distribution.
+						<br /><br />
+
+						<strong>*click*</strong> Unfortunately, that doesn't work well. Or more precisely, that doesn't scale well. There are two main issues with this method that we are going to fix.
+					</aside>
+				</section>
+
+                <!-- <section></section> -->
+				<!-- Cranley-Patterson is detrimental for error -->
+				<section id="cpr_harmful_section">
+					<h2>Issue #1 : CPR Considered Harmful</h2>
+					<div id="cpr_harmful">
+						<div style="position:absolute; width:400px; top:210px; left:235px; text-align:center; font-size:0.7em;">
+							<strong>CPR : shifting samples</strong>
+						</div>
+						<div id="cpr_harmful_equivalent" style="opacity:0; position:absolute; width:400px; top:210px; left:650px; text-align:center; font-size:0.7em;">
+							<strong>equivalent : shifting integrand</strong>
+						</div>
+						<center style="padding-top:120px;">
+							<object id="cpr_harmful_samples" height="300px" data="images/cpr_harmful/samples.svg" type="image/svg+xml"></object>
+						</center>
+					</div>
+
+					<div class="fragment" id="cpr_harmful_01" data-fragment-index="1"></div>
+					<div class="fragment" id="cpr_harmful_02" data-fragment-index="2"></div>
+					<div class="fragment" id="cpr_harmful_03" data-fragment-index="3"></div>
+					<div class="fragment" id="cpr_harmful_04" data-fragment-index="4"></div>
+					<div class="fragment" id="cpr_harmful_05" data-fragment-index="5"></div>
+					<center class="fragment" id="cpr_harmful_06" data-fragment-index="6" style="width:310px; position:absolute; top:233px; left:692px; ">
+						<div style="width:100%; height:310px; border: solid 3px red;"></div>
+						<strong style="width:100%; text-align: center; color:red; font-size:0.7em;">break stratification</strong>
+					</center>
+
+					<script>
+						var cpr_harmful_build_once = true;
+                        function cpr_harmful_init() {
+                            cpr_harmful_build_once = false;
+                            var snap  = Snap('#cpr_harmful_samples');
+                            var layer = snap.select('#layer1');
+                            var mask  = snap.select('#mask_integrand');
+                            var fx    = snap.select('#integrand_warped');
+                            fx.attr({ mask: mask, stroke: 'black' });
+
+                            var unit = snap.select('#unit_warped');
+                            var bbox = unit.getBBox();
+
+                            var g = unit.group();
+                            for(var i=0; i<8; ++i){
+                                var u = sobol.sample(i, 0);
+                                var v = sobol.sample(i, 1);
+
+                                var xi = unit.circle(u*bbox.width, v*bbox.height, 0.5);
+                                var R = 0.6;
+                                var G = 0.6;
+                                var B = 0.6;
+                                var ci = Snap.rgb(255.0*R, 255.0*G, 255.0*B);
+                                xi.attr({ fill: 'white', stroke: ci, strokeWidth: 0.25 });
+                                g.add( xi );
+                            }
+
+                            var mask = unit.select('rect');
+                            g.attr({ id: 'samples_warped' });
+                            var g2 = unit.g(g).attr({ clip: mask.clone() });
+
+                            var unit_fixed = snap.select('#unit');
+                            var mask = unit_fixed.select('rect');
+
+
+                            // Create the stratification
+                            bbox = unit_fixed.getBBox();
+                            // var g = unit_fixed.g();
+                            for(var l=1; l<4; ++l) {
+                                var I = Math.pow(2,l);
+                                for(var i=1; i<I; ++i) {
+                                    var p = i / I;
+                                    unit_fixed.line(p*bbox.width, 0.0, p*bbox.width, bbox.height).attr({ stroke: 'blue', strokeWidth:0.5/I });
+                                    unit_fixed.line(0.0, p*bbox.height, bbox.width, p*bbox.height).attr({ stroke: 'blue', strokeWidth:0.5/I });
+                                }
+                            }
+
+                            unit_fixed.append( g2.clone() );
+
+                            // Duplicate the elements in the warped region
+                            var children = g.children();
+                            children.forEach(element => {
+                                var xo = element.clone();
+                                xo.x = xo.x + bbox.width;
+                                xo.attr({ transform: 't' + '0' + ',' + -bbox.height });
+                                g.append(xo);
+
+                                var xo = element.clone();
+                                xo.x = xo.x + bbox.width;
+                                xo.attr({ transform: 't' + bbox.width + ',' + '0' });
+                                g.append(xo);
+
+                                var xo = element.clone();
+                                xo.x = xo.x + bbox.width;
+                                xo.attr({ transform: 't' + bbox.width + ',' + -bbox.height });
+                                g.append(xo);
+                            });
+
+                            // Set opacity
+                            var elem   = snap.select("#integrand_warped");
+                            elem.attr({ opacity: 0.0 });
+                            var elem   = snap.select("#unit");
+                            elem.attr({ opacity: 0.0 });
+                            snap.select("#border").attr({ opacity: 0.0 });
+                            snap.selectAll("line").attr({ opacity: 0.0 });
+
+                        }
+
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if(event.currentSlide.id == 'cpr_harmful_section' && cpr_harmful_build_once)
+							{
+                                cpr_harmful_init();
+							}
+						});
+
+						Reveal.addEventListener( 'fragmentshown', function( event ) {
+							if(event.fragment.id == "cpr_harmful_01") {
+								var snap   = Snap('#cpr_harmful_samples');
+								var elem = snap.select('#samples_warped').animate({transform : 't-10,0'}, 500);
+							}
+							else if(event.fragment.id == "cpr_harmful_02") {
+								var snap   = Snap('#cpr_harmful_samples');
+								var elem = snap.select('#samples_warped').animate({transform : 't-10,10'}, 500);
+							}
+							else if(event.fragment.id == "cpr_harmful_03") {
+								var snap   = Snap('#cpr_harmful_samples');
+								snap.select("#integrand_warped").animate({ opacity: 1.0 }, 500);
+								snap.select("#unit").animate({ opacity: 1.0 }, 500);
+								snap.select("#border").animate({ opacity: 1.0 }, 500);
+								$('#cpr_harmful_equivalent').animate({ opacity: 1.0 });
+							}
+							else if(event.fragment.id == "cpr_harmful_04") {
+								var snap   = Snap('#cpr_harmful_samples');
+								var elem   = snap.select("#integrand_warped");
+								var childs = elem.selectAll("image");
+								childs.forEach(element => {
+									element.animate({transform : 't-10,0'}, 500);
+								});
+							}
+							else if(event.fragment.id == "cpr_harmful_05") {
+								var snap   = Snap('#cpr_harmful_samples');
+								var elem   = snap.select("#integrand_warped");
+								var childs = elem.selectAll("image");
+								childs.forEach(element => {
+									element.animate({transform : 't-10,10'}, 500);
+								});
+							} else if(event.fragment.id == "cpr_harmful_06") {
+                                var snap  = Snap('#cpr_harmful_samples');
+                                snap.selectAll("line").animate({ opacity: 1.0 }, 500);
+                            }
+						});
+						Reveal.addEventListener( 'fragmenthidden', function( event ) {
+							if(event.fragment.id == "cpr_harmful_01") {
+								var snap   = Snap('#cpr_harmful_samples');
+								var elem = snap.select('#samples_warped').animate({transform : 't0,0'}, 500);
+							}
+							else if(event.fragment.id == "cpr_harmful_02") {
+								var snap   = Snap('#cpr_harmful_samples');
+								var elem = snap.select('#samples_warped').animate({transform : 't-10,0'}, 500);
+							}
+							else if(event.fragment.id == "cpr_harmful_03") {
+								var snap   = Snap('#cpr_harmful_samples');
+								snap.select("#integrand_warped").animate({ opacity: 0.0 }, 500);
+								snap.select("#unit").animate({ opacity: 0.0 }, 500);
+								snap.select("#border").animate({ opacity: 0.0 }, 500);
+								$('#cpr_harmful_equivalent').animate({ opacity: 0.0 });
+							}
+							else if(event.fragment.id == "cpr_harmful_04") {
+								var snap   = Snap('#cpr_harmful_samples');
+								var elem   = snap.select("#integrand_warped");
+								var childs = elem.selectAll("image");
+								childs.forEach(element => {
+									element.animate({transform : 't0,0'}, 500);
+								});
+							}
+							else if(event.fragment.id == "cpr_harmful_05") {
+								var snap   = Snap('#cpr_harmful_samples');
+								var elem   = snap.select("#integrand_warped");
+								var childs = elem.selectAll("image");
+								childs.forEach(element => {
+									element.animate({transform : 't-10,0'}, 500);
+								});
+							} else if(event.fragment.id == "cpr_harmful_06") {
+                                var snap  = Snap('#cpr_harmful_samples');
+                                snap.selectAll("line").animate({ opacity: 0.0 }, 500);
+                            }
+						});
+					</script>
+					<aside class="notes">
+						The first issue concerns the scambling mechanism, and applies outside of the scope BNDS. The fact is, you should not use Cranley-Patterson rotations, shift modulo one, or whatever fancy name you want to give it, blindy on sequences. Let us see why.
+						<br /><br />
+
+						<strong>*click*</strong> <strong>*click*</strong>
+						As previously mentioned, CPR acts as a toroidal shift of the samples. The integrand is fixed, and the samples are rotating.
+						<br /><br />
+
+						<strong>*click*</strong> <strong>*click*</strong>
+						Another view, is to fix the samples and toroidally shift the integrand.
+						<br /><br />
+
+						<strong>*click*</strong>
+                        Now the issue is appearant: we added discontinuties inside the stratification. If the sampling pattern used is stratified, it will slow down the convergence.
+					</aside>
+				</section>
+				<section id="section_cpr_harmful_integrand">
+					<h2>Issue #1 : CPR Considered Harmful</h2>
+					<div style="position:absolute; width:400px; top:210px; left:235px; text-align:center; font-size:0.7em;">
+						<strong>Integrand</strong>
+					</div>
+					<center style="padding-top:120px;">
+						<object id="cpr_harmful_integrand" height="300px" data="images/cpr_harmful/samples.svg" type="image/svg+xml"></object>
+					</center>
+
+					<div style="position:absolute; width:400px; top:210px; left:650px; text-align:center; font-size:0.7em;">
+						<strong>Numerical Integrand Error</strong>
+					</div>
+					<div style="position:absolute; top:237px; left:650px;">
+						<object height="340px" data="images/cpr_harmful/plot.svg" type="image/svg+xml"></object>
+					</div>
+					<aside class="notes">
+                        And this is what I am showing here. If we integrate the left function using an Owen scrambled Sobol sequence with or without CPR, we obtain the error plot on the right. As you can see, the cranley patterson rotation, in green, has a higher error as we increase the sample count.
+					</aside>
+				</section>
+				<section id="section_scrambling">
+					<h2>Solution #1 : XOR Scrambling</h2>
+					<ul>
+						<li>Use a <strong>stratification preserving</strong> randomization
+							<ul>
+								<li>XOR scrambling [<a href="https://www.uni-kl.de/AG-Heinrich/EMS.pdf">Kollig and Keller 2002</a>]</li>
+								<li class="fragment" data-fragment-index="1">Example with pmj02</li>
+							</ul>
+						</li>
+					</ul><br /><br />
+					<center class="fragment" data-fragment-index="1">
+						<svg id="scrambling_svg" width="300px" height="300px" viewBox="-2 -2 516 516" xmlns="http://www.w3.org/2000/svg" style="box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);">
+							<g id="unit">
+								<rect x="0" y="0" width="512" height="512" style="fill:white; stroke:black; stroke-width:3px;" />
+							</g>
+						</svg><br />
+                        <div style="font-size:0.6em;">pmj02 sequence</div>
+                        <div id="scrambling_preserve_stratification" style="font-size:0.7em; color:red; opacity:0;">Preserve multi-stratification</div>
+					</center>
+					<div style="position:absolute; top:400px; left:150px;" class="fragment" data-fragment-index="3" id="scrambling_01">
+						first dim. XOR key:
+						<span id="scrambling_key_0" style="color:black;">1</span>
+						<span id="scrambling_key_1" style="color:black;">0</span>
+						<span id="scrambling_key_2" style="color:black;">1</span>
+						<span id="scrambling_key_3" style="color:black;">1</span>
+					</div>
+					<div class="fragment" id="scrambling_00"  data-fragment-index="2"></div>
+					<div class="fragment" id="scrambling_0"></div>
+					<div class="fragment" id="scrambling_1"></div>
+					<div class="fragment" id="scrambling_2"></div>
+					<div class="fragment" id="scrambling_3"></div>
+					<div class="fragment" id="scrambling_4"></div>
+					<div class="fragment" id="scrambling_5"></div>
+					<div class="fragment" id="scrambling_6"></div>
+					<div class="fragment" id="scrambling_7"></div>
+					<div class="fragment" id="scrambling_8"></div>
+					<script>
+                    // Value for the pmj02 sequence
+                    var pmj02_256spp_i = [149, 24, 214, 108, 37, 187, 89, 231, 65, 254, 163, 49, 3, 137, 200, 112, 182, 43, 83, 235, 221, 97, 19, 157, 134, 13, 123, 193, 245, 79, 59, 169, 144, 30, 210, 106, 189, 32, 92, 227, 142, 7, 206, 116, 53, 165, 71, 250, 177, 47, 87, 236, 20, 153, 100, 219, 126, 197, 129, 8, 60, 172, 75, 241, 147, 29, 209, 104, 191, 35, 224, 95, 166, 55, 69, 248, 141, 5, 204, 118, 242, 72, 174, 62, 131, 11, 198, 124, 22, 154, 103, 216, 44, 179, 84, 238, 213, 110, 26, 150, 228, 91, 184, 38, 138, 1, 114, 203, 51, 160, 252, 66, 170, 57, 247, 76, 132, 15, 121, 194, 98, 222, 16, 159, 40, 181, 232, 80, 136, 2, 113, 201, 48, 162, 255, 64, 215, 109, 148, 25, 186, 36, 88, 230, 234, 82, 183, 42, 156, 18, 220, 96, 192, 122, 135, 12, 168, 58, 244, 78, 128, 9, 196, 127, 240, 74, 61, 173, 218, 101, 152, 21, 237, 86, 176, 46, 226, 93, 188, 33, 145, 31, 107, 211, 6, 143, 207, 117, 164, 52, 251, 70, 139, 0, 202, 115, 253, 67, 50, 161, 90, 229, 39, 185, 111, 212, 151, 27, 133, 14, 195, 120, 171, 56, 246, 77, 158, 17, 99, 223, 180, 41, 81, 233, 146, 28, 208, 105, 34, 190, 225, 94, 205, 119, 4, 140, 249, 68, 54, 167, 243, 73, 175, 63, 199, 125, 10, 130, 217, 102, 23, 155, 178, 45, 239, 85];
+                    var pmj02_256spp_j = [132, 58, 105, 209, 167, 21, 85, 254, 147, 39, 207, 127, 234, 78, 182, 9, 170, 25, 244, 88, 218, 99, 142, 50, 229, 70, 188, 3, 155, 43, 198, 114, 103, 221, 137, 52, 243, 94, 173, 31, 187, 7, 64, 224, 156, 45, 117, 194, 83, 248, 18, 163, 109, 214, 131, 62, 74, 237, 15, 178, 35, 149, 202, 121, 251, 80, 17, 161, 111, 213, 129, 60, 177, 13, 238, 72, 32, 151, 201, 123, 227, 67, 5, 185, 158, 46, 119, 193, 240, 92, 28, 174, 101, 223, 138, 55, 247, 91, 168, 26, 97, 217, 140, 48, 196, 113, 152, 41, 231, 69, 191, 1, 232, 76, 10, 181, 125, 204, 36, 145, 253, 86, 22, 164, 135, 57, 210, 107, 139, 54, 222, 100, 175, 29, 241, 93, 184, 4, 66, 226, 192, 118, 159, 47, 150, 33, 122, 200, 239, 73, 12, 176, 212, 110, 61, 128, 160, 16, 81, 250, 216, 96, 49, 141, 169, 27, 246, 90, 230, 68, 0, 190, 112, 197, 153, 40, 205, 124, 37, 144, 180, 11, 233, 77, 211, 106, 134, 56, 252, 87, 23, 165, 19, 162, 249, 82, 108, 215, 63, 130, 14, 179, 236, 75, 148, 34, 203, 120, 172, 30, 95, 242, 53, 136, 220, 102, 116, 195, 44, 157, 225, 65, 186, 6, 42, 154, 199, 115, 2, 189, 71, 228, 24, 171, 89, 245, 143, 51, 219, 98, 59, 133, 208, 104, 166, 20, 255, 84, 126, 206, 38, 146, 8, 183, 235, 79];
+
+                    var scrambling_index = 1;
+                    var scrambling_timerId;
+                    var scrambling_refresh = function() {
+                        var snap  = Snap('#scrambling_svg');
+                        var index = scrambling_index;
+                        var prev  = (index == 1) ? 16 : index/2;
+                        snap.select('#stratification_' + prev).attr({opacity: 0.0});
+                        snap.select('#stratification_' + index).attr({opacity: 1.0});
+                        scrambling_index = (index >= 16) ? 1 : index*2;
+                    }
+
+                    Reveal.addEventListener( 'slidechanged', function( event ) {
+                        if(event.previousSlide && event.previousSlide.id == 'section_scrambling') {
+                            window.clearInterval(scrambling_timerId);
+                        }
+                    });
+
+					var scrambling_once = true;
+					Reveal.addEventListener( 'slidechanged', function( event ) {
+						if(event.currentSlide.id == 'section_scrambling' && scrambling_once) {
+							scrambling_once = false;
+							var snap = Snap('#scrambling_svg');
+							var unit = snap.select('#unit');
+							var bbox = unit.getBBox();
+
+							// Fill the unit space with
+							for(var level=1; level<=4; ++level) {
+								var g = snap.g();
+								var w = 512/Math.pow(2,level);
+								for(var i=0; i<512/w; i+=2)
+								{
+									var s = i*w;
+									g.rect(s, 0, w, 512).attr({ fill: '#0001' });
+								}
+								g.attr({id: 'level_'+level, opacity: 0});
+							}
+
+							// Fill the unit space with points
+							for(var i=0; i<16; ++i){
+								var u = pmj02_256spp_i[i] / 256.0; // sobol.sample(i, 0);
+								var v = pmj02_256spp_j[i] / 256.0; //sobol.sample(i, 1);
+
+								var xi = snap.circle(u*bbox.width, v*bbox.height, 6.0);
+								xi.attr({ fill: 'white', stroke: '#666', strokeWidth: 4.0 });
+							}
+
+                            // Display multi stratified
+                            // Loop over the width of the x axis
+                            var main_g = snap.g().attr({id: 'stratification', opacity: 0});
+							for(var wx=1; wx<=16; wx*=2) {
+                                // Create a new svg group
+								var g = main_g.g();
+
+                                // Deduce the width of the y axis
+                                var scale = 512/16;
+                                var wy= 16/wx;
+								for(var x=0; x<16; x+=wx)
+								    for(var y=0; y<16; y+=wy)
+								    {
+                                        var c = ((x/wx+y/wy) % 2) == 0 ? '#A001' : '#0000';
+                                        g.rect(x*scale, y*scale, wx*scale, wy*scale).attr({ fill: c });
+								    }
+								g.attr({id: 'stratification_'+wx, opacity: 0});
+							}
+						}
+					});
+					Reveal.addEventListener( 'fragmentshown', function( event ) {
+						var snap = Snap('#scrambling_svg');
+						var unit = snap.select('#unit');
+						var bbox = unit.getBBox();
+						var list = snap.selectAll('circle');
+                        var new_x;
+                        if(event.fragment.id == "scrambling_00") {
+                            snap.select('#stratification').attr({ opacity: 1 });
+                            scrambling_timerId = window.setInterval(scrambling_refresh, 1000);
+                        }
+                        else if(event.fragment.id == "scrambling_01") {
+                            snap.select('#stratification').attr({ opacity: 0 });
+                            window.clearInterval(scrambling_timerId);
+                        }
+                        else if(event.fragment.id == "scrambling_0") {
+							var elem = $('#scrambling_key_0');
+							elem.css('color', '#F00');
+							list.forEach(function(elem) {
+								new_x = elem.asPX('cx');
+								if(new_x < 256) {
+									elem.animate({'stroke': '#989dff'}, 500);
+								} else {
+									elem.animate({'stroke': '#ff99b3'}, 500);
+								}
+							});
+							snap.select('#level_1').animate({ opacity: 1.0 }, 500);
+						}
+						else if(event.fragment.id == "scrambling_1") {
+							list.forEach(function(elem) {
+								new_x = elem.asPX('cx');
+								new_x = new_x ^ 256;
+								elem.animate({'cx': new_x}, 500);
+							});
+						}
+						else if(event.fragment.id == "scrambling_2") {
+							$('#scrambling_key_0').css('color', '#000');
+							$('#scrambling_key_1').css('color', '#F00');
+							list.forEach(function(elem) {
+								new_x = elem.asPX('cx');
+								if(new_x & 128) {
+									elem.animate({'stroke': '#989dff'}, 500);
+								} else {
+									elem.animate({'stroke': '#ff99b3'}, 500);
+								}
+							});
+							snap.select('#level_1').animate({ opacity: 0.0 }, 500);
+							snap.select('#level_2').animate({ opacity: 1.0 }, 500);
+						}
+						else if(event.fragment.id == "scrambling_3") {
+							$('#scrambling_key_1').css('color', '#000');
+							$('#scrambling_key_2').css('color', '#F00');
+							list.forEach(function(elem) {
+								new_x = elem.asPX('cx');
+								if(new_x & 64) {
+									elem.animate({'stroke': '#989dff'}, 500);
+								} else {
+									elem.animate({'stroke': '#ff99b3'}, 500);
+								}
+							});
+							snap.select('#level_2').animate({ opacity: 0.0 }, 500);
+							snap.select('#level_3').animate({ opacity: 1.0 }, 500);
+						}
+						else if(event.fragment.id == "scrambling_4") {
+							list.forEach(function(elem) {
+								new_x = elem.asPX('cx');
+								new_x = new_x ^ 64;
+								elem.animate({'cx': new_x}, 500);
+							});
+						}
+						else if(event.fragment.id == "scrambling_5") {
+							$('#scrambling_key_2').css('color', '#000');
+							$('#scrambling_key_3').css('color', '#F00');
+							list.forEach(function(elem) {
+								new_x = elem.asPX('cx');
+								if(new_x & 32) {
+									elem.animate({'stroke': '#989dff'}, 500);
+								} else {
+									elem.animate({'stroke': '#ff99b3'}, 500);
+								}
+							});
+							snap.select('#level_3').animate({ opacity: 0.0 }, 500);
+							snap.select('#level_4').animate({ opacity: 1.0 }, 500);
+						}
+						else if(event.fragment.id == "scrambling_6") {
+							list.forEach(function(elem) {
+								new_x = elem.asPX('cx');
+								new_x = new_x ^ 32;
+								elem.animate({'cx': new_x}, 500);
+							});
+						}
+						else if(event.fragment.id == "scrambling_7") {
+							$('#scrambling_key_3').css('color', '#000');
+							$('#scrambling_preserve_stratification').animate({ opacity:1 }, 500);
+							snap.select('#level_4').animate({ opacity: 0.0 }, 500);
+						}
+                        else if(event.fragment.id == "scrambling_8") {
+                            snap.select('#stratification').attr({ opacity: 1 });
+                            scrambling_timerId = window.setInterval(scrambling_refresh, 1000);
+						}
+					});
+					Reveal.addEventListener( 'fragmenthidden', function( event ) {
+						var snap = Snap('#scrambling_svg');
+						var unit = snap.select('#unit');
+						var bbox = unit.getBBox();
+						var list = snap.selectAll('circle');
+                        var new_x;
+
+                        if(event.fragment.id == "scrambling_00") {
+                            snap.select('#stratification').attr({ opacity: 0 });
+                            window.clearInterval(scrambling_timerId);
+                        }
+                        else if(event.fragment.id == "scrambling_01") {
+                            snap.select('#stratification').attr({ opacity: 1 });
+                            scrambling_timerId = window.setInterval(scrambling_refresh, 1000);
+                        }
+                        else if(event.fragment.id == "scrambling_0") {
+							var elem = $('#scrambling_key_0');
+							elem.css('color', '#000');
+							list.forEach(function(elem) {
+								elem.animate({'stroke': '#666'}, 500);
+							});
+							snap.select('#level_1').animate({ opacity: 0.0 }, 500);
+						}
+						else if(event.fragment.id == "scrambling_1") {
+							list.forEach(function(elem) {
+								new_x = elem.asPX('cx');
+								new_x = new_x ^ 256;
+								elem.animate({'cx': new_x}, 500);
+							});
+						}
+						else if(event.fragment.id == "scrambling_2") {
+							$('#scrambling_key_0').css('color', '#000');
+							$('#scrambling_key_1').css('color', '#F00');
+							list.forEach(function(elem) {
+								new_x = elem.asPX('cx');
+								if(new_x & 256) {
+									elem.animate({'stroke': '#989dff'}, 500);
+								} else {
+									elem.animate({'stroke': '#ff99b3'}, 500);
+								}
+							});
+							snap.select('#level_2').animate({ opacity: 0.0 }, 500);
+							snap.select('#level_1').animate({ opacity: 1.0 }, 500);
+						}
+						else if(event.fragment.id == "scrambling_3") {
+							$('#scrambling_key_1').css('color', '#000');
+							$('#scrambling_key_2').css('color', '#F00');
+							list.forEach(function(elem) {
+								new_x = elem.asPX('cx');
+								if(new_x & 128) {
+									elem.animate({'stroke': '#989dff'}, 500);
+								} else {
+									elem.animate({'stroke': '#ff99b3'}, 500);
+								}
+							});
+							snap.select('#level_3').animate({ opacity: 0.0 }, 500);
+							snap.select('#level_2').animate({ opacity: 1.0 }, 500);
+						}
+						else if(event.fragment.id == "scrambling_4") {
+							list.forEach(function(elem) {
+								new_x = elem.asPX('cx');
+								new_x = new_x ^ 64;
+								elem.animate({'cx': new_x}, 500);
+							});
+						}
+						else if(event.fragment.id == "scrambling_5") {
+							$('#scrambling_key_2').css('color', '#000');
+							$('#scrambling_key_3').css('color', '#F00');
+							list.forEach(function(elem) {
+								new_x = elem.asPX('cx');
+								if(new_x & 64) {
+									elem.animate({'stroke': '#989dff'}, 500);
+								} else {
+									elem.animate({'stroke': '#ff99b3'}, 500);
+								}
+							});
+							snap.select('#level_4').animate({ opacity: 0.0 }, 500);
+							snap.select('#level_3').animate({ opacity: 1.0 }, 500);
+						}
+						else if(event.fragment.id == "scrambling_6") {
+							list.forEach(function(elem) {
+								new_x = elem.asPX('cx');
+								new_x = new_x ^ 32;
+								elem.animate({'cx': new_x}, 500);
+							});
+						}
+						else if(event.fragment.id == "scrambling_7") {
+							$('#scrambling_key_3').css('color', '#F00');
+							$('#scrambling_preserve_stratification').animate({ opacity:0 }, 500);
+							snap.select('#level_4').animate({ opacity: 0.0 }, 500);
+						}
+                        else if(event.fragment.id == "scrambling_8") {
+                            window.clearInterval(scrambling_timerId);
+                            snap.select('#stratification').attr({ opacity: 0 });
+						}
+					});
+					</script>
+					<aside class="notes">
+						Instead of using CPR, we choose to use a XOR scrambling because it preserves the convergence
+						properties of (0,2)-sequences such as pmj02 or Sobol.
+						<br /><br />
+
+						<strong>*click*</strong>
+						Here is how it works for the first dimension of this pmj02 point set. <strong>*click*</strong> pmj02 ensure that only one point fall in each bin of those stratum.
+						<br /><br />
+
+						<strong>*click*</strong>
+                        We iterate on the bits of a scrambling key and permut samples falling in the left and right nodes of a binary tree given the index in the scrambling key.
+                        <strong>*click*</strong> For example, we start with the first bit of the scrambling key and subdivide in two the unit space.
+                        <strong>*click*</strong> Since the bit is one, we permut the samples.
+						<br /><br />
+
+						<strong>*click*</strong>
+						We continue to the next bit and subdivide further and look for the bit's value. Here no change.
+						<br /><br />
+
+						<strong>*click*</strong> Again, <strong>*click*</strong> here we do have to swap.
+						<strong>*click*</strong> <strong>*click*</strong> Until we exhaust all the digits.
+                        <br /><br />
+
+                        <strong>*click*</strong> The good thinkg about this scrambling scheme is that it preseves binary stratification. So if the input sequence is stratified, the scrambled sequence will be stratified as well. And this is what we can see with this scrambled pmj02 set.
+					</aside>
+				</section>
+
+				<section id="section_convergence_chair">
+					<div id="convergence_chair">
+						<img class="pixelated" id="convergence_chair_kk2002"   width="1280px" height="720px" src="images/chair/chair_spp=8_SequenceSamplerWhiteNoiseErrorDistribution.jpg" style="margin:0px; clip-path: polygon(  0%  0%, 100%  0%, 100% 100%,  0% 100%); position:absolute; top:0px; left:0px;" />
+						<div style="position:absolute; width:1280px; left:0px; top:650px; text-shadow:1px 1px 2px black; color:azure;">
+							<p>XOR scrambling [Kollig &amp; Keller 2002]</p>
+						</div>
+
+						<img class="pixelated" id="convergence_chair_gf2016" width="1280px" height="720px" src="images/chair/chair_spp=8_SequenceSamplerSolidAngleCPR.jpg" style="margin:0px; clip-path: polygon(  50%  0%, 100%  0%, 100% 100%, 50% 100%); position:absolute; top:0px; left:0px;" />
+						<div id="convergence_chair_gf2016_label" style="position:absolute; width:1280px; left:0px; top:650px; text-shadow:1px 1px 2px black; color:azure; clip-path: polygon(  50%  0%, 100%  0%, 100% 100%, 50% 100%);">
+							<p id="convergence_chair_gf2016_authors" style="padding-left:830px; width:500px; text-align:left;">CPR [Georgiev and Fajardo 2016]</p>
+						</div>
+						<div id="convergence_chair_border" style="position:absolute; top:-2px;left:-2px; z-index:1; width:50%; height:100%; border-right: solid 2px black;" ></div>
+					</div>
+
+					<div style="position:absolute; left:0px; top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;">
+						<p id="convergence_chair_title">Chair - 8 spp</p>
+					</div>
+
+					<div class="fragment" id="convergence_chair_b_02"></div>
+					<div class="fragment" id="convergence_chair_b_03"></div>
+
+					<script>
+						var convergence_chair_date  = new Date();
+						var convergence_chair_start = convergence_chair_date.getTime();
+						var convergence_chair_timerId;
+
+						var refresh_convergence_chair = function()
+						{
+							convergence_chair_date = new Date();
+							var current_time = convergence_chair_date.getTime();
+							var t = (current_time - convergence_chair_start) / 1000;
+							var x = 50 * (Math.sin(t) + 1.0);
+							$('#convergence_chair_gf2016').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+							$('#convergence_chair_gf2016_label').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+							$('#convergence_chair_border').css('width', x+'%');
+						}
+
+						Reveal.addEventListener( 'fragmentshown', function( event ) {
+							if(event.fragment.id == "convergence_chair_b_02") {
+								convergence_chair_date = new Date();
+								convergence_chair_start   = convergence_chair_date.getTime();
+								convergence_chair_timerId = window.setInterval(refresh_convergence_chair, 1000.0/60.0);
+							}
+							else if(event.fragment.id == "convergence_chair_b_03") {
+								setNewSPP('convergence_chair', 16);
+								$('#convergence_chair_title').html('Chair - 16 spp');
+							}
+						});
+						Reveal.addEventListener( 'fragmenthidden', function( event ) {
+							if(event.fragment.id == "convergence_chair_b_02") {
+								window.clearInterval(convergence_chair_timerId);
+								var x = 50;
+								$('#convergence_chair_gf2016').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#convergence_chair_gf2016_label').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#convergence_chair_border').css('width', x+'%');
+							} else if(event.fragment.id == "convergence_chair_b_03") {
+								setNewSPP('convergence_chair', 8);
+								$('#convergence_chair_title').html('Chair - 8 spp');
+							}
+						});
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if((event.currentSlide && event.currentSlide.id == 'section_convergence_chair_spp') &&
+							   (event.previousSlide && event.previousSlide.id == 'section_result_realtime'))
+							{
+								var x = 50;
+								$('#convergence_chair_gf2016').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#convergence_chair_gf2016_label').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#convergence_chair_border').css('width', x+'%');
+								convergence_chair_timerId = window.setInterval(refresh_convergence_chair, 1000.0/60.0);
+							}
+							if((event.currentSlide && event.currentSlide.id == 'section_convergence_chair_spp') &&
+							   (event.previousSlide && event.previousSlide.id == 'section_result_offline'))
+							{
+								var x = 50;
+								$('#convergence_chair_gf2016').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#convergence_chair_gf2016_label').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#convergence_chair_border').css('width', x+'%');
+							}
+							if(event.previousSlide && event.previousSlide.id == 'section_convergence_chair_spp')
+							{
+								window.clearInterval(convergence_chair_timerId);
+							}
+						} );
+					</script>
+					<aside class="notes">
+						Here I will compare rendering this chair scene using XOR scrambling with random keys per pixel on the left and using Cranley Patterson Rotations on the right.
+						<br /><br />
+
+						<strong>*click*</strong>
+						At 8 spp we already a huge difference notably in the soft shadow region.
+						<br /><br />
+
+						<strong>*click*</strong>
+						This difference persists with more samples, here 16spp.
+						<br /><br />.
+					</aside>
+				</section>
+
+				<section id="section_limitation_georgiev_spp">
+					<h2>Issue #2 : Lack of Progressivity</h2>
+
+					<div class="fragment" data-fragment-index="1" style="position:absolute; top:95px; left:-105px; width:1280px; height:720px;">
+						<div style="position:absolute; top:5%; left:50%; width:50%; height:65%; border:solid 1px black;"></div>
+						<img id="limitation_georgiev_1spp_img" width="1280px" height="720px" style="position:absolute; top:0px; left:0px; margin:0px; z-index:-1; clip-path: polygon(50% 5%, 100% 5%, 100% 70%, 50% 70%);" src="images/boxed3/boxed3_spp=1_SequenceSamplerSolidAngleCPR.png" class="pixelated"/>
+						<img id="limitation_georgiev_1spp_ref" width="1280px" height="720px" style="opacity:0;" src="images/boxed3/boxed3_spp=256_SequenceSamplerWhiteNoiseErrorDistribution.png" class="pixelated"/>
+						<div class="fragment" data-fragment-index="2"  id="limitation_georgiev_1spp_inset" style="position:absolute; left:800px; top:350px; margin:0px; border:solid 1px chartreuse; width:128px; height:128px;"></div>
+					</div>
+
+					<p class="fragment" data-fragment-index="1" style="position:absolute; left:500px; top:600px; text-shadow:1px 1px 2px #0004; font-size: 1.0em; font-variant-caps: small-caps;">Boxed - 1 spp</p>
+					<div class="fragment" data-fragment-index="1" style="position:absolute; left:910px; top:610px; text-shadow:1px 1px 2px #0004; ; font-size: 0.7em;">
+						<p>Georgiev and Fajardo [2016]</p>
+					</div>
+					<div class="fragment" data-fragment-index="2" style="position:absolute; top:230px; left:150px;">
+						<canvas id="limitation_georgiev_1spp_fft" class="pixelated" style="border:solid 1px chartreuse; width:256px;" width="128" height="128"></canvas>
+						<div style="width:256px; text-align:center; font-size:0.6em; text-shadow:1px 1px 2px #0004; ">Power Spectrum of Error</div>
+					</div>
+					<canvas id="limitation_georgiev_1spp_inset_ref" class="pixelated" style="opacity:0;" width="128" height="128"></canvas>
+
+					<script>
+						Reveal.addEventListener( 'ready', function( event ) {
+							$('#limitation_georgiev_1spp_img').ready(function() {
+								tokyo_denoising_set = true;
+								var canvas = document.getElementById('limitation_georgiev_1spp_fft');
+								var inset  = document.getElementById('limitation_georgiev_1spp_inset');
+								var top    = parseFloat(inset.style.top);
+								var left   = parseFloat(inset.style.left);
+								var ctx    = canvas.getContext('2d');
+								ctx.drawImage(document.getElementById('limitation_georgiev_1spp_img'), left, top, 128, 128, 0, 0, 128, 128);
+
+								var ref_cnv = document.getElementById('limitation_georgiev_1spp_inset_ref');
+								var ref_ctx = ref_cnv.getContext('2d');
+								ref_ctx.drawImage(document.getElementById('limitation_georgiev_1spp_ref'), left, top, 128, 128, 0, 0, 128, 128);
+								PowerSpectrumOfError(canvas, ref_cnv, 70);
+							});
+						});
+					 </script>
+					<aside class="notes">
+						The second issue we are going to fix is progressivity.
+						<br /><br />
+
+						<strong>*click*</strong>
+                        We will look at the power spectrum of this inset and increase the sample count.
+                        <strong>*click*</strong>
+                        At one sample per pixel, BNDS does a very good job at distributing the error as a blue-noise.
+						<br /><br />
+					</aside>
+				</section>
+				<section id="section_limitation_georgiev_16spp">
+					<h2>Issue #2 : Lack of Progressivity</h2>
+
+					<div style="position:absolute; top:95px; left:-105px; width:1280px; height:720px;">
+						<div style="position:absolute; top:5%; left:50%; width:50%; height:65%; border:solid 1px black;"></div>
+						<img id="limitation_georgiev_16spp_img" width="1280px" height="720px" style="position:absolute; top:0px; left:0px; margin:0px; z-index:-1; clip-path: polygon(50% 5%, 100% 5%, 100% 70%, 50% 70%);" src="images/boxed3/boxed3_spp=16_SequenceSamplerSolidAngleCPR.png" class="pixelated"/>
+						<img id="limitation_georgiev_16spp_ref" width="1280px" height="720px" style="opacity:0;" src="images/boxed3/boxed3_spp=256_SequenceSamplerWhiteNoiseErrorDistribution.png" class="pixelated"/>
+						<div id="limitation_georgiev_16spp_inset" style="position:absolute; left:800px; top:350px; margin:0px; border:solid 1px chartreuse; width:128px; height:128px;"></div>
+					</div>
+
+					<p style="position:absolute; left:500px; top:600px; text-shadow:1px 1px 2px #0004; font-size: 1.0em; font-variant-caps: small-caps;">Boxed - 16 spp</p>
+					<div style="position:absolute; left:910px; top:610px; text-shadow:1px 1px 2px #0004; ; font-size: 0.7em;">
+						<p>Georgiev and Fajardo [2016]</p>
+					</div>
+					<div style="position:absolute; top:230px; left:150px;">
+						<canvas id="limitation_georgiev_16spp_fft" class="pixelated" style="border:solid 1px chartreuse; width:256px;" width="128" height="128"></canvas>
+						<div style="width:256px; text-align:center; font-size:0.6em; text-shadow:1px 1px 2px #0004; ">Power Spectrum of Error</div>
+					</div>
+					<canvas id="limitation_georgiev_16spp_inset_ref" class="pixelated" style="opacity:0;" width="128" height="128"></canvas>
+					<script>
+						Reveal.addEventListener( 'ready', function( event ) {
+							$('#limitation_georgiev_16spp_ref').ready(function() {
+								tokyo_intro_set = true;
+								var canvas = document.getElementById('limitation_georgiev_16spp_fft');
+								var inset  = document.getElementById('limitation_georgiev_16spp_inset');
+								var top    = parseFloat(inset.style.top);
+								var left   = parseFloat(inset.style.left);
+								var ctx    = canvas.getContext('2d');
+								ctx.drawImage(document.getElementById('limitation_georgiev_16spp_img'), left, top, 128, 128, 0, 0, 128, 128);
+
+								// Draw the ref on its tile
+								var ref_cnv = document.getElementById('limitation_georgiev_16spp_inset_ref');
+								var ref_ctx = ref_cnv.getContext('2d');
+								ref_ctx.drawImage(document.getElementById('limitation_georgiev_16spp_ref'), left, top, 128, 128, 0, 0, 128, 128);
+
+								PowerSpectrumOfError(canvas, ref_cnv, 700);
+							});
+						});
+					 </script>
+				<aside class="notes">
+					But as I increase the sample count, the blue-noisyness of the power spectrum fades aways.
+					<br /><br />
+				</aside>
+				</section>
+				<section id="section_limitation_georgiev_32spp">
+					<h2>Issue #2 : Lack of Progressivity</h2>
+
+					<div style="position:absolute; top:95px; left:-105px; width:1280px; height:720px;">
+						<div style="position:absolute; top:5%; left:50%; width:50%; height:65%; border:solid 1px black;"></div>
+						<img id="limitation_georgiev_32spp_img" width="1280px" height="720px" style="position:absolute; top:0px; left:0px; margin:0px; z-index:-1; clip-path: polygon(50% 5%, 100% 5%, 100% 70%, 50% 70%);" src="images/boxed3/boxed3_spp=32_SequenceSamplerSolidAngleCPR.png" class="pixelated"/>
+						<img id="limitation_georgiev_32spp_ref" width="1280px" height="720px" style="opacity:0;" src="images/boxed3/boxed3_spp=256_SequenceSamplerWhiteNoiseErrorDistribution.png" class="pixelated"/>
+						<div id="limitation_georgiev_32spp_inset" style="position:absolute; left:800px; top:350px; margin:0px; border:solid 1px chartreuse; width:128px; height:128px;"></div>
+					</div>
+
+					<p style="position:absolute; left:500px; top:600px; text-shadow:1px 1px 2px #0004; font-size: 1.0em; font-variant-caps: small-caps;">Boxed - 16 spp</p>
+					<div style="position:absolute; left:910px; top:610px; text-shadow:1px 1px 2px #0004; ; font-size: 0.7em;">
+						<p>Georgiev and Fajardo [2016]</p>
+					</div>
+					<div style="position:absolute; top:230px; left:150px;">
+						<canvas id="limitation_georgiev_32spp_fft" class="pixelated" style="border:solid 1px chartreuse; width:256px;" width="128" height="128"></canvas>
+						<div style="width:256px; text-align:center; font-size:0.6em; text-shadow:1px 1px 2px #0004; ">Power Spectrum of Error</div>
+						<div class="fragment" style="width:256px; color:orangered; text-align:center; font-size:0.7em; text-shadow:1px 1px 2px #0003;">White-noise as SPP increase</div>
+					</div>
+					<canvas id="limitation_georgiev_32spp_inset_ref" class="pixelated" style="opacity:0;" width="128" height="128"></canvas>
+					<script>
+						Reveal.addEventListener( 'ready', function( event ) {
+							$('#limitation_georgiev_32spp_ref').ready(function() {
+								tokyo_intro_set = true;
+								var canvas = document.getElementById('limitation_georgiev_32spp_fft');
+								var inset  = document.getElementById('limitation_georgiev_32spp_inset');
+								var top    = parseFloat(inset.style.top);
+								var left   = parseFloat(inset.style.left);
+								var ctx    = canvas.getContext('2d');
+								ctx.drawImage(document.getElementById('limitation_georgiev_32spp_img'), left, top, 128, 128, 0, 0, 128, 128);
+
+								// Draw the ref on its tile
+								var ref_cnv = document.getElementById('limitation_georgiev_32spp_inset_ref');
+								var ref_ctx = ref_cnv.getContext('2d');
+								ref_ctx.drawImage(document.getElementById('limitation_georgiev_32spp_ref'), left, top, 128, 128, 0, 0, 128, 128);
+
+								PowerSpectrumOfError(canvas, ref_cnv, 1500);
+							});
+						});
+						Reveal.addEventListener( 'fragmentshown', function( event ) {
+							if(event.fragment.id == "limitation_georgiev_32spp_01") {
+								var elem = document.getElementById('limitation_georgiev_32spp_blur')
+								elem.style.filter  = 'blur(10px)';
+								elem.style.opacity = 0.5;
+							}
+						});
+						Reveal.addEventListener( 'fragmenthidden', function( event ) {
+							if(event.fragment.id == "limitation_georgiev_32spp_01") {
+								var elem = document.getElementById('limitation_georgiev_32spp_blur');
+								elem.style.filter  = 'none';
+								elem.style.opacity = 1.0;
+							}
+						});
+					 </script>
+					<aside class="notes">
+						To match a white-noise spectrum <strong>*click*</strong> that we would obtain with pure random scrambling.
+					</aside>
+				</section>
+
+				<!--  -->
+				<section id="ours_pipeline">
+					<h2>Solution #2 : Change the Optimization Space</h2>
+					<center style="width:100%; position:absolute; top:100px;">
+						<object id="ours_pipeline_svg" class="pixelated" width="1100px" data="images/gf2016/pipeline.svg" type="image/svg+xml"></object>
+					</center>
+
+					<div class="fragment" id="ours_pipeline_01"></div>
+					<div class="fragment" id="ours_pipeline_02"></div>
+					<script>
+						var new_pipeline_once = true;
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if(event.currentSlide.id == 'ours_pipeline' && new_pipeline_once)
+							{
+								new_pipeline_once = false;
+								var snap = Snap('#ours_pipeline_svg');
+								snap.select('#ours').attr({ opacity: 1 });
+								var unit = snap.select('#unit_samples');
+								var bbox = unit.getBBox();
+								var mask = unit.select('rect');
+								var g    = snap.group();
+
+								var R = 0.6;
+								var G = 0.6;
+								var B = 0.6;
+								var ci = Snap.rgb(255.0*R, 255.0*G, 255.0*B);
+
+								for(var i=0; i<8; ++i){
+									var u = sobol.sample(i, 0);
+									var v = sobol.sample(i, 1);
+
+									var xi = unit.circle(u*bbox.width, v*bbox.height, 1.0);
+									xi.attr({ fill: 'white', stroke: ci, strokeWidth: 1.0 });
+									g.add( xi );
+								}
+								g.attr({ id: 'samples' });
+								unit.g(g).attr({ clip: mask.clone() });
+
+
+								// Duplicate the elements in the warped region
+								var R = 0.8;
+								var G = 0.4;
+								var B = 0.4;
+								var ci = Snap.rgb(255.0*R, 255.0*G, 255.0*B);
+
+								var children = g.children();
+								var g        = snap.group();
+								children.forEach(element => {
+									var x0 = element.clone();
+									x0.attr({ stroke: ci });
+									g.append(x0);
+
+									var x1 = x0.clone();
+									x1.attr({ transform: 't' + '0' + ',' + -bbox.height });
+									g.append(x1);
+
+									var x1 = x0.clone();
+									x1.attr({ transform: 't' + bbox.width + ',' + '0' });
+									g.append(x1);
+
+									var x1 = x0.clone();
+									x1.attr({ transform: 't' + bbox.width + ',' + -bbox.height });
+									g.append(x1);
+								});
+
+								g.attr({ id: 'samples_warped', opacity: 0.0 });
+								unit.g(g).attr({ clip: mask.clone() });
+
+								snap.select('#ours').attr({opacity : 0.0});
+							}
+						});
+
+						Reveal.addEventListener( 'fragmentshown', function( event ) {
+							if(event.fragment.id == "ours_pipeline_01") {
+								var snap   = Snap('#ours_pipeline_svg');
+								snap.select('#gf2016').animate({opacity : 0.2}, 500);
+								snap.select('#cpr').animate({opacity : 0.2}, 500);
+
+							}
+							if(event.fragment.id == "ours_pipeline_02") {
+								var snap   = Snap('#ours_pipeline_svg');
+								snap.select('#ours').animate({opacity : 1.0}, 500);
+								var corr = snap.select('#correlation');
+								corr.animate({opacity : 1.0}, 500);
+								corr.select('path').attr({opacity : 0.0});
+							}
+						});
+						Reveal.addEventListener( 'fragmenthidden', function( event ) {
+							if(event.fragment.id == "ours_pipeline_01") {
+								var snap   = Snap('#ours_pipeline_svg');
+								snap.select('#gf2016').animate({opacity : 1.0}, 500);
+								snap.select('#cpr').animate({opacity : 1.0}, 500);
+							}
+							if(event.fragment.id == "ours_pipeline_02") {
+								var snap   = Snap('#ours_pipeline_svg');
+								snap.select('#ours').animate({opacity : 0.0}, 500);
+								var corr = snap.select('#correlation');
+								corr.animate({opacity : 0.0}, 500);
+								corr.select('path').attr({opacity : 0.0});
+							}
+						});
+					</script>
+					<aside class="notes">
+						To overcome this issue, we have to go back to BNDS's pipeline. The issue here is that, the
+						optimization of the dither mask is done independently of why it is used for. Why should your input mask be blue-noise when what you want is the final rendering to be blue-noise?
+						<br /><br />
+
+						<strong>*click*</strong>So, instead, we choose to optimize the result of a 'rendering' to have a blue-noise spectrum.
+						<br /><br />
+
+						<strong>*click*</strong>
+						The problem now is that we can't optimize for an integrand we don't know.
+					</aside>
+				</section>
+				<section id="section_test_integrands_constant">
+					<h2>Our Method : Test Integrands</h2>
+					<ul style="width:60%;">
+						<li>Optimize with <strong>constant image-space</strong> integrands
+							<ul>
+								<li class="fragment" data-fragment-index="1"><strong>Same</strong> integrand for every pixel</li>
+								<li class="fragment" data-fragment-index="2">But <strong>different</strong> XOR keys per pixel</li>
+							</ul>
+						</li>
+					</ul>
+					<div  style="position:relative; display:flex; justify-content:space-evenly;">
+						<svg class="fragment" data-fragment-index="4" style="position:absolute; top:0px; left:0px; width:100%;"  width="100%" height="400px">
+							<g>
+								<path
+								style="opacity:1;fill:#e7e7e7;fill-opacity:1;stroke:none;stroke-width:1.99999988;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+								d="M 372.19336 -22.871094 L 372.19336 0 L 0 0 L 0 113.13672 L 372.19336 113.13672 L 372.19336 136.00977 L 440.99023 96.289062 L 509.78906 56.568359 L 440.99023 16.847656 L 372.19336 -22.871094 z "
+								transform="translate(390, 50)"
+								id="rect817" />
+							</g>
+						</svg>
+						<div class="fragment" data-fragment-index="2">
+							<div style="position:relative; width:200px; height:200px;">
+								<canvas id="scrambling_mask_cnv" width="16px" height="16px" style="opacity: 0.5; position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
+                                <div class="fragment" data-fragment-index="3">
+                                <div id="scrambling_mask_pixel" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:10px; height:10px; border:solid 3px purple;"></div>
+                                </div>
+							</div>
+							<br />
+							<div style="width:200px; text-align:center; font-size:0.6em;">Scrambling mask</div>
+						</div>
+						<div  class="fragment" data-fragment-index="1" id="scrambling_mask_01"  >
+							<div style="position:relative; width:200px; height:200px; margin-top:120px;">
+								<img style="position:absolute; top:0px; left:0px; border: solid 1px black;" width="200px" src="images/ours/robustness/TestFunction2DHeavisideXY.jpg" />
+								<svg class="fragment" data-fragment-index="3" id="scrambling_mask_integrand_svg" style="position:absolute; top:0px; left:0px; margin: 15px 0px 0px 0px; border: solid 2px purple;" width="200px" height="200px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+									<g id="unit">
+										<rect x="0" y="0" width="512" height="512" style="fill:none;" />
+									</g>
+								</svg>
+							</div>
+							<br />
+							<div style="width:200px; text-align:center; font-size:0.6em;">Integrand <div class="fragment" data-fragment-index="3">&amp; Samples</div></div>
+						</div>
+						<div class="fragment" data-fragment-index="4">
+							<div style="position:relative; width:200px; height:200px;">
+								<canvas id="scrambling_res_cnv" width="16px" height="16px" style="opacity: 0.5; position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
+								<div id="scrambling_res_pixel" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:10px; height:10px; border:solid 3px purple;"></div>
+							</div>
+							<br />
+							<div style="width:200px; text-align:center; font-size:0.6em;">Resulting Image</div>
+						</div>
+
+					</div>
+					<div id="scrambling_mask_02" class="fragment"  data-fragment-index="5"></div>
+					<div id="scrambling_mask_03" class="fragment"  data-fragment-index="6"></div>
+					<div id="scrambling_mask_04" class="fragment"  data-fragment-index="7"></div>
+					<script>
+
+						/* This function scamble the samples in the `scrambling_mask_integrand_svg` svg
+						 * element according to the 2D scramble located in canvas `scrambling_mask_cnv`.
+						 * If one provides a negative pixel coordinate, no xor is applied.
+						 */
+						function movePointFromPixelScramble(i, j) {
+							var snap = Snap('#scrambling_mask_integrand_svg');
+							var svg  = document.getElementById('scrambling_mask_integrand_svg');
+							var unit = snap.select('#unit');
+							var bbox = unit.getBBox();
+							var list = snap.selectAll('circle');
+							var cnv  = document.getElementById('scrambling_mask_cnv');
+							var ctx  = cnv.getContext('2d');
+							var img  = ctx.getImageData(0, 0, cnv.width, cnv.height);
+							var data = img.data;
+
+							var xor_x = 0;
+							if(i >= 0) {
+								xor_x = data[4*(i + j*cnv.width) + 0];
+							}
+							var xor_y = 0;
+							if(j >= 0) {
+								xor_y = data[4*(i + j*cnv.height) + 1];
+							}
+							for(var k=0; k<16; ++k) {
+								var elem = list[k];
+								var new_x = svg.points[k][0] ^ xor_x;
+								var new_y = svg.points[k][1] ^ xor_y;
+								elem.animate({'cx': new_x, 'cy': new_y}, 500);
+							}
+
+							if(i >= 0 || j >= 0) {
+								$('#scrambling_mask_pixel').animate({ top: (j*200/16), left: (i*200/16)}, 500);
+								$('#scrambling_res_pixel').animate({  top: (j*200/16), left: (i*200/16)}, 500);
+							}
+                        }
+
+                        var frame  = 0;
+                        var max_f  = 1000;
+                        var test_integrands_timerId;
+                        function refreshScrambleMask() {
+                            var cnv = document.getElementById('scrambling_mask_cnv');
+                            var width  = cnv.width;
+                            var height = cnv.height;
+
+                            updateScrambleMasksWithTarget(renders[0], masks[0], target, width, height, 100);
+
+                            renderImageInCanvas(renders[0], 'scrambling_res_cnv', width, height, 1);
+                            renderImageInCanvas(masks[0],   'scrambling_mask_cnv',  width, height, 2);
+                        }
+
+						var test_integrand_once = true;
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if(event.currentSlide.id == 'section_test_integrands_constant' && test_integrand_once) {
+                                test_integrand_once = false;
+
+                                var cnv = document.getElementById('scrambling_res_cnv');
+                                var width  = cnv.width;
+                                var height = cnv.height;
+
+                                // console.log(width, height)
+                                initMaskAndRender(width, height);
+                                // updateScrambleMasks([renders[0], renders[1]], [masks[0], masks[1]], width, height, 1);
+
+                                var ctx = cnv.getContext('2d');
+                                ctx.drawImage(document.getElementById('ditherMaskPng'), 0, 0);
+                                var img = ctx.getImageData(0, 0, width, height);
+                                target = new Uint8Array(width*height);
+                                for(var k=0; k<width*height; ++k) {
+                                    target[k] = img.data[4*k+0];
+                                }
+
+                                renderImageInCanvas(masks[0],   'scrambling_mask_cnv', width, height, 2);
+                                renderImageInCanvas(renders[0], 'scrambling_res_cnv',  width, height, 1);
+
+								/* Generate the samples */
+								var svg  = document.getElementById('scrambling_mask_integrand_svg');
+								var snap = Snap('#scrambling_mask_integrand_svg');
+								var unit = snap.select('#unit');
+								var bbox = unit.getBBox();
+								svg.points = [];
+								for(var i=0; i<16; ++i){
+									var u = sobol.sample(i, 0);
+									var v = sobol.sample(i, 1);
+									var x = u*bbox.width;
+									var y = v*bbox.height;
+									svg.points[i] = [x, y];
+									var xi = snap.circle(x, y, 6.0);
+									xi.attr({ fill: 'white', stroke: '#666', strokeWidth: 4.0 });
+								}
+
+								var i = 5;
+								var j = 5;
+								movePointFromPixelScramble(i, j);
+                            }
+
+							if(event.previousSlide && event.previousSlide.id == 'section_test_integrands_constant') {
+                                window.clearInterval(test_integrands_timerId);
+                            }
+						});
+
+						Reveal.addEventListener( 'fragmentshown', function( event ) {
+							if(event.fragment.id == "scrambling_mask_01") {
+								var i = 5;
+								var j = 5;
+								movePointFromPixelScramble(i, j);
+							}
+							else if(event.fragment.id == "scrambling_mask_02") {
+								var i = 10;
+								var j = 10;
+								movePointFromPixelScramble(i, j);
+							}
+							else if(event.fragment.id == "scrambling_mask_03") {
+								var i = 5;
+								var j = 15;
+                                movePointFromPixelScramble(i, j);
+							}
+							else if(event.fragment.id == "scrambling_mask_04") {
+                                $('#scrambling_mask_pixel').animate( {opacity: 0.0} );
+                                $('#scrambling_res_pixel').animate( {opacity: 0.0} );
+                                test_integrands_timerId = window.setInterval(refreshScrambleMask, 500);
+                            }
+						});
+						Reveal.addEventListener( 'fragmenthidden', function( event ) {
+							if(event.fragment.id == "scrambling_mask_01") {
+								var i = -1;
+								var j = -1;
+								movePointFromPixelScramble(i, j);
+							}
+							else if(event.fragment.id == "scrambling_mask_02") {
+								var i = 5;
+								var j = 5;
+								movePointFromPixelScramble(i, j);
+							}
+							else if(event.fragment.id == "scrambling_mask_03") {
+								var i = 10;
+								var j = 10;
+                                movePointFromPixelScramble(i, j);
+							}
+							else if(event.fragment.id == "scrambling_mask_04") {
+                                $('#scrambling_mask_pixel').animate( {opacity: 1.0} );
+                                $('#scrambling_res_pixel').animate( {opacity: 1.0} );
+                                window.clearInterval(test_integrands_timerId);
+                            }
+						});
+					</script>
+					<aside class="notes">
+                        Our idea was to design a family of rendering functions.
+                        We started with an ideal case, that is to have the same integrand for every pixel of the image.
+						<br /><br />
+
+						<strong>*click*</strong> Say we wnat to integrate this 2D integrand.
+                        <br /><br />
+
+                        <strong>*click*</strong> We use a scrambling mask that contains a different scrambling key in each pixel. <strong>*click*</strong> And we use it to scramble an input point set.
+						<br /><br />
+
+                        <strong>*click*</strong> Using a different sequence in each pixel to integrate the same integrand will produce a noise image here on the right. <strong>*click*</strong> <strong>*click*</strong>.
+                        <br /><br />
+
+                        <strong>*click*</strong>
+                        Permuting the pixels in the scrambling mask is equivalent to do it in the noise image. We used simulated annealing like BNDS for it. Note that this optimization is done for a fixed sample count that we call the target sample count.
+					</aside>
+				</section>
+				<section id="section_test_integrands_space">
+					<h2>Our Method : Test Integrands</h2>
+					<div style="width:100%; display:flex; justify-content:space-evenly;">
+						<ul style="width:55%;">
+							<li style="opacity:0.2;">Optimize with <strong>constant image-space</strong> integrands
+								<ul>
+									<li><strong>Same</strong> integrand for every pixel</li>
+									<li>But a <strong>different</strong> XOR key per pixel</li>
+								</ul>
+							</li>
+							<li>Optimize using <strong>oriented Heavisides</strong>
+								<ul>
+									<li class="fragment" id="test_integrands_space_orientation"><span>Random orientation $\theta$</span> <span class="fragment" id="test_integrands_space_shift">and offset $d$</span></li>
+									<li class="fragment" id="test_integrands_space_dim"><strong>Warning:</strong> $D$ dimensional integrands</li>
+								</ul>
+							</li>
+						</ul>
+						<div style="position:relative; width:40%; margin-top:50px;">
+							<canvas id="test_integrands_cnv" width="400px" height="400px" style="position:absolute; top:0px; left:0px; background-color: white; border: solid 1px black; width:400px; height:400px;"></canvas>
+							<object id="test_integrands_svg" style="position:absolute; top:0px; left:0px; width:400px; height:400px;" data="images/ours/test_integrands.svg"></object>
+						</div>
+					</div>
+					<script>
+
+						function renderTestFunction(theta, distance)
+						{
+							var cnv = document.getElementById('test_integrands_cnv');
+							var ctx = cnv.getContext('2d');
+							var W = cnv.width;
+							var H = cnv.height;
+
+							var x  = -W/2;
+							var dy = distance * 0.5* H;
+							var y  = dy;
+
+							ctx.clearRect(0, 0, W, H);
+
+							ctx.translate(0.5*W, 0.5*H);
+							ctx.rotate(theta);
+							ctx.translate(0, dy);
+
+							ctx.fillRect(-W, 0, 2*W, H);
+
+							ctx.translate(0, -dy);
+							ctx.rotate(-theta);
+							ctx.translate(-0.5*W, -0.5*H);
+
+							var svg = document.getElementById('test_integrands_svg');
+							svg.style.transform = 'rotate(' + theta + 'rad) translate(0px, ' + dy + 'px)';
+						}
+
+						var results_test_integrands = new Date();
+						var results_test_integrands = results_test_integrands.getTime();
+						var results_test_integrands_timerId;
+						var results_test_integrands_angle = 0.12*Math.PI;
+						var results_test_integrands_distance = 0;
+
+						var test_integrands_refresh_rotate = function()
+						{
+							results_test_integrands_angle += 0.5*Math.PI / 60;
+							renderTestFunction(results_test_integrands_angle, results_test_integrands_distance);
+						}
+
+						var test_integrands_refresh_forward = true;
+						var test_integrands_refresh_shift = function()
+						{
+							results_test_integrands_distance += ((test_integrands_refresh_forward) ? 1.0 : -1.0) * 0.255 / 60;
+							// console.log(results_test_integrands_distance);
+							if(results_test_integrands_distance > 0.5) {
+								test_integrands_refresh_forward = false;
+							}
+							if(results_test_integrands_distance < 0.0) {
+								test_integrands_refresh_forward = true;
+							}
+							renderTestFunction(results_test_integrands_angle, results_test_integrands_distance);
+						}
+
+						$('#test_integrands_cnv').ready(function() {
+							renderTestFunction(results_test_integrands_angle, results_test_integrands_distance);
+						});
+
+
+						Reveal.addEventListener( 'fragmentshown', function( event ) {
+							if(event.fragment.id == "test_integrands_space_orientation") {
+								results_test_integrands_timerId = window.setInterval(test_integrands_refresh_rotate, 1000.0/60.0);
+							}
+							else if(event.fragment.id == "test_integrands_space_shift") {
+								window.clearInterval(results_test_integrands_timerId);
+								results_test_integrands_timerId = window.setInterval(test_integrands_refresh_shift, 1000.0/60.0);
+							}
+							else if(event.fragment.id == "test_integrands_space_dim") {
+								window.clearInterval(results_test_integrands_timerId);
+							}
+						});
+						Reveal.addEventListener( 'fragmenthidden', function( event ) {
+							if(event.fragment.id == "test_integrands_space_orientation") {
+								window.clearInterval(results_test_integrands_timerId);
+							}
+							else if(event.fragment.id == "test_integrands_space_shift") {
+								window.clearInterval(results_test_integrands_timerId);
+								results_test_integrands_distance = 0
+								results_test_integrands_timerId = window.setInterval(test_integrands_refresh_rotate, 1000.0/60.0);
+							}
+							else if(event.fragment.id == "test_integrands_space_dim") {
+								window.clearInterval(results_test_integrands_timerId);
+								results_test_integrands_timerId = window.setInterval(test_integrands_refresh_shift, 1000.0/60.0);
+							}
+						});
+					</script>
+					<aside class="notes">
+						Still, we have to choose a family of integrands for this optimization. We choose
+						the family of oriented heavisides.
+						<br /><br />
+
+						<strong>*click*</strong> We randomized the orientation. <strong>*click*</strong>
+						and the offset of those heavisides to obtain a vector of <strong>*click*</strong>
+						D-dimensional integrands. During optimization we maximize the L2 distance
+						of the vectors of integrals of neigboring pixels.
+					</aside>
+				</section>
+				<section id="section_test_integrands_robust">
+					<h2>Our Method : Test Integrands</h2>
+					<div style="width:100%; display:flex; justify-content:space-evenly;">
+						<ul style="width:50%;">
+							<li style="opacity:0.2;">Optimize with <strong>constant image-space</strong> integrands
+								<ul>
+									<li><strong>Same</strong> integrand for every pixel</li>
+									<li>But a <strong>different</strong> XOR key per pixel</li>
+								</ul>
+							</li>
+							<li style="opacity:0.2;">Optimize using <strong>oriented Heavisides</strong>
+								<ul>
+									<li><span>Random orientation $\theta$</span> <span>and offset $d$</span></li>
+									<li><strong>Warning:</strong> $D$ dimensional integrands</li>
+								</ul>
+							</li>
+							<li><strong>Robust</strong> to simple changes of integrand
+								<ul>
+									<li class="fragment" data-fragment-index="1">Varying orientation</li>
+									<li class="fragment" data-fragment-index="2">Varying smoothness</li>
+									<li class="fragment" data-fragment-index="3">Varying topology</li>
+								</ul>
+							</li>
+						</ul>
+						<div style="position:relative; width:55%; padding-top:20px; padding-right:20px;">
+							<table class="fragment" data-fragment-index="1">
+								<tr style="font-size:0.5em;">
+									<td style="text-align:center; font-weight:800;">Integrand</td>
+									<td style="text-align:center; font-weight:800;">Integral - 1spp</td>
+									<td style="text-align:center; font-weight:800;">Power Spectrum</td>
+								</tr>
+								<tr>
+									<td style="padding-top:0px; border:none;"><img width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY.jpg" /></td>
+									<td style="padding-top:0px; border:none;"><img id="test_integrands_robust_heaviside" width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_1spp_SequenceSiggraph.jpg" /></td>
+									<td style="padding-top:0px; border:none;"><canvas class="pixelated" style="border:solid 1px black; width:120px; height:120px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);" id="test_integrands_robust_heaviside_ft" width="64px" height="64px"></canvas></td>
+								</tr>
+								<tr class="fragment" data-fragment-index="2">
+									<td style="padding-bottom:0px; padding-top:0px; border:none;"><img width="120px" src="images/ours/robustness/TestFunction2DCos.png" /></td>
+									<td style="padding-bottom:0px; padding-top:0px; border:none;"><img id="test_integrands_robust_2cos" width="120px" src="images/ours/robustness/TestFunction2DCos_1spp_SequenceSiggraph.jpg" /></td>
+									<td style="padding-bottom:0px; padding-top:0px; border:none;"><canvas class="pixelated" style="border:solid 1px black; width:120px; height:120px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);" id="test_integrands_robust_2cos_ft" width="64px" height="64px"></canvas></td>
+								</tr>
+								<tr class="fragment" data-fragment-index="3">
+									<td style="padding-bottom:0px; padding-top:0px; border:none;"><img width="120px" src="images/ours/robustness/TestFunction2DDiskCentered.jpg" /></td>
+									<td style="padding-bottom:0px; padding-top:0px; border:none;"><img id="test_integrands_robust_gauss" width="120px" src="images/ours/robustness/TestFunction2DDiskCentered_1spp_SequenceSiggraph.jpg" /></td>
+									<td style="padding-bottom:0px; padding-top:0px; border:none;"><canvas class="pixelated" style="border:solid 1px black; width:120px; height:120px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);" id="test_integrands_robust_gauss_ft" width="64px" height="64px"></canvas></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<script>
+						Reveal.addEventListener( 'ready', function( event ) {
+							// Heaviside test function
+							var cnv = document.getElementById('test_integrands_robust_heaviside_ft');
+							var ctx = cnv.getContext('2d');
+							ctx.drawImage(document.getElementById('test_integrands_robust_heaviside'), 0, 0, cnv.width, cnv.height);
+							canvasFFT(cnv, 50);
+
+							// 2D Cosine test function
+							var cnv = document.getElementById('test_integrands_robust_2cos_ft');
+							var ctx = cnv.getContext('2d');
+							ctx.drawImage(document.getElementById('test_integrands_robust_2cos'), 0, 0, cnv.width, cnv.height);
+							canvasFFT(cnv, 40);
+
+							// Gaussian test function
+							var cnv = document.getElementById('test_integrands_robust_gauss_ft');
+							var ctx = cnv.getContext('2d');
+							ctx.drawImage(document.getElementById('test_integrands_robust_gauss'), 0, 0, cnv.width, cnv.height);
+							canvasFFT(cnv, 20);
+						});
+					</script>
+					<aside class="notes">
+                        We found that using those integrands was stable enough for our needs. <strong>*click*</strong> indeed, changing for an unknown orientation and shift preserves the blue-noise spectrum. <strong>*click*</strong> changing the smoothness of the integrand as well. <strong>*click*</strong> Also the topology
+                        of the integrand.
+					</aside>
+				</section>
+				<section id="section_ours_sorting">
+					<h2>Our Method : Sorting</h2>
+					<ul>
+						<li>Optimize <strong>every</strong> power of two spp
+                            <ul class="fragment">
+								<li>Possible with (0,2)-sequences</li>
+								<li>Sorting using XOR of sample index</li>
+							</ul>
+						</li>
+					</ul>
+
+					<center class="fragment" style="transform:scale(0.9); padding-top:50px;">
+						<object id="ours_sorting_svg" width="1280" height="300" data="images/ours/sorting.svg" type="image/svg+xml"></object>
+					</center>
+					<div class="fragment" id="ours_sorting_00"></div>
+					<div class="fragment" id="ours_sorting_01"></div>
+					<div class="fragment" id="ours_sorting_02"></div>
+					<div class="fragment" id="ours_sorting_03"></div>
+					<div class="fragment" id="ours_sorting_04"></div>
+					<div class="fragment" id="ours_sorting_05"></div>
+					<div class="fragment" id="ours_sorting_06"></div>
+
+					<script>
+						/* Given a list of pairs, swap the transforms in each pair.
+						 */
+						function permutPairInXml(snap, list)
+						{
+							list.forEach(e => {
+								var el0 = snap.select(e[0]);
+								var el1 = snap.select(e[1]);
+								var t0  = el0.transform().localMatrix;
+								var t1  = el1.transform().localMatrix;
+								el1.attr({transform: t1});
+								el0.attr({transform: t0});
+								el1.animate({transform: t0}, 500);
+								el0.animate({transform: t1}, 500);
+							});
+						}
+
+						/* Given a list of pairs, colorize each element of the pair with
+						 * a different color.
+						 */
+						function ColorPairInXml(snap, list, color1, color2)
+						{
+							snap.selectAll('rect').attr({fill: '#FFF'});
+							list.forEach(e => {
+								var el0 = snap.select(e[0]);
+								var el1 = snap.select(e[1]);
+								el0.selectAll('rect').attr({fill: color1});
+								el1.selectAll('rect').attr({fill: color2});
+							});
+						}
+
+						/* Given a list of elements, apply the given opacity
+						 */
+						 function OpacityInXml(snap, list, opacity)
+						{
+							list.forEach(e => {
+								snap.select(e).attr({opacity: opacity});
+							});
+						}
+
+						/* Generate a sample in each group element of the list
+						 */
+						function SamplingInGroupXml(snap, list)
+						{
+							var ci = '#000';
+							for(var i=0; i<list.length; ++i)
+							{
+								var g = snap.select(list[i]);
+								if(g == undefined) {
+									// console.log(list[i]);
+									continue;
+								}
+
+								var u = sobol.sample(i, 0);
+								var v = sobol.sample(i, 1);
+
+								var bbox = g.getBBox();
+								var xi = g.circle(u*bbox.width, v*bbox.height, 3.0);
+								xi.attr({ fill: 'white', fillOpacity:1, stroke: ci, strokeWidth: 2.0 });
+								var ti = g.text(0.5*bbox.width, bbox.height + 20, i + '')
+								ti.attr({textAnchor: 'middle', fontFamily: 'Comfortaa'});
+							}
+						}
+
+						var ours_sorting_sobol_once = true;
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if(event.currentSlide.id == 'section_ours_sorting' && ours_sorting_sobol_once)
+							{
+								ours_sorting_sobol_once = false;
+								var snap = Snap('#ours_sorting_svg');
+								var unit = snap.select('#sequence');
+								var bbox = unit.getBBox();
+								var mask = unit.select('rect');
+								var g    = snap.group();
+
+								var R = 0.6;
+								var G = 0.6;
+								var B = 0.6;
+								var ci = Snap.rgb(255.0*R, 255.0*G, 255.0*B);
+
+								for(var i=0; i<8; ++i){
+									var u = sobol.sample(i, 0);
+									var v = sobol.sample(i, 1);
+
+									var xi = unit.circle(u*bbox.width, v*bbox.height, 3.0);
+									xi.attr({ fill: 'white', stroke: '#000', strokeWidth: 2.0 });
+									g.add( xi );
+								}
+								g.attr({ id: 'samples' });
+								unit.g(g).attr({ clip: mask.clone() });
+
+							}
+						});
+
+						var ours_sorting_first_time = true;
+						Reveal.addEventListener( 'fragmentshown', function( event ) {
+							var snap = Snap('#ours_sorting_svg');
+							if(event.fragment.id == "ours_sorting_00") {
+								snap.selectAll('rect').attr({fill: '#FFF'});
+								if(ours_sorting_first_time) {
+									ours_sorting_first_time = false;
+									var list = ['#s000', '#s001', '#s010', '#s011', '#s100', '#s101', '#s110', '#s111'];
+									SamplingInGroupXml(snap, list);
+								}
+								snap.select('#s').animate({opacity: 1.0}, 500);
+								snap.select('#sequence').animate({opacity: 0.0}, 200);
+							}
+							else if(event.fragment.id == "ours_sorting_01") {
+								var list = [['#s0', '#s1']];
+								ColorPairInXml(snap, list, '#ebecff', '#ffebf0');
+							}
+							else if(event.fragment.id == "ours_sorting_02") {
+								var list = [['#s0', '#s1']];
+								permutPairInXml(snap, list);
+							}
+							else if(event.fragment.id == "ours_sorting_03") {
+								var list1 = [['#s10', '#s11']];
+								var list2 = ['#s00', '#s01'];
+								ColorPairInXml(snap, list1, '#ebecff', '#ffebf0');
+								OpacityInXml(snap, list2, 0.1);
+							}
+							else if(event.fragment.id == "ours_sorting_04") {
+								var list = [['#s10', '#s11']];
+								permutPairInXml(snap, list);
+							}
+							else if(event.fragment.id == "ours_sorting_05") {
+								var list1 = [['#s110', '#s111']];
+								var list2 = ['#s100', '#s101'];
+								ColorPairInXml(snap, list1, '#ebecff', '#ffebf0');
+								OpacityInXml(snap, list2, 0.1);
+							}
+							else if(event.fragment.id == "ours_sorting_06") {
+								var list = [['#s110', '#s111']];
+								permutPairInXml(snap, list);
+							}
+						});
+						Reveal.addEventListener( 'fragmenthidden', function( event ) {
+							var snap = Snap('#ours_sorting_svg');
+							if(event.fragment.id == "ours_sorting_00") {
+								snap.select('#s').animate({opacity: 0.0}, 200);
+								snap.select('#sequence').animate({opacity: 1.0}, 500);
+							}
+							if(event.fragment.id == "ours_sorting_01") {
+								snap.selectAll('rect').attr({fill: '#FFF'});
+							}
+							else if(event.fragment.id == "ours_sorting_02") {
+								var list = [['#s0', '#s1']];
+								permutPairInXml(snap, list);
+							}
+							else if(event.fragment.id == "ours_sorting_03") {
+								var list1 = [['#s0', '#s1']];
+								var list2 = ['#s00', '#s01'];
+								ColorPairInXml(snap, list1, '#ebecff', '#ffebf0');
+								OpacityInXml(snap, list2, 1.0);
+							}
+							else if(event.fragment.id == "ours_sorting_04") {
+								var list = [['#s10', '#s11']];
+								permutPairInXml(snap, list);
+							}
+							else if(event.fragment.id == "ours_sorting_05") {
+								var list1 = [['#s00', '#s01'], ['#s10', '#s11']];
+								var list2 = ['#s100', '#s101'];
+								ColorPairInXml(snap, list1, '#ebecff', '#ffebf0');
+								OpacityInXml(snap, list2, 1.0);
+							}
+							else if(event.fragment.id == "ours_sorting_06") {
+								if(ours_sorting_first_time) {
+									ours_sorting_first_time = false;
+									var list = ['#s000', '#s001', '#s010', '#s011', '#s100', '#s101', '#s110', '#s111'];
+									SamplingInGroupXml(snap, list);
+								}
+
+								var list = [['#s110', '#s111']];
+								permutPairInXml(snap, list);
+
+							}
+						});
+                    </script>
+                    <aside class="notes">
+                        However, optimizing for a specific sample count is good for final rendering but not for progressive rendering. So we rely on a second optmization stage to ensure that our sampler produces a blue-noise distribution of the error for every power of two sample count.
+                        <br /><br />
+
+                        <strong>*click*</strong>
+                        We use the property that any power of two sub-sequence of a (0,2)-sequence is a (0,2)-sequence and applied a XOR on the index as an additional degree of freedom for our optimization.
+                        <br /><br />
+
+                        <strong>*click*</strong>
+                        Let see how scrambling the index works on this pointset of eight samples.
+                        <strong>*click*</strong>
+                        We can list each point in this poinset according to its index from 0 to 7.
+                        <br /><br />
+
+                        <strong>*click*</strong>
+                        We start by splitting the point set in two and look if using the first subset or the second subset achieve bluenoise at 4 samples per pixel. If the second subset is better, we permut the sample index. <strong>*click*</strong> We continue, with the 2 spp case by focusing on the first four points. <strong>*click*</strong> And we permut if necessary. <strong>*click*</strong> And again for the one spp case. <strong>*click*</strong> <strong>*click*</strong>.
+                    </aside>
+				</section>
+
+				<section id="section_ours_sorting_2">
+					<h2>Our Method : Sorting</h2>
+					<ul>
+						<li style="opacity:0.2;">Optimize <strong>every</strong> power of two spp
+							<ul>
+								<li>Possible with (0,2)-sequences</li>
+								<li>Sorting using XOR of sample index</li>
+							</ul>
+						</li>
+
+						<li>Permits <strong>progressivity</strong>
+							<ul>
+								<li>Blue-noise distribution across spp</li>
+							</ul>
+						</li>
+					</ul>
+
+					<center>
+					<div style="position:relative;">
+						<table class="fragment0" data-fragment-index="1">
+							<tr style="font-size:0.5em;">
+								<td style="text-align:center; font-weight:800;">Integrand</td>
+								<td style="text-align:center; font-weight:800;">1spp</td>
+								<td style="text-align:center; font-weight:800;">4spp</td>
+								<td style="text-align:center; font-weight:800;">8spp</td>
+								<td style="text-align:center; font-weight:800;">64spp</td>
+								<td style="text-align:center; font-weight:800;">128spp</td>
+							</tr>
+							<tr>
+								<td style="padding-top:0px; border:none;"><img width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY.jpg" /></td>
+								<td style="padding-top:0px; border:none;"><img id="test_integrands_prog_heaviside_1spp"   width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_1spp_SequenceSiggraph.jpg" /></td>
+								<td style="padding-top:0px; border:none;"><img id="test_integrands_prog_heaviside_4spp"   width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_4spp_SequenceSiggraph.jpg" /></td>
+								<td style="padding-top:0px; border:none;"><img id="test_integrands_prog_heaviside_8spp"   width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_8spp_SequenceSiggraph.jpg" /></td>
+								<td style="padding-top:0px; border:none;"><img id="test_integrands_prog_heaviside_64spp"  width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_64spp_SequenceSiggraph.jpg" /></td>
+								<td style="padding-top:0px; border:none;"><img id="test_integrands_prog_heaviside_256spp" width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_128spp_SequenceSiggraph.jpg" /></td>
+							</tr>
+							<tr>
+								<td></td>
+								<td style="padding-top:0px; border:none;"><canvas class="pixelated" style="border:solid 1px black; width:120px; height:120px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);" id="test_integrands_prog_heaviside_1spp_ft"   width="64px" height="64px"></canvas></td>
+								<td style="padding-top:0px; border:none;"><canvas class="pixelated" style="border:solid 1px black; width:120px; height:120px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);" id="test_integrands_prog_heaviside_4spp_ft"   width="64px" height="64px"></canvas></td>
+								<td style="padding-top:0px; border:none;"><canvas class="pixelated" style="border:solid 1px black; width:120px; height:120px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);" id="test_integrands_prog_heaviside_8spp_ft"  width="64px" height="64px"></canvas></td>
+								<td style="padding-top:0px; border:none;"><canvas class="pixelated" style="border:solid 1px black; width:120px; height:120px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);" id="test_integrands_prog_heaviside_64spp_ft"  width="64px" height="64px"></canvas></td>
+								<td style="padding-top:0px; border:none;"><canvas class="pixelated" style="border:solid 1px black; width:120px; height:120px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);" id="test_integrands_prog_heaviside_256spp_ft" width="64px" height="64px"></canvas></td>
+							</tr>
+						</table>
+					</div>
+					</center>
+					<script>
+						Reveal.addEventListener( 'ready', function( event ) {
+							// Heaviside test function
+							var cnv = document.getElementById('test_integrands_prog_heaviside_1spp_ft');
+							var ctx = cnv.getContext('2d');
+							ctx.drawImage(document.getElementById('test_integrands_prog_heaviside_1spp'), 0, 0, cnv.width, cnv.height);
+							canvasFFT(cnv, 50);
+
+							var cnv = document.getElementById('test_integrands_prog_heaviside_4spp_ft');
+							var ctx = cnv.getContext('2d');
+							ctx.drawImage(document.getElementById('test_integrands_prog_heaviside_4spp'), 0, 0, cnv.width, cnv.height);
+							canvasFFT(cnv, 150);
+
+							var cnv = document.getElementById('test_integrands_prog_heaviside_8spp_ft');
+							var ctx = cnv.getContext('2d');
+							ctx.drawImage(document.getElementById('test_integrands_prog_heaviside_8spp'), 0, 0, cnv.width, cnv.height);
+							canvasFFT(cnv, 190);
+
+							var cnv = document.getElementById('test_integrands_prog_heaviside_64spp_ft');
+							var ctx = cnv.getContext('2d');
+							ctx.drawImage(document.getElementById('test_integrands_prog_heaviside_64spp'), 0, 0, cnv.width, cnv.height);
+							canvasFFT(cnv, 800);
+
+							var cnv = document.getElementById('test_integrands_prog_heaviside_256spp_ft');
+							var ctx = cnv.getContext('2d');
+							ctx.drawImage(document.getElementById('test_integrands_prog_heaviside_256spp'), 0, 0, cnv.width, cnv.height);
+							canvasFFT(cnv, 1000);
+						});
+					</script>
+                    <aside class="notes">
+                        As you can see here, with this second optimization stage, we obtain a screen-space sequence that renders blue-noise error distribution on the training integrands for different sample counts.
+                    </aside>
+				</section>
+
+				<!-- Implementation slides-->
+				<section id="section_implementation">
+					<h2>Summary</h2>
+
+					<svg style="position:absolute; top:250px; left:0px; width:100%;"  width="100%" height="400px">
+						<g>
+							<path
+							style="opacity:1;fill:#e7e7e7;fill-opacity:1;stroke:none;stroke-width:1.99999988;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+							d="M 482.90765,-22.871094 V 0 L 0,0 v 113.13672 l 482.90765,0 v 22.87305 L 551.70452,96.289062 620.50335,56.568359 551.70452,16.847656 Z"
+							transform="translate(350, 50)"
+							id="rect817" />
+						</g>
+					</svg>
+
+					<div style="display:flex; justify-content:space-evenly;">
+						<!-- Scrambling and sorting masks -->
+						<center style="width:30%; font-size:0.7em;">
+							<div>
+								<div style="position:relative; width:200px; height:200px;">
+									<canvas id="summary_scrambling_mask_cnv" width="64px" height="64px" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
+								</div>
+								<br />
+								<div style="width:200px; text-align:center; font-size:0.6em;">Scrambling mask</div>
+							</div><br />
+
+							<div>
+								<div style="position:relative; width:200px; height:200px;">
+									<canvas id="summary_sorting_mask_cnv" width="64px" height="64px" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
+								</div>
+								<br />
+								<div style="width:200px; text-align:center; font-size:0.6em;">Sorting mask</div>
+							</div>
+						</center>
+
+						<!-- Source code -->
+						<center style="width:30%; font-size:0.7em; padding-top:130px;">
+							<pre><code class="js" data-line-numbers>function screen_space_sampler(i, j, index, dimension)
+{
+	// Fetch keys associated with pixel (i,j)
+	scramble = scrambling_keys(i,j)
+	sort = sorting_keys(i,j)
+
+	// XOR the index
+	index  = index ^ sort
+	sample = sobol_owen(index, dimension)
+
+	// XOR the sample
+	sample = sample ^ scramble
+
+	return sample
+}
+                            </code></pre>
+							<div style="width:200px; text-align:center; font-size:0.8em;">2 texture fetches + 2 XORs</div>
+						</center>
+
+						<!-- Result ? -->
+						<center style="width:30%; font-size:0.7em; padding-top:120px;">
+							<div style="position:relative; width:200px; height:200px;">
+								<img id="summary_result_cnv" width="64px" height="64px" src="images/ours/robustness/TestFunction2DGaussian_8spp_SequenceSiggraph.jpg" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;" />
+							</div>
+							<br />
+							<div style="width:200px; text-align:center; font-size:0.6em;">QMC Integration</div>
+						</center>
+					</div>
+					<script>
+
+						Reveal.addEventListener( 'ready', function( event ) {
+							/* Generate the scrambling mask */
+							var width  = 64;
+							var height = 64;
+							var cnv = document.getElementById('summary_scrambling_mask_cnv');
+							var ctx = cnv.getContext('2d');
+							var img = ctx.createImageData(width, height);
+							for(var j=0; j<height; ++j)
+								for(var i=0; i<width; ++i)
+								{
+									var r  = Math.random();
+									var g  = Math.random();
+									var id = 4*(j*width + i);
+									img.data[id + 0]  = 255.0*r;
+									img.data[id + 1]  = 255.0*g;
+									img.data[id + 2]  = 0.0;
+									img.data[id + 3]  = 255.0;
+								}
+							ctx.putImageData(img, 0, 0);
+							cnv.image = img;
+
+
+							/* Generate the sorting mask */
+							var width  = 64;
+							var height = 64;
+							var cnv = document.getElementById('summary_sorting_mask_cnv');
+							var ctx = cnv.getContext('2d');
+							var img = ctx.createImageData(width, height);
+							for(var j=0; j<height; ++j)
+								for(var i=0; i<width; ++i)
+								{
+									var g  = Math.random();
+									var id = 4*(j*width + i);
+									img.data[id + 0]  = 255.0*g;
+									img.data[id + 1]  = 255.0*g;
+									img.data[id + 2]  = 255.0*g;
+									img.data[id + 3]  = 255.0;
+								}
+							ctx.putImageData(img, 0, 0);
+							cnv.image = img;
+						});
+
+					</script>
+                    <aside class="notes">
+                        To recap our pipeline, given a fixed sequence we want to use, we precompute a texture storing the scramble keys and another storing the sorting keys.
+                        At runtime, we fetch both textures with respect to the given pixel and xor the index, fetch the corresponding point in the sequence, and xor its integer position.
+                        Et voila !
+                    </aside>
+				</section>
+
+
+				<!-- Result section -->
+				<section>
+					<center style="padding-top: 320px;">What can we do with two XORs ?<center>
+                    <aside class="notes">
+                        Lets look at some results to what we can achieve with those two simple operations.
+                    </aside>
+				</section>
+				<section id="section_results_offline">
+					<h2>Results: Offline Rendering</h2>
+					<ul>
+						<li>Direct Illumination in Mitsuba
+							<ul>
+								<li>Implemented a new <span style="font-variant-caps: small-caps;">Sampler</span></li>
+								<li>No impact on performances</li>
+							</ul>
+						</li>
+						<li>Extensive study
+							<ul>
+								<li>See our supplemental material</li>
+								<li>Interactive HTML</li>
+							</ul>
+						</li>
+					</ul>
+
+					<img style="position:absolute; top:150px; left:650px; image-rendering:optimizeQuality; height:400px;" src="./images/ours/mitsuba.png">
+                    <aside class="notes">
+                        I will first show some offline results using the Mitsuba renderer.
+                        Our screen-space samplers was trivially implemented as a new sampler with no impact on performances.
+                        <br /><br />
+
+                        I encourage you to look at our interactive supplemental material that you can find online for more results.
+                    </aside>
+				</section>
+				<section id="section_results_boxed_spp">
+					<div id="boxed3">
+						<img class="pixelated" id="results_boxed_ours"   width="1280px" height="720px" src="images/boxed3/boxed3_spp=1_SequenceSamplerBlueNoiseErrorDistribution.png" style="margin:0px; clip-path: polygon(  0%  0%, 100%  0%, 100% 100%,  0% 100%); position:absolute; top:0px; left:0px;" />
+						<div style="position:absolute; width:1280px; left:0px; top:650px; text-shadow:1px 1px 2px black; color:azure;">
+							<p>Ours</p>
+						</div>
+
+						<img class="pixelated" id="results_boxed_gf2016" width="1280px" height="720px" src="images/boxed3/boxed3_spp=1_SequenceSamplerSolidAngleCPR.png"              style="margin:0px; clip-path: polygon(  50%  0%, 100%  0%, 100% 100%, 50% 100%); position:absolute; top:0px; left:0px; opacity:0;" />
+						<div id="results_boxed_gf2016_label" style="position:absolute; width:1280px; left:0px; top:650px; text-shadow:1px 1px 2px black; color:azure; clip-path: polygon(  50%  0%, 100%  0%, 100% 100%, 50% 100%); opacity:0;">
+							<p style="padding-left:870px;">Georgiev and Fajardo [2016]</p>
+						</div>
+						<div id="results_boxed_border" style="position:absolute; top:-2px;left:-2px; z-index:1; width:50%; height:100%; border-right: solid 2px white; opacity:0;" ></div>
+					</div>
+
+					<div style="position:absolute; left:0px; top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;">
+						<p id="results_boxed_title">Boxed - 1 spp</p>
+					</div>
+
+
+					<div class="fragment" id="results_boxed_b_01"></div>
+					<div class="fragment" id="results_boxed_b_02"></div>
+					<div class="fragment" id="results_boxed_b_03"></div>
+					<div class="fragment" id="results_boxed_b_04"></div>
+					<div class="fragment" id="results_boxed_b_05"></div>
+
+					<script>
+						var results_boxed3_date  = new Date();
+						var results_boxed3_start = results_boxed3_date.getTime();
+						var results_boxed3_timerId;
+
+						var refresh_boxed_new = function()
+						{
+							results_boxed3_date = new Date();
+							var current_time = results_boxed3_date.getTime();
+							var t = (current_time - results_boxed3_start) / 1000;
+							var x = 50 * (Math.sin(t) + 1.0);
+							$('#results_boxed_gf2016').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+							$('#results_boxed_gf2016_label').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+							$('#results_boxed_border').css('width', x+'%');
+						}
+
+						Reveal.addEventListener( 'fragmentshown', function( event ) {
+							if(event.fragment.id == "results_boxed_b_01") {
+								$('#results_boxed_gf2016').animate({'opacity': 1.0}, 500);
+								$('#results_boxed_gf2016_label').animate({'opacity': 1.0}, 500);
+								$('#results_boxed_border').animate({'opacity': 1.0}, 500);
+							}
+							else if(event.fragment.id == "results_boxed_b_02") {
+								results_boxed3_date = new Date();
+								results_boxed3_start   = results_boxed3_date.getTime();
+								results_boxed3_timerId = window.setInterval(refresh_boxed_new, 1000.0/60.0);
+							}
+							else if(event.fragment.id == "results_boxed_b_03") {
+								setNewSPP('boxed3', 4);
+								$('#results_boxed_title').html('Boxed - 4 spp');
+							} else if(event.fragment.id == "results_boxed_b_04") {
+								setNewSPP('boxed3', 8);
+								$('#results_boxed_title').html('Boxed - 8 spp');
+							} else if(event.fragment.id == "results_boxed_b_05") {
+								setNewSPP('boxed3', 16);
+								$('#results_boxed_title').html('Boxed - 16 spp');
+							}
+						});
+						Reveal.addEventListener( 'fragmenthidden', function( event ) {
+							if(event.fragment.id == "results_boxed_b_01") {
+								$('#results_boxed_gf2016').animate({'opacity': 0.0}, 500);
+								$('#results_boxed_gf2016_label').animate({'opacity': 0.0}, 500);
+								$('#results_boxed_border').animate({'opacity': 0.0}, 500);
+							} else if(event.fragment.id == "results_boxed_b_02") {
+								window.clearInterval(results_boxed3_timerId);
+								var x = 50;
+								$('#results_boxed_gf2016').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#results_boxed_gf2016_label').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#results_boxed_border').css('width', x+'%');
+							} else if(event.fragment.id == "results_boxed_b_03") {
+								setNewSPP('boxed3', 1);
+								$('#results_boxed_title').html('Boxed - 1 spp');
+							} else if(event.fragment.id == "results_boxed_b_04") {
+								setNewSPP('boxed3', 4);
+								$('#results_boxed_title').html('Boxed - 4 spp');
+							} else if(event.fragment.id == "results_boxed_b_05") {
+								setNewSPP('boxed3', 8);
+								$('#results_boxed_title').html('Boxed - 8 spp');
+							}
+						});
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if((event.currentSlide && event.currentSlide.id == 'section_results_boxed_spp') &&
+							   (event.previousSlide && event.previousSlide.id == 'section_result_realtime'))
+							{
+								var x = 50;
+								$('#results_boxed_gf2016').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#results_boxed_gf2016_label').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#results_boxed_border').css('width', x+'%');
+								results_boxed3_timerId = window.setInterval(refresh_boxed_new, 1000.0/60.0);
+							}
+							if((event.currentSlide && event.currentSlide.id == 'section_results_boxed_spp') &&
+							   (event.previousSlide && event.previousSlide.id == 'section_result_offline'))
+							{
+								var x = 50;
+								$('#results_boxed_gf2016').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#results_boxed_gf2016_label').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#results_boxed_border').css('width', x+'%');
+							}
+							if(event.previousSlide && event.previousSlide.id == 'section_results_boxed_spp')
+							{
+								window.clearInterval(results_boxed3_timerId);
+							}
+						} );
+					</script>
+                    <aside class="notes">
+                        Lets start with this scene with diffuse materials and a cylindrical arealight. <strong>*click*</strong> Our method produces the same blue-noise quality than BNDS at one spp. <strong>*click*</strong> <strong>*click*</strong> As we increase the sample count <strong>*click*</strong> we see that BNDS will fail to distribute the error as a blue-noise while our method still manage to produce a visually pleasing result. <strong>*click*</strong> <strong>*click*</strong>
+                    </aside>
+				</section>
+				<section id="section_results_chair_spp">
+					<div id="chair">
+						<img class="pixelated" id="results_chair_ours"   width="1280px" height="720px" src="images/chair/chair_spp=1_SequenceSamplerBlueNoiseErrorDistribution.jpg" style="margin:0px; clip-path: polygon(  0%  0%, 100%  0%, 100% 100%,  0% 100%); position:absolute; top:0px; left:0px;" />
+						<div style="position:absolute; width:1280px; left:0px; top:650px; text-shadow:1px 1px 2px black; color:azure;">
+							<p>Ours</p>
+						</div>
+
+						<img class="pixelated" id="results_chair_gf2016" width="1280px" height="720px" src="images/chair/chair_spp=1_SequenceSamplerSolidAngleCPR.jpg"              style="margin:0px; clip-path: polygon(  50%  0%, 100%  0%, 100% 100%, 50% 100%); position:absolute; top:0px; left:0px; opacity:0;" />
+						<div id="results_chair_gf2016_label" style="position:absolute; width:1280px; left:0px; top:650px; text-shadow:1px 1px 2px black; color:azure; clip-path: polygon(  50%  0%, 100%  0%, 100% 100%, 50% 100%); opacity:0;">
+							<p id="results_chair_gf2016_authors" style="padding-left:870px; width:330px; text-align:right;">Georgiev and Fajardo [2016]</p>
+						</div>
+						<div id="results_chair_border" style="position:absolute; top:-2px;left:-2px; z-index:1; width:50%; height:100%; border-right: solid 2px black; opacity:0;" ></div>
+					</div>
+
+					<div style="position:absolute; left:0px; top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;">
+						<p id="results_chair_title">chair - 1 spp</p>
+					</div>
+
+
+					<div class="fragment" id="results_chair_b_01"></div>
+					<div class="fragment" id="results_chair_b_02"></div>
+					<div class="fragment" id="results_chair_b_03"></div>
+					<div class="fragment" id="results_chair_b_04"></div>
+					<div class="fragment" id="results_chair_b_05"></div>
+
+					<script>
+						var results_chair_date  = new Date();
+						var results_chair_start = results_chair_date.getTime();
+						var results_chair_timerId;
+
+						var refresh_chair_new = function()
+						{
+							results_chair_date = new Date();
+							var current_time = results_chair_date.getTime();
+							var t = (current_time - results_chair_start) / 1000;
+							var x = 50 * (Math.sin(t) + 1.0);
+							$('#results_chair_gf2016').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+							$('#results_chair_gf2016_label').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+							$('#results_chair_border').css('width', x+'%');
+						}
+
+						Reveal.addEventListener( 'fragmentshown', function( event ) {
+							if(event.fragment.id == "results_chair_b_01") {
+								$('#results_chair_gf2016').animate({'opacity': 1.0}, 500);
+								$('#results_chair_gf2016_label').animate({'opacity': 1.0}, 500);
+								$('#results_chair_border').animate({'opacity': 1.0}, 500);
+							}
+							else if(event.fragment.id == "results_chair_b_02") {
+								results_chair_date = new Date();
+								results_chair_start   = results_chair_date.getTime();
+								results_chair_timerId = window.setInterval(refresh_chair_new, 1000.0/60.0);
+							}
+							else if(event.fragment.id == "results_chair_b_03") {
+								setNewSPP('chair', 4);
+								$('#results_chair_title').html('chair - 4 spp');
+							} else if(event.fragment.id == "results_chair_b_04") {
+								setNewSPP('chair', 8);
+								$('#results_chair_title').html('chair - 8 spp');
+							} else if(event.fragment.id == "results_chair_b_05") {
+								setNewSPP('chair', 16);
+								$('#results_chair_title').html('chair - 16 spp');
+							}
+						});
+						Reveal.addEventListener( 'fragmenthidden', function( event ) {
+							if(event.fragment.id == "results_chair_b_01") {
+								$('#results_chair_gf2016').animate({'opacity': 0.0}, 500);
+								$('#results_chair_gf2016_label').animate({'opacity': 0.0}, 500);
+								$('#results_chair_border').animate({'opacity': 0.0}, 500);
+							} else if(event.fragment.id == "results_chair_b_02") {
+								window.clearInterval(results_chair_timerId);
+								var x = 50;
+								$('#results_chair_gf2016').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#results_chair_gf2016_label').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#results_chair_border').css('width', x+'%');
+							} else if(event.fragment.id == "results_chair_b_03") {
+								setNewSPP('chair', 1);
+								$('#results_chair_title').html('chair - 1 spp');
+							} else if(event.fragment.id == "results_chair_b_04") {
+								setNewSPP('chair', 4);
+								$('#results_chair_title').html('chair - 4 spp');
+							} else if(event.fragment.id == "results_chair_b_05") {
+								setNewSPP('chair', 8);
+								$('#results_chair_title').html('chair - 8 spp');
+							}
+						});
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if((event.currentSlide && event.currentSlide.id == 'section_results_chair_spp') &&
+							   (event.previousSlide && event.previousSlide.id == 'section_result_realtime'))
+							{
+								var x = 50;
+								$('#results_chair_gf2016').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#results_chair_gf2016_label').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#results_chair_border').css('width', x+'%');
+								results_chair_timerId = window.setInterval(refresh_chair_new, 1000.0/60.0);
+							}
+							if((event.currentSlide && event.currentSlide.id == 'section_results_chair_spp') &&
+							   (event.previousSlide && event.previousSlide.id == 'section_result_offline'))
+							{
+								var x = 50;
+								$('#results_chair_gf2016').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#results_chair_gf2016_label').css('clip-path', 'polygon(  ' + x + '%  0%, 100%  0%, 100% 100%,  ' + x + '% 100%)');
+								$('#results_chair_border').css('width', x+'%');
+							}
+							if(event.previousSlide && event.previousSlide.id == 'section_results_chair_spp')
+							{
+								window.clearInterval(results_chair_timerId);
+							}
+						} );
+					</script>
+                    <aside class="notes">
+                        This chair scene show both extended soft shadows and a glossy material. <strong>*click*</strong> Here again, our method is equivalent to BNDS.  <strong>*click*</strong> However, as we increase the sampling rate here.  <strong>*click*</strong> two things happen. First as in the previous example, BNDS transition to white-noise. <strong>*click*</strong> Then, we also see here the change in convergence due to Cranley-Patterson rotations. <strong>*click*</strong> As you can see, our method preserves the convergence.
+                    </aside>
+				</section>
+
+				<section id='section_result_realtime'>
+					<h2>Results: Real-Time Application</h2>
+					<ul>
+						<li>In the Unity Engine
+							<ul>
+								<li>Implementation by <a href="https://twitter.com/afrenchdutch">Thomas Deliot</a></li>
+								<li>Dithering Ambient Occlusion</li>
+								<li>Dithering Screen-Space Reflections</li>
+							</ul>
+						</li>
+						<li class="fragment">Performances on desktop
+							<ul>
+								<li>Nvidia 2080 GPU at 720p</li><br />
+								<table style="font-size: 0.9em; margin-left:10px;">
+									<tr>
+										<td></td>
+										<td><strong>White-noise</strong></td>
+										<td><strong>Ours</strong></td>
+									</tr>
+									<tr>
+										<td><strong>AO</strong></td>
+										<td style="text-align:center;">0.26 ms</td>
+										<td style="text-align:center;">0.54 ms</td>
+									</tr>
+									<tr>
+										<td><strong>SSR</strong></td>
+										<td style="text-align:center;">2.81 ms</td>
+										<td style="text-align:center;">3.06 ms</td>
+									</tr>
+								</table><br />
+								<li>
+									Fixed cost : 0.25 ms
+								</li>
+							</ul>
+						</li>
+						<li class="fragment">Live demo !</li>
+					</ul>
+
+					<img style="position:absolute; top:150px; left:550px; image-rendering:optimizeQuality;" height="400px" src="./images/unity/editor.png">
+                    <aside class="notes">
+                        Now I will show you some more results in real-time. Thomas Deliot, our research engineer implemented two use cases of our sampler inside the unity engine to integrate Ambient Occlusion and Screen-Space Reflections.
+                        <br /><br />
+
+                        <strong>*click*</strong> On a recent Nvidia GPU, we found that the method incured a fixed cost of 0.25ms per frame.
+                        <br /><br />
+
+                        <strong>*click*</strong> Let's look at it live.
+                    </aside>
+				</section>
+
+
+				<!-- Limitations -->
+				<section>
+					<h2>Limitations : Another Hit in the Wall?</h2>
+					<ul>
+						<li><strong>Share</strong> limitations with BNDS !
+							<ul>
+								<li>Can't handle <strong>high-dimensional</strong> integrands</li>
+								<li>Not robust on <strong>complex integrands</strong></li>
+							</ul>
+						</li>
+						<li class="fragment" data-fragment-index="1">Still <strong>you should use our method</strong> rather than BNDS
+							<ul>
+								<li>Can <strong>only do better</strong>, not worse</li>
+							</ul>
+						</li>
+						<li class="fragment" data-fragment-index="2">
+							We felt a bit disapointed
+						</li>
+						<li class="fragment" data-fragment-index="3">A solution : flip the problem
+							<ul>
+								<li>Do not focus on the sequence</li>
+								<li>See our <a href="https://belcour.github.io/blog/research/2019/06/18/animation-bluenoise.html">EGSR paper</a></li>
+							</ul>
+					</ul>
+					<div class="fragment" data-fragment-index="3" style="width:300px; position:absolute; top:150px; left:750px;">
+						<img style="image-rendering:optimizeQuality;" width="300px" src="./images/end/egsr.png" /><br />
+						<center style="width:100%; font-size:0.6em;">[<a href="https://belcour.github.io/blog/research/2019/06/18/animation-bluenoise.html">Heitz & Belcour 2019</a>]</center>
+					</div>
+					<aside class="notes">
+                        Our method is not free from limitation and in fact, we do share some of other limitations of BNDS. For example, our method does not scale well in dimensionality or with high-frequency textured assets.
+                        <br /><br />
+
+                        <strong>*click*</strong> Yet, we always performs either better or simply not worse than BNDS so you should use our method in your renderer.
+
+                        <br /><br />
+                        <strong>*click*</strong> As a side story, while working on this project, Eric and I were a bit disapointed
+                        by those limitations. So, we started to dig more into this dimensionality issue.
+                        <br /><br />
+
+                        <strong>*click*</strong> We found out that, by forgetting about the sequence and focusing solely on the pixel values we could build a more robust method for rendering animations that we presented at EGSR this year. I encourage you to look at it, all the material is available online.
+					</aside>
+				</section>
+
+
+				<!-- Summary -->
+				<section>
+					<h2>Summary</h2>
+					<!-- <video style="position:absolute; top:0px; left: 330px; margin: 0; border: none; box-shadow: none; height:720px; max-width: 100%; max-height: 100%; z-index: -500;" height="720px" width="100%" data-autoplay loop src="./videos/littlest-tokyo_4spp_bluenoise_sig19.ogg"></video> -->
+					<img style="position:absolute; top:0px; left: 330px; margin: 0; border: none; box-shadow: none; height:720px; max-width: 100%; max-height: 100%; z-index: -500;" height="720px" width="100%" src="./videos/littlest-tokyo_4spp/bluenoise_sig19/littlest-tokyo_0064.png">
+					<div style="position:absolute; top:0; left: 0px; margin: 0; max-width: 100%; max-height: 100%; z-index: -5; width: 720px; height:720px; background-color: #ddd; box-shadow: 2px 2px 5px black; ">
+
+						<ul style="padding-top:15%;">
+							<li class="fragment">A <strong>novel</strong> <strong>progressive</strong> screen-space sampler
+								<ul>
+									<li>That distributes error as a <strong>blue-noise</strong></li>
+									<li><strong>State-of-the-art</strong> convergence</li>
+									<li><strong>Efficient</strong> and <strong>compatible</strong> with real-time</li>
+								</ul>
+							</li>
+							<li class="fragment">Our <strong>contributions</strong>
+								<ul>
+									<li><strong>New optimization space</strong>: test integrands</li>
+									<li>Two stage optimization: <strong>ranking</strong> and <strong>scrambling</strong></li>
+								</ul>
+							</li>
+							<li class="fragment">Clearing <strong>misconceptions</strong>
+								<ul>
+									<li class="fragment"><strong>No more</strong> Cranley Patterson rotations</li>
+									<li class="fragment">Blue-noise <strong>not restricted</strong> to previz.</li>
+									<li class="fragment">Only <strong>scratched</strong> the surface (see EGSR talk)</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+					<aside class="notes">
+                        To summarize, I presented our new progressive screen-space sampler that aims to distribute the error of Monte-Carlo rendering as a blue-noise in screen-space. Our sampler has state-of-the-art convergence, it is lean and efficient.
+                        <br /><br />
+
+                        <strong>*click*</strong> To achieve this, we reformulated the optimization of nD dither masks as the optimization of test integrands across pixels of two textures. One that scrambles the samples value and one that reorders the samples order.
+                        <br /><br />
+
+                        <strong>*click*</strong> The goal of this presentation was not only to introduce you this method, but also to clear some misconceptions. <strong>*click*</strong> I hope that after this presentation, you will keep away from Cranley-Patterson rotation (unless you know what you are doing).  <strong>*click*</strong> I also hope that I cleared the misconception that blue-noise distribution of the error was only good for previsualization and low sampling counts. It matters as much or even more when doing denoising.
+                        <br /><br />
+
+                        <strong>*click*</strong> Finally, this talk is also a call for action. We think that we only scratched the surface of what is possible and were surprized to see so few paper on the subject. I hope that this talk will inspire you or others to come up with better solutions.
+					</aside>
+				</section>
+				<section>
+					<h2>Thank you for your attention</h2>
+					<center style="padding-top: 100px;">
+						<div style="display:flex; justify-content: space-evenly; font-size:0.8em; width: 500px;">
+							<img style="width: 128px; border: 0.7px solid black; box-shadow: 2px 2px 5px #0005; margin: 0px; image-rendering: optimizeQuality;" src="./images/end/paper.png" />
+							<img style="width: 128px; border: 0.7px solid black; box-shadow: 2px 2px 5px #0005; margin: 0px; image-rendering: optimizeQuality;" src="./images/end/supp.png" />
+							<img style="width: 128px; border: 0.7px solid black; box-shadow: 2px 2px 5px #0005; margin: 0px; image-rendering: optimizeQuality;" src="./images/end/code.png" />
+						</div>
+						<div style="display:flex; justify-content: space-evenly; font-size:0.8em; width: 500px; padding-top:10px;">
+							<div style="padding-top: 0px; width:128px; text-align:center; font-size: 0.7em;">paper</div>
+							<div style="padding-top: 0px; width:128px; text-align:center; font-size: 0.7em;">supp. mat.</div>
+							<div style="padding-top: 0px; width:128px; text-align:center; font-size: 0.7em;">code</div>
+						</div>
+					</center>
+
+					<center style="padding-top:100px;">available at <a href="https://belcour.github.io/blog/research/2019/06/17/sampling-bluenoise.html">belcour.github.io/blog</a></center>
+					<aside class="notes">
+						Lastly, I encourage you to check out our paper, supplemental material, and code. Thank you for your attention.
+					</aside>
+				</section>
+			</div>
+		</div>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+                width: 1280,
+				height: 720,
+				margin: 0,
+                history: true,
+                slideNumber: true,
+                // showNotes: true,
+                // hideInactiveCursor: true,
+                transition: 'fade',
+
+				math: {
+		            mathjax: 'ext/mathjax/MathJax.js',
+		            config: 'TeX-AMS_SVG-full'
+					// mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+					// config: 'TeX-AMS_HTML-full',  // See http://docs.mathjax.org/en/latest/config-files.html
+					// pass other options into `MathJax.Hub.Config()`
+					// TeX: { Macros: macros }
+				},
+
+				dependencies: [
+					{ src: 'ext/reveal.js/plugin/markdown/marked.js' },
+					// { src: 'ext/reveal.js/plugin/markdown/markdown.js' },
+					{ src: 'ext/reveal.js/plugin/notes/notes.js', async: true },
+					{ src: 'ext/reveal.js/plugin/highlight/highlight.js', async: true },
+					{ src: 'ext/reveal.js/plugin/math/math.js', async: true },
+				],
+			});
+
+			$(window).load( function(){ $(".twentytwenty-container").twentytwenty({default_offset_pct: 0.5}); });
+		</script>
+	</body>
+</html>
