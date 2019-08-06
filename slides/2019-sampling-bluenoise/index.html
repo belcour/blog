@@ -29,10 +29,10 @@
 		<script src="ext/snap.svg/snap.svg-min.js"></script>
 		<script src="scripts/canvas2video.js"></script>
 		<script src="scripts/sobol.js"></script>
-		<script src="scripts/fft.js"></script>
-        <script src="scripts/utils.js"></script>
-        <script src="scripts/dithermask.js"></script>
-		<script src="scripts/jquery.min.js"></script>
+      <script src="scripts/fft.js"></script>
+      <script src="scripts/utils.js"></script>
+      <script src="scripts/dithermask.js"></script>
+      <script src="scripts/jquery.min.js"></script>
 		<script src="scripts/jquery.cycle2.min.js"></script>
 		<script src="scripts/bootstrap.min.js"></script>
 		<script>
@@ -49,7 +49,7 @@
 		<div class="reveal">
 			<div class="slides">
 
-				<section class="title" data-background="images/background/title.png">
+				<section class="title" data-background="images/background/title.png" class="pixelated">
 					<h1 style="font-size:1.2em;">A Low-Discrepancy Sampler that Distributes Monte Carlo Errors <br /> as a Blue Noise in Screen Space</h1>
 					<br /> <br />
 					<div style="display:flex; justify-content: space-evenly; font-size:0.8em;">
@@ -82,7 +82,7 @@
 
 				<section data-background="black" id="section_video_tokyo_spp">
 						<div style="width:100%; height:100%; position:absolute; top:0px;" id="video_tokyo_spp_frame">
-							<canvas id="video_tokyo_source_1spp" style="position:absolute;top:0;left:0;z-index:-1; width:1280px; height:720px; transition: opacity 1s" width="1280" height="720">
+							<canvas class="pixelated" id="video_tokyo_source_1spp" style="position:absolute;top:0;left:0;z-index:-1; width:1280px; height:720px; transition: opacity 1s" width="1280" height="720">
 							</canvas>
 							<p style="position:absolute; left:-10px  ;top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;" id="video_tokyo_spp_01" data-fragment-index='1' class="fragment fade-out">LittlestTokyo - 1 spp</p>
 							<p style="position:absolute; left:-10px  ;top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;" id="video_tokyo_spp_01" data-fragment-index='1' class="fragment fade-in-then-out">LittlestTokyo - 2 spp</p>
@@ -90,7 +90,7 @@
 							<p style="position:absolute; left:-10px  ;top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;" id="video_tokyo_spp_03" data-fragment-index='3' class="fragment fade-in">LittlestTokyo - 4 spp</p>
 							<p style="position:absolute; left:-10px  ;top:650px; color:azure; text-shadow:1px 1px 2px black;">Random scrambling</p>
 
-							<p style="position:absolute; left:1060px;top:665px; color:azure; text-shadow:1px 1px 2px black; font-size:0.5em;">3D model by <a href="https://www.artstation.com/glenatron">Glen Fox</a></p>
+							<p style="position:absolute; left:1040px;top:665px; color:azure; text-shadow:1px 1px 2px black; font-size:0.5em;">3D model by <a href="https://www.artstation.com/glenatron">Glen Fox</a></p>
 						</div>
 						<div class="fragment" id="video_tokyo_spp_04" style="position:absolute; left:0px; top:300px; width:100%; text-align:center;">
 							<h2 style="color:white; text-shadow:1px 1px 2px black;">A <em>screen-space</em> sampler ? <div style="font-size: 4.0em;">🤨</div></h2>
@@ -187,8 +187,8 @@
 				<section data-background="black" id="section_video_tokyo">
 					<!-- Rendering video in canvas -->
 					<div id="video_tokyo_border" style="position:absolute;top:-2px;left:-2px;z-index:1; width:1282px; height:100%; transition: width 2s; border-right: solid 2px white;" ></div>
-					<canvas id="video_tokyo_source_white" style="position:absolute;top:0;left:0;z-index:-1; width:1280px; height:720px; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); transition: clip-path 2s;" width="1280" height="720"></canvas>
-					<canvas id="video_tokyo_source_blue"  style="position:absolute;top:0;left:0;z-index:-2; width:1280px; height:720px;" width="1280" height="720"></canvas>
+					<canvas class="pixelated" id="video_tokyo_source_white" style="position:absolute;top:0;left:0;z-index:-1; width:1280px; height:720px; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); transition: clip-path 2s;" width="1280" height="720"></canvas>
+					<canvas class="pixelated" id="video_tokyo_source_blue"  style="position:absolute;top:0;left:0;z-index:-2; width:1280px; height:720px;" width="1280" height="720"></canvas>
 
 					<!-- Labels -->
 					<p style="position:absolute; left:-10px; top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;">LittlestTokyo - 4 spp</p>
@@ -306,12 +306,12 @@
 				</section>
                 <section data-background="black" id="introduction_sampling">
 					<!-- Full image canvas with  small inset -->
-					<canvas id="canvas_tokyo_intro_full"  style="position:absolute; top:  0px; left: 0px; z-index:-2; width:1280px; height:720px;" width="1280" height="720"></canvas>
+					<canvas class="pixelated" id="canvas_tokyo_intro_full"  style="position:absolute; top:  0px; left: 0px; z-index:-2; width:1280px; height:720px;" width="1280" height="720"></canvas>
 					<div style="position:absolute; top:100px; left:660px; width:64px; height:64px; border:solid 2px red;"></div>
 
 					<!-- Big Inset -->
 					<div style="position:absolute; top: 20px; left:1020px; width:200px; height:200px;">
-						<canvas id="canvas_tokyo_intro_inset" style="width:100%; height:100%; border:solid 2px red;" width="64" height="64"></canvas>
+						<canvas class="pixelated" id="canvas_tokyo_intro_inset" style="width:100%; height:100%; border:solid 2px red;" width="64" height="64"></canvas>
 						<div style="width:100%; text-align:center; font-size:0.7em; color:white; text-shadow:1px 1px 2px black;">Inset</div>
 					</div>
 
@@ -325,7 +325,7 @@
 
 					<!-- Power Spectrum -->
 					<div class="fragment" data-fragment-index="2" style="position:absolute; top:300px; left:1020px; width:200px; height:200px" >
-						<canvas id="canvas_tokyo_intro_fft" style="width:100%; height:100%; border:solid 2px red;" width="64" height="64"></canvas>
+						<canvas class="pixelated" id="canvas_tokyo_intro_fft" style="width:100%; height:100%; border:solid 2px red;" width="64" height="64"></canvas>
 						<div style="width:100%; text-align:center; font-size:0.7em; color:white; text-shadow:1px 1px 2px black;">Power Spectrum</div>
 					</div>
 
@@ -454,18 +454,18 @@
                     </div>
 					<div id="introduction_denoising_blur" style="transition: filter 0.5s, opacity 0.5s;">
 						<!-- Full image canvas with  small inset -->
-						<canvas id="canvas_tokyo_denoising_full"  style="position:absolute; top:  0px; left: 0px; z-index:-2; width:1280px; height:720px;" width="1280" height="720"></canvas>
+						<canvas class="pixelated" id="canvas_tokyo_denoising_full"  style="position:absolute; top:  0px; left: 0px; z-index:-2; width:1280px; height:720px;" width="1280" height="720"></canvas>
 						<div style="position:absolute; top:100px; left:660px; width:64px; height:64px; border:solid 1.5px red;"></div>
 
 						<!-- Big Inset -->
 						<div style="position:absolute; top: 20px; left:1020px; width:200px; height:200px;">
-							<canvas id="canvas_tokyo_denoising_inset" style="width:100%; height:100%; border:solid 2px red;" width="64" height="64"></canvas>
+							<canvas class="pixelated" id="canvas_tokyo_denoising_inset" style="width:100%; height:100%; border:solid 2px red;" width="64" height="64"></canvas>
 							<div style="width:100%; text-align:center; font-size:0.7em; color:white; text-shadow:1px 1px 2px black;">Inset</div>
 						</div>
 
 						<!-- Power Spectrum -->
 						<div style="position:absolute; top:300px; left:1020px; width:200px; height:200px" >
-							<canvas id="canvas_tokyo_denoising_fft" style="width:100%; height:100%; border:solid 2px red;" width="64" height="64"></canvas>
+							<canvas class="pixelated" id="canvas_tokyo_denoising_fft" style="width:100%; height:100%; border:solid 2px red;" width="64" height="64"></canvas>
 							<div style="width:100%; text-align:center; font-size:0.7em; color:white; text-shadow:1px 1px 2px black;">Power Spectrum</div>
 						</div>
 
@@ -676,7 +676,7 @@
 							$$ d(i,j) > bn(i,j) $$
 						</center>
                         <center style="position: absolute; top:-70px; left:-140px; z-index:10;" class="fragment fade-in-then-out" data-fragment-index="3">
-                            <img id="ditherMaskPng" class="pixelated" height="200px" src="images/dithering/dither2.png"><br />
+                            <img class="pixelated" id="ditherMaskPng" class="pixelated" height="200px" src="images/dithering/dither2.png"><br />
                             <p style="margin:0px; font-size:0.6em; text-shadow: 1px 1px 1px white;">$bn(i,j)$</p>
                         </center>
 					</div>
@@ -1792,7 +1792,7 @@
 						</svg>
 						<div class="fragment" data-fragment-index="2">
 							<div style="position:relative; width:200px; height:200px;">
-								<canvas id="scrambling_mask_cnv" width="16px" height="16px" style="opacity: 0.5; position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
+								<canvas class="pixelated" id="scrambling_mask_cnv" width="16px" height="16px" style="opacity: 0.5; position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
                                 <div class="fragment" data-fragment-index="3">
                                 <div id="scrambling_mask_pixel" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:10px; height:10px; border:solid 3px purple;"></div>
                                 </div>
@@ -1814,7 +1814,7 @@
 						</div>
 						<div class="fragment" data-fragment-index="4">
 							<div style="position:relative; width:200px; height:200px;">
-								<canvas id="scrambling_res_cnv" width="16px" height="16px" style="opacity: 0.5; position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
+								<canvas class="pixelated" id="scrambling_res_cnv" width="16px" height="16px" style="opacity: 0.5; position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
 								<div id="scrambling_res_pixel" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:10px; height:10px; border:solid 3px purple;"></div>
 							</div>
 							<br />
@@ -2142,18 +2142,18 @@
 									<td style="text-align:center; font-weight:800;">Power Spectrum</td>
 								</tr>
 								<tr>
-									<td style="padding-top:0px; border:none;"><img width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY.jpg" /></td>
-									<td style="padding-top:0px; border:none;"><img id="test_integrands_robust_heaviside" width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_1spp_SequenceSiggraph.jpg" /></td>
+									<td style="padding-top:0px; border:none;"><img class="pixelated" width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY.jpg" /></td>
+									<td style="padding-top:0px; border:none;"><img class="pixelated" id="test_integrands_robust_heaviside" width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_1spp_SequenceSiggraph.jpg" /></td>
 									<td style="padding-top:0px; border:none;"><canvas class="pixelated" style="border:solid 1px black; width:120px; height:120px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);" id="test_integrands_robust_heaviside_ft" width="64px" height="64px"></canvas></td>
 								</tr>
 								<tr class="fragment" data-fragment-index="2">
-									<td style="padding-bottom:0px; padding-top:0px; border:none;"><img width="120px" src="images/ours/robustness/TestFunction2DCos.png" /></td>
-									<td style="padding-bottom:0px; padding-top:0px; border:none;"><img id="test_integrands_robust_2cos" width="120px" src="images/ours/robustness/TestFunction2DCos_1spp_SequenceSiggraph.jpg" /></td>
+									<td style="padding-bottom:0px; padding-top:0px; border:none;"><img class="pixelated" width="120px" src="images/ours/robustness/TestFunction2DCos.png" /></td>
+									<td style="padding-bottom:0px; padding-top:0px; border:none;"><img class="pixelated" id="test_integrands_robust_2cos" width="120px" src="images/ours/robustness/TestFunction2DCos_1spp_SequenceSiggraph.jpg" /></td>
 									<td style="padding-bottom:0px; padding-top:0px; border:none;"><canvas class="pixelated" style="border:solid 1px black; width:120px; height:120px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);" id="test_integrands_robust_2cos_ft" width="64px" height="64px"></canvas></td>
 								</tr>
 								<tr class="fragment" data-fragment-index="3">
-									<td style="padding-bottom:0px; padding-top:0px; border:none;"><img width="120px" src="images/ours/robustness/TestFunction2DDiskCentered.jpg" /></td>
-									<td style="padding-bottom:0px; padding-top:0px; border:none;"><img id="test_integrands_robust_gauss" width="120px" src="images/ours/robustness/TestFunction2DDiskCentered_1spp_SequenceSiggraph.jpg" /></td>
+									<td style="padding-bottom:0px; padding-top:0px; border:none;"><img class="pixelated" width="120px" src="images/ours/robustness/TestFunction2DDiskCentered.jpg" /></td>
+									<td style="padding-bottom:0px; padding-top:0px; border:none;"><img class="pixelated" id="test_integrands_robust_gauss" width="120px" src="images/ours/robustness/TestFunction2DDiskCentered_1spp_SequenceSiggraph.jpg" /></td>
 									<td style="padding-bottom:0px; padding-top:0px; border:none;"><canvas class="pixelated" style="border:solid 1px black; width:120px; height:120px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);" id="test_integrands_robust_gauss_ft" width="64px" height="64px"></canvas></td>
 								</tr>
 							</table>
@@ -2433,12 +2433,12 @@
 								<td style="text-align:center; font-weight:800;">128spp</td>
 							</tr>
 							<tr>
-								<td style="padding-top:0px; border:none;"><img width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY.jpg" /></td>
-								<td style="padding-top:0px; border:none;"><img id="test_integrands_prog_heaviside_1spp"   width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_1spp_SequenceSiggraph.jpg" /></td>
-								<td style="padding-top:0px; border:none;"><img id="test_integrands_prog_heaviside_4spp"   width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_4spp_SequenceSiggraph.jpg" /></td>
-								<td style="padding-top:0px; border:none;"><img id="test_integrands_prog_heaviside_8spp"   width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_8spp_SequenceSiggraph.jpg" /></td>
-								<td style="padding-top:0px; border:none;"><img id="test_integrands_prog_heaviside_64spp"  width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_64spp_SequenceSiggraph.jpg" /></td>
-								<td style="padding-top:0px; border:none;"><img id="test_integrands_prog_heaviside_256spp" width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_128spp_SequenceSiggraph.jpg" /></td>
+								<td style="padding-top:0px; border:none;"><img class="pixelated" width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY.jpg" /></td>
+								<td style="padding-top:0px; border:none;"><img class="pixelated" id="test_integrands_prog_heaviside_1spp"   width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_1spp_SequenceSiggraph.jpg" /></td>
+								<td style="padding-top:0px; border:none;"><img class="pixelated" id="test_integrands_prog_heaviside_4spp"   width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_4spp_SequenceSiggraph.jpg" /></td>
+								<td style="padding-top:0px; border:none;"><img class="pixelated" id="test_integrands_prog_heaviside_8spp"   width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_8spp_SequenceSiggraph.jpg" /></td>
+								<td style="padding-top:0px; border:none;"><img class="pixelated" id="test_integrands_prog_heaviside_64spp"  width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_64spp_SequenceSiggraph.jpg" /></td>
+								<td style="padding-top:0px; border:none;"><img class="pixelated" id="test_integrands_prog_heaviside_256spp" width="120px" src="images/ours/robustness/TestFunction2DHeavisideXY_128spp_SequenceSiggraph.jpg" /></td>
 							</tr>
 							<tr>
 								<td></td>
@@ -2504,7 +2504,7 @@
 						<center style="width:30%; font-size:0.7em;">
 							<div>
 								<div style="position:relative; width:200px; height:200px;">
-									<canvas id="summary_scrambling_mask_cnv" width="64px" height="64px" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
+									<canvas class="pixelated" id="summary_scrambling_mask_cnv" width="64px" height="64px" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
 								</div>
 								<br />
 								<div style="width:200px; text-align:center; font-size:0.6em;">Scrambling mask</div>
@@ -2512,7 +2512,7 @@
 
 							<div>
 								<div style="position:relative; width:200px; height:200px;">
-									<canvas id="summary_sorting_mask_cnv" width="64px" height="64px" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
+									<canvas class="pixelated" id="summary_sorting_mask_cnv" width="64px" height="64px" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
 								</div>
 								<br />
 								<div style="width:200px; text-align:center; font-size:0.6em;">Sorting mask</div>
@@ -2543,7 +2543,7 @@
 						<!-- Result ? -->
 						<center style="width:30%; font-size:0.7em; padding-top:120px;">
 							<div style="position:relative; width:200px; height:200px;">
-								<img id="summary_result_cnv" width="64px" height="64px" src="images/ours/robustness/TestFunction2DGaussian_8spp_SequenceSiggraph.jpg" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;" />
+								<img class="pixelated" id="summary_result_cnv" width="64px" height="64px" src="images/ours/robustness/TestFunction2DGaussian_8spp_SequenceSiggraph.jpg" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;" />
 							</div>
 							<br />
 							<div style="width:200px; text-align:center; font-size:0.6em;">QMC Integration</div>
@@ -2961,7 +2961,7 @@
 				<section>
 					<h2>Summary</h2>
 					<!-- <video style="position:absolute; top:0px; left: 330px; margin: 0; border: none; box-shadow: none; height:720px; max-width: 100%; max-height: 100%; z-index: -500;" height="720px" width="100%" data-autoplay loop src="./videos/littlest-tokyo_4spp_bluenoise_sig19.ogg"></video> -->
-					<img style="position:absolute; top:0px; left: 330px; margin: 0; border: none; box-shadow: none; height:720px; max-width: 100%; max-height: 100%; z-index: -500;" height="720px" width="100%" src="./videos/littlest-tokyo_4spp/bluenoise_sig19/littlest-tokyo_0064.png">
+					<img class="pixelated" style="position:absolute; top:0px; left: 330px; margin: 0; border: none; box-shadow: none; height:720px; max-width: 100%; max-height: 100%; z-index: -500;" height="720px" width="100%" src="./videos/littlest-tokyo_4spp/bluenoise_sig19/littlest-tokyo_0064.png">
 					<div style="position:absolute; top:0; left: 0px; margin: 0; max-width: 100%; max-height: 100%; z-index: -5; width: 720px; height:720px; background-color: #ddd; box-shadow: 2px 2px 5px black; ">
 
 						<ul style="padding-top:15%;">
@@ -3028,14 +3028,13 @@
 			// - https://github.com/hakimel/reveal.js#configuration
 			// - https://github.com/hakimel/reveal.js#dependencies
 			Reveal.initialize({
-                width: 1280,
+            width: 1280,
 				height: 720,
 				margin: 0,
-                history: true,
-                slideNumber: true,
-                showNotes: true,
-                // hideInactiveCursor: true,
-                transition: 'fade',
+            slideNumber: true,
+            showNotes: true,
+            transition: 'fade',
+            overview: false,
 
 				math: {
 		            mathjax: 'ext/mathjax/MathJax.js',
@@ -3047,8 +3046,6 @@
 				},
 
 				dependencies: [
-					{ src: 'ext/reveal.js/plugin/markdown/marked.js' },
-					// { src: 'ext/reveal.js/plugin/markdown/markdown.js' },
 					{ src: 'ext/reveal.js/plugin/notes/notes.js', async: true },
 					{ src: 'ext/reveal.js/plugin/highlight/highlight.js', async: true },
 					{ src: 'ext/reveal.js/plugin/math/math.js', async: true },

@@ -109,13 +109,13 @@ body {
   margin: 5px 40px;
   line-height: 1.3; }
 
-/* Ensure certain elements are never larger than the slide itself */
-.reveal canvas,
-.reveal img,
-.reveal video,
-.reveal iframe {
-  image-rendering: optimizeSpeed;
-  /* image-rendering: pixelated; */
+/* Add pixelated class to display 'pixel perfect' images */
+.pixelated {
+  image-rendering: pixelated;                 /* Chrome  */
+  -ms-interpolation-mode: nearest-neighbor;   /* IE8+    */
+}
+:-moz-any(.pixelated) {
+  image-rendering: optimizeSpeed;             /* Firefox */
 }
 
 .reveal strong,
@@ -319,10 +319,3 @@ body {
 @media print {
   .backgrounds {
     background-color: #fff; } }
-
-img.pixelated {
-  image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
-  image-rendering: -moz-crisp-edges;          /* Firefox                        */
-  image-rendering: -o-crisp-edges;            /* Opera                          */
-  -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */  
-}
