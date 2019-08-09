@@ -183,6 +183,7 @@ simulation or to adapt the sampling budget locally.
       <em>Eurographics Symposium on Rendering</em> 2019
       <a href="{{ site.url | append: site.baseurl }}/research/2019/06/18/animation-bluenoise.html">webpage</a>
       <a href="https://drive.google.com/open?id=1znhbmKGeHphfae1tz3YnroOzOA5-sYcd">pdf</a>
+      <a href="https://drive.google.com/file/d/181AXka1ntceVsKIJ_ZD51V3iYeq2szYP/view?usp=sharing">demo</a>
       <!-- <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/supplemental.zip">supp. doc</a> -->
       <!-- <a href="https://hal.archives-ouvertes.fr/hal-02150657/bibtex">bib</a> &nbsp; -->
       <!-- <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerCPP.zip">code</a> -->
@@ -200,6 +201,7 @@ simulation or to adapt the sampling budget locally.
       <a href="{{ site.url | append: site.baseurl }}/supp/2019-sampling-bluenoise/index.html">supp. html</a>
       <a href="https://hal.archives-ouvertes.fr/hal-02150657/bibtex">bib</a>
       <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerCPP.zip">code</a>
+      <a href="https://drive.google.com/file/d/181AXka1ntceVsKIJ_ZD51V3iYeq2szYP/view?usp=sharing">demo</a>
       <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerBlueNoiseErrors2019_video.mp4">video</a>
       <a href="https://belcour.github.io/blog/slides/2019-sampling-bluenoise/index.html">slides</a>
   </td>
