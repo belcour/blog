@@ -1525,8 +1525,11 @@
 					<canvas id="limitation_georgiev_1spp_inset_ref" class="pixelated" style="opacity:0;" width="128" height="128"></canvas>
 
 					<script>
-						Reveal.addEventListener( 'ready', function( event ) {
-							$('#limitation_georgiev_1spp_img').ready(function() {
+						// Reveal.addEventListener( 'ready', function( event ) {
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if((event.currentSlide && event.currentSlide.id == 'section_limitation_georgiev_spp'))
+							{
+							// $('#limitation_georgiev_1spp_img').ready(function() {
 								tokyo_denoising_set = true;
 								var canvas = document.getElementById('limitation_georgiev_1spp_fft');
 								var inset  = document.getElementById('limitation_georgiev_1spp_inset');
@@ -1539,7 +1542,8 @@
 								var ref_ctx = ref_cnv.getContext('2d');
 								ref_ctx.drawImage(document.getElementById('limitation_georgiev_1spp_ref'), left, top, 128, 128, 0, 0, 128, 128);
 								PowerSpectrumOfError(canvas, ref_cnv, 70);
-							});
+							// });
+							}
 						});
 					 </script>
 					<aside class="notes">
@@ -1573,8 +1577,10 @@
 					</div>
 					<canvas id="limitation_georgiev_16spp_inset_ref" class="pixelated" style="opacity:0;" width="128" height="128"></canvas>
 					<script>
-						Reveal.addEventListener( 'ready', function( event ) {
-							$('#limitation_georgiev_16spp_ref').ready(function() {
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if((event.currentSlide && event.currentSlide.id == 'section_limitation_georgiev_16spp'))
+							{
+							// $('#limitation_georgiev_16spp_ref').ready(function() {
 								tokyo_intro_set = true;
 								var canvas = document.getElementById('limitation_georgiev_16spp_fft');
 								var inset  = document.getElementById('limitation_georgiev_16spp_inset');
@@ -1589,7 +1595,8 @@
 								ref_ctx.drawImage(document.getElementById('limitation_georgiev_16spp_ref'), left, top, 128, 128, 0, 0, 128, 128);
 
 								PowerSpectrumOfError(canvas, ref_cnv, 700);
-							});
+							// });
+							}
 						});
 					 </script>
 				<aside class="notes">
@@ -1618,8 +1625,10 @@
 					</div>
 					<canvas id="limitation_georgiev_32spp_inset_ref" class="pixelated" style="opacity:0;" width="128" height="128"></canvas>
 					<script>
-						Reveal.addEventListener( 'ready', function( event ) {
-							$('#limitation_georgiev_32spp_ref').ready(function() {
+						Reveal.addEventListener( 'slidechanged', function( event ) {
+							if((event.currentSlide && event.currentSlide.id == 'section_limitation_georgiev_32spp'))
+							{
+							// $('#limitation_georgiev_32spp_ref').ready(function() {
 								tokyo_intro_set = true;
 								var canvas = document.getElementById('limitation_georgiev_32spp_fft');
 								var inset  = document.getElementById('limitation_georgiev_32spp_inset');
@@ -1634,7 +1643,8 @@
 								ref_ctx.drawImage(document.getElementById('limitation_georgiev_32spp_ref'), left, top, 128, 128, 0, 0, 128, 128);
 
 								PowerSpectrumOfError(canvas, ref_cnv, 1500);
-							});
+							// });
+							}
 						});
 						Reveal.addEventListener( 'fragmentshown', function( event ) {
 							if(event.fragment.id == "limitation_georgiev_32spp_01") {
