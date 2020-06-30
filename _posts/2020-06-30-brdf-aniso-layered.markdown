@@ -37,7 +37,7 @@ published: true
     <span style="position:absolute; font-size:0.8em; top:-25px; left:1360px;">FFT</span>  
 </div> -->
 <center>
-<img src="{{ site.url | append: site.baseurl }}/data/images/teaser_BrdfAniso.jpg" width="60%">
+<img style="border:1px solid black;" src="{{ site.url | append: site.baseurl }}/data/images/teaser_BrdfAniso.jpg" width="60%">
 </center><br />
 
 <span>
