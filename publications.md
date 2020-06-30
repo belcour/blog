@@ -83,6 +83,20 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
+  <td><a href="{{ site.url | append: site.baseurl }}/research/2020/06/30/brdf-aniso-layered.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_anisoLayered.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
+  <td style="vertical-align:top;"><b>Rendering Layered Materials with Anisotropic Interfaces</b> <br />
+      Philippe Weier, and Laurent Belcour<br />
+      <em>Journal of Computer Graphics Techniques (JCGT)</em> vol. 9, no. 2, 37-57, 2020
+      <a href="{{ site.url | append: site.baseurl }}/research/2020/06/30/brdf-aniso-layered.html">webpage</a>
+      <a href="http://jcgt.org/published/0009/02/03/paper.pdf">pdf</a>
+      <a href="http://jcgt.org/published/0009/02/03/html_supplemental.zip">supp. html</a>
+      <a href="http://jcgt.org/published/0009/02/03/bibtex.bib">bib</a>
+      <a href="http://jcgt.org/published/0009/02/03/mitsuba_supplemental.zip">code</a>
+      <!-- <a href="https://youtu.be/wM5E-NJtaug">video</a> -->
+      <!-- <a href="https://belcour.github.io/blog/slides/2018-brdf-realtime-layered/slides.html">slides</a> -->
+  </td>
+</tr>
+<tr>
   <td><a href="{{ site.url | append: site.baseurl }}/research/2018/05/05/brdf-realtime-layered.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Layered.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
   <td style="vertical-align:top;"><b>Efficient Rendering of Layered Materials using an Atomic Decomposition with Statistical Operators</b> <br />
       Laurent Belcour<br />
