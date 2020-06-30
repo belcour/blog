@@ -59,7 +59,7 @@ published: true
 We present a lightweight and efficient method to render layered materials with anisotropic interfaces. Our work extends our previously published statistical framework to handle anisotropic microfacet models. A key insight to our work is that when projected on the tangent plane, BRDF lobes from an anisotropic GGX distribution are well approximated by ellipsoidal distributions aligned with the tangent frame: its covariance matrix is diagonal in this space. We leverage this property and perform the isotropic layered algorithm on each anisotropy axis independently. We further update the mapping of roughness to directional variance and the evaluation of the average reflectance to account for anisotropy.
 
 <strong>Validation</strong><br />
-Using an extensive study, we validated that our model was visualy close to the ground truth. See our supplemental material results (warning: the archive is > 4GB).
+We validated that our model was visualy close to the ground truth. See our supplemental material for all our results (warning: the archive is > 4GB).
 <center>
 <img src="{{ site.url | append: site.baseurl }}/data/images/layered_aniso-validation.jpg" width="60%"><br />
 <div style="width:50%;">
