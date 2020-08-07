@@ -19,6 +19,7 @@ tags: [
 thumbnail: "/data/images/thumbnail_BrdfFresnelDecompo.png"
 materials: [
     { type: "html", name: "course webpage", url: "https://blog.selfshadow.com/publications/s2020-shading-course/" },
+    { type: "pdf", name: "abstract", url: "https://hal.inria.fr/hal-02883680v1/document" },
     #{ type: "zip", name: "code", url: "https://gist.github.com/jdupuy/5d9180e7b1c2cecd405ec36f80d406ef" },
     #{ type: "slides", name: "slides", url: "http://onrendering.com/data/papers/ms16/slides/index.html#/" },
 ]
