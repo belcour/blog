@@ -1,0 +1,102 @@
+# Current Labs members
+- name: Eric Heitz
+  title: Lead Research Scientist
+  url: https://eheitzresearch.wordpress.com/
+  photo: /images/people/eric_heitz.jpg
+  center: labs
+  email: "eric@unity3d.com"
+
+- name: Jonathan Dupuy
+  title: Research Scientist
+  center: labs
+  photo: /images/people/jonathan_dupuy.jpg
+  url: http://onrendering.com/
+  email: "jonathandu@unity3d.com"
+
+- name: Laurent Belcour
+  title: Research Scientist
+  url: https://belcour.github.io/blog/
+  topics: "Appearance Modeling - (Quasi)-Monte Carlo"
+  photo: /images/people/laurent_belcour.jpg
+  center: labs
+  email: "laurent@unity3d.com"
+
+- name: Kenneth Vanhoey
+  title: Research Scientist
+  url: "http://www.kvanhoey.eu/"
+  topics: "Machine Learning for CGI and Content Creation"
+  photo: /images/people/kenneth_vanhoey.jpg
+  center: labs
+  email: "kennethv@unity3d.com"
+
+- name: Thomas Deliot
+  title: Research Engineer
+  url: "http://thomasdeliot.wixsite.com/blog"
+  center: labs
+  photo: /images/people/thomas_deliot.jpg
+  
+- name: Thomas Chambon
+  title: Research Engineer
+  url: "https://www.linkedin.com/in/thomas-chambon-0a648664/"
+  center: labs
+  photo: /images/people/thomas_chambon.jpg
+
+- name: Sylvain Durand
+  title: "Research Intern"
+  center: labs
+  topics: "Blue-Noise Sampling"
+  url: "https://sdurand7.github.io/"
+  photo: /images/people/sylvain_durand.jpg
+
+- name: Corentin Salaun
+  title: "Research Intern"
+  center: labs
+  topics: "Blue-Noise Sampling"
+  url: "https://iribis.github.io/"
+  photo: /images/people/corentin_salaun.jpg
+
+# Former Labs members
+- name: Pierre Moreau
+  title: "Research Intern"
+  center: alumni
+  topics: "Control Variates"
+  url: "https://pmoreau.org/"
+  photo: /images/people/pierre_moreau.jpg
+
+- name: Jad Khouri
+  title: "Research Intern"
+  center: alumni
+  topics: "GPU Tessellation"
+  url: "https://jadkhoury.github.io/"
+  photo: /images/people/jad_khoury.jpg
+
+- name: Philippe Weier
+  title: "Research Intern"
+  center: alumni
+  topics: "Appearance Modeling"
+  url: "https://weiphil.github.io/portfolio/"
+  photo: /images/people/philippe_weier.jpg
+
+- name: Adele Saint-Denis
+  title: "Research Intern"
+  topics: "Real-Time Style Transfer"
+  center: alumni
+  photo: /images/people/adele_saintdenis.jpg
+ 
+- name: Christophe Riccio
+  title: "R&amp;D Engineer"
+  center: alumni
+  photo: /images/people/christophe_riccio.png
+  url: "http://github.com/g-truc"
+
+# R&D Engineers
+  
+- name: Arthur Dufay
+  title: "R&amp;D Engineer"
+  center: "R&D"
+  photo: /images/people/arthur_dufay.jpg
+  url: "http://www.linkedin.com/in/arthur-dufay-a9689388/"
+  
+  
+  
+  

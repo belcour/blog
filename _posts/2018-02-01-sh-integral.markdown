@@ -1,30 +1,35 @@
 ---
-layout: post
-title:  "Integrating Clipped Spherical Harmonics Expansions"
-author: "Laurent Belcour, Guofu Xie, Christophe Hery, Mark Meyer, Wojciech Jarosz, and Derek Nowrouzezahrai"
+layout: publication
+date: 2018-02-01
+title: "Integrating Clipped Spherical Harmonics Expansions"
+authors: [
+   { name: "Laurent Belcour" },
+   { name: "Guofu Xie", "affiliation": "UdeM" },
+   { name: "Christophe Hery", "affiliation": "Pixar" },
+   { name: "Mark Meyer", "affiliation": "Pixar" },
+   { name: "Wojciech Jarosz", "affiliation": "Dartmouth College" },
+   { name: "Derek Nowrouzezahrai", "affiliation": "UdeM" },
+]
 journal: "ACM Transactions on Graphics"
-date:   2018-02-01
-categories: research
-published: true
+categories: [
+    "research",
+    "publication"
+]
+tags: [
+    "published",
+    "Appearance Modeling and Rendering",
+]
+thumbnail: "/data/images/thumbnail_SHInt.png"
+materials: [
+   { type: "pdf", name: "paper", url: "https://hal.inria.fr/hal-01695284/document"},
+   { type: "latex", name: "bib", url: "https://hal.inria.fr/hal-01695284/bibtex"},
+   { type: "zip", name: "code", url: "https://github.com/belcour/IntegralSH/" },
+   { type: "slides", name: "slides", url: "https://belcour.github.io/blog/slides/2018-integration-sh/slides.html" },
+]
 ---
 <!-- <center><img src="{{ site.url | append: site.baseurl }}/data/images/shint/teaser.svg" /></center><br /> -->
 
-<span>
-   <a href="https://hal.inria.fr/hal-01695284/document">
-      <img src="{{ site.url | append: site.baseurl }}/data/images/icon_pdf.png" height="32px">paper
-   </a> &nbsp;
-   <a href="https://hal.inria.fr/hal-01695284/bibtex">
-      <img src="{{ site.url | append: site.baseurl }}/data/images/icon_latex.png" height="32px">bib
-   </a> &nbsp;
-   <a href="https://github.com/belcour/IntegralSH/">
-      <img src="{{ site.url | append: site.baseurl }}/data/images/icon_zip.png" height="32px">code
-   </a>
-   <a href="https://belcour.github.io/blog/slides/2018-integration-sh/slides.html">
-      <img src="{{ site.url | append: site.baseurl }}/data/images/icon_slides.png" height="32px">slides
-   </a>
-</span><br />
-
-<h4>Project Summary</h4>
+<strong>Project Summary</strong>
 Many applications in rendering rely on integrating functions over spherical polygons. We present a new numerical solution for computing the integral of spherical harmonics (SH) expansions clipped to polygonal domains. For example the appearance of a surface lit by a polygonal light source is defined as the integral of an hemispherical function, the Bidirectional Reflectance Distribution Function (BRDF), over the projected footprint of the light. Mathematically, we need to compute the integral of this hemispherical function in footprint of the polygon projected on the hemisphere.
 <center><div style="font-size: 90%;">
     <table style="width:50%;">

@@ -78,71 +78,6 @@ simulation or to adapt the sampling budget locally.
 </table>
 <br />
 
-
-### BRDF Modeling and Rendering
-
-<table>
-<tr>
-  <td><a href="{{ site.url | append: site.baseurl }}/research/2020/06/30/brdf-aniso-layered.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_anisoLayered.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
-  <td style="vertical-align:top;"><b>Rendering Layered Materials with Anisotropic Interfaces</b> <br />
-      Philippe Weier, and Laurent Belcour<br />
-      <em>Journal of Computer Graphics Techniques (JCGT)</em> vol. 9, no. 2, 37-57, 2020
-      <a href="{{ site.url | append: site.baseurl }}/research/2020/06/30/brdf-aniso-layered.html">webpage</a>
-      <a href="http://jcgt.org/published/0009/02/03/paper.pdf">pdf</a>
-      <a href="http://jcgt.org/published/0009/02/03/html_supplemental.zip">supp. html</a>
-      <a href="http://jcgt.org/published/0009/02/03/bibtex.bib">bib</a>
-      <a href="http://jcgt.org/published/0009/02/03/mitsuba_supplemental.zip">code</a>
-      <!-- <a href="https://youtu.be/wM5E-NJtaug">video</a> -->
-      <!-- <a href="https://belcour.github.io/blog/slides/2018-brdf-realtime-layered/slides.html">slides</a> -->
-  </td>
-</tr>
-<tr>
-  <td><a href="{{ site.url | append: site.baseurl }}/research/2018/05/05/brdf-realtime-layered.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Layered.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
-  <td style="vertical-align:top;"><b>Efficient Rendering of Layered Materials using an Atomic Decomposition with Statistical Operators</b> <br />
-      Laurent Belcour<br />
-      <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2018, 37 (4)
-      <a href="{{ site.url | append: site.baseurl }}/research/2018/05/05/brdf-realtime-layered.html">webpage</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-01785457/document">pdf</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-01785457v2/file/suppl.pdf">supp. pdf</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-01785457/bibtex">bib</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-01785457v2/file/suppl.zip">code</a>
-      <a href="https://youtu.be/wM5E-NJtaug">video</a>
-      <a href="https://belcour.github.io/blog/slides/2018-brdf-realtime-layered/slides.html">slides</a>
-  </td>
-</tr>
-<tr>
-  <td><a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_SHInt.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
-  <td style="vertical-align:top;"><b>Integrating Clipped Spherical Harmonics Expansions</b> <br />
-      Laurent Belcour, Guofu Xie, Christophe Hery, Mark Meyer, Wojciech Jarosz, and Derek Nowrouzezahrai<br />
-      <em>ACM Transactions on Graphics</em>, 2018
-      <a href="{{ site.url | append: site.baseurl }}/research/2018/02/01/sh-integral.html">webpage</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-01695284/document">pdf</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-01695284/bibtex">bib</a>
-      <a href="https://github.com/belcour/IntegralSH/">code</a>
-      <a href="https://belcour.github.io/blog/slides/2018-integration-sh/slides.html">slides</a>
-  </td>
-</tr>
-<tr>
-  <td><a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Irid.png" alt="Iridescence" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
-  <td style="vertical-align:top;"><b>A Practical Extension to Microfacet Theory for the Modeling of Varying Iridescence</b> <br />
-      Laurent Belcour, Pascal Barla<br />
-      <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2017, 36 (4)
-      <a href="{{ site.url | append: site.baseurl }}/research/2017/05/01/brdf-thin-film.html">webpage</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-01518344/document">pdf</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supp-mat-small%20%281%29.pdf">supp. pdf</a> <a href="https://hal.archives-ouvertes.fr/hal-01518344/bibtex">bib</a> <a href="https://hal.inria.fr/hal-01518344v2/file/supplemental-code%20%282%29.zip">code</a> <a href="https://youtu.be/4nKb9hRYbPA">video</a> <a href="{{ site.url | append: site.baseurl }}/slides/2017-brdf-thin-film/slides.html">slides</a>
-  </td>
-</tr>
-<tr>
-  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_Pivot.png" alt="Pivot" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></td>
-  <td style="vertical-align:top;"><b>A Spherical Cap Preserving Parameterization for Spherical Distributions</b> <br />
-      <a href="http://onrendering.com/" style="color:rgb(0,0,0);">Jonathan Dupuy</a>, Eric Heitz, Laurent Belcour<br />
-      <em>ACM Transactions on Graphics</em> (proceedings of SIGGRAPH), 2017, 36 (4)
-      <a href="https://www.youtube.com/watch?v=9aZMRjbflpo">video</a> <a href="http://onrendering.com/data/papers/pivot.pdf">pdf</a> <a href="http://onrendering.com/data/papers/supplemental.zip">supp</a> <a href="http://github.com/jdupuy/pivot">code</a>
-  </td>
-</tr>
-</table>
-<br />
-
-
 ### BRDF Analysis
 
 <table>
@@ -188,47 +123,106 @@ simulation or to adapt the sampling budget locally.
 </tr>
 </table><br />
 
-### Sampling
-<table>
-<tr>
-  <td><a href="{{ site.url | append: site.baseurl }}/research/2019/06/17/sampling-bluenoise.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_AnimationBlueNoise.png" alt="Sampling Blue-Noise" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
-  <td style="vertical-align:top;"><b>Distributing Monte Carlo Errors as a Blue Noise in Screen Space by Permuting Pixel Seeds Between Frames</b> <br />
-      Eric Heitz, Laurent Belcour<br />
-      <em>Eurographics Symposium on Rendering</em> 2019
-      <a href="{{ site.url | append: site.baseurl }}/research/2019/06/18/animation-bluenoise.html">webpage</a>
-      <a href="https://drive.google.com/open?id=1znhbmKGeHphfae1tz3YnroOzOA5-sYcd">pdf</a>
-      <a href="https://drive.google.com/file/d/181AXka1ntceVsKIJ_ZD51V3iYeq2szYP/view?usp=sharing">demo</a>
-      <!-- <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/supplemental.zip">supp. doc</a> -->
-      <!-- <a href="https://hal.archives-ouvertes.fr/hal-02150657/bibtex">bib</a> &nbsp; -->
-      <!-- <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerCPP.zip">code</a> -->
-      <!-- <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerBlueNoiseErrors2019_video.mp4">video</a> -->
-  </td>
-</tr>
-<tr>
-  <td><a href="{{ site.url | append: site.baseurl }}/research/2019/06/17/sampling-bluenoise.html"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_SamplingBlueNoise.png" alt="Sampling Blue-Noise" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
-  <td style="vertical-align:top;"><b>A Low-Discrepancy Sampler that Distributes Monte Carlo Errors as a Blue Noise in Screen Space</b> <br />
-      Eric Heitz, Laurent Belcour, Victor Ostromoukhov, David Coeurjolly, and Jean-Claude Iehl<br />
-      <em>ACM SIGGRAPH Talk</em> 2019
-      <a href="{{ site.url | append: site.baseurl }}/research/2019/06/17/sampling-bluenoise.html">webpage</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-02150657/document">pdf</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/supplemental.zip">supp. doc</a>
-      <a href="{{ site.url | append: site.baseurl }}/supp/2019-sampling-bluenoise/index.html">supp. html</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-02150657/bibtex">bib</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerCPP.zip">code</a>
-      <a href="https://drive.google.com/file/d/181AXka1ntceVsKIJ_ZD51V3iYeq2szYP/view?usp=sharing">demo</a>
-      <a href="https://hal.archives-ouvertes.fr/hal-02150657/file/samplerBlueNoiseErrors2019_video.mp4">video</a>
-      <a href="https://belcour.github.io/blog/slides/2019-sampling-bluenoise/index.html">slides</a>
-  </td>
-</tr>
-<tr>
-  <td><a href="https://drive.google.com/file/d/1gmwg0Qh5UkAvfAJRwGKA2Hqcl_psE4CA/view?usp=sharing"><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_TrackLength.png" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;" /></a></td>
-  <td style="vertical-align:top;"><b>A note on track-length sampling with non-exponential distributions </b> <br />
-      Eric Heitz, Laurent Belcour  <br />
-      <em>Tech. Report - Unity Technologies</em>, May 2018
-      <a href="https://drive.google.com/file/d/1gmwg0Qh5UkAvfAJRwGKA2Hqcl_psE4CA/view?usp=sharing">pdf</a>
-  </td>
-</tr>
-</table><br />
+
+{% for project in site.data.research.projects %}
+{% assign posts = site.posts | where: "tags", project[0] %} 
+
+### {{ project[0] }}
+
+{{ project[1].abstract }}
+
+<div class="post-list">
+
+{% for post in posts %}
+
+<!-- Generate the post URL -->
+<!-- It is either a local URL or and outside URL if you want -->
+<!-- to reference your own blog / website. -->
+{% assign publication_url = post.url | prepend: site.baseurl %}
+{% assign url_type = "internal_url" %}
+{% if post.url_outside %}
+    {% assign publication_url = post.url_outside %}
+    {% assign url_type = "outside_url" %}
+{% endif %}
+
+{% if post.categories contains "publication" %}
+  <div style="position:relative; display:flex; margin-bottom:0px; padding: 10px; overflow: hidden;">
+
+    {% if  post.award %}
+    <center style="transform:rotate(45deg); font-family:Roboto; font-weight:600; position:absolute; top:40px; left:85%; width:200px; background-color:red; color:white; padding:5px;">
+        {{ post.award }}
+    </center>
+    {% endif %}
+
+    <div class="publication-image" style="margin-right:15px;">
+        <a href="{{ publication_url }}">
+        {% if post.thumbnail %}
+            <img style="max-width:none; width:90px; height:90px; overflow: hidden; border: solid 1px black;" width="90px" height="90px" src="{{ post.thumbnail | prepend: site.baseurl }}" />
+        {% else %}
+            <img style="max-width:none; width:90px; height:90px; overflow: hidden" width="90px" height="90px" src="{{ 'images/thumbnails/default.png' | prepend: site.baseurl }}" />
+        {% endif %}
+        </a>
+    </div>
+    <div class="publication-bibliography">
+        <!-- Publication title -->
+        <div class="publication-title">
+            <a class="{{ url_type }}" href="{{ publication_url }}">
+            <strong>{{ post.title }}</strong>
+            </a>
+        </div>
+
+        <!-- Generate author list -->
+        <div class="publication-authors">
+            {% assign authors_size = {{post.authors.size | minus: 1 }} %}
+            {% for index in (0..authors_size) %}
+
+            {% assign author = post.authors[index] %}
+
+            {% assign author_infos = site.data.members | where: "name", author.name %}
+            {% if author_infos.size > 0 %}
+                {% assign author_affiliation = "Unity Technologies" %}
+                {% assign author_url = author_infos[0].url %}
+            {% else %}
+                {% assign author_affiliation = author.affiliation %}
+                {% assign author_url = author.url %}
+            {% endif %}
+            <span class="publication-authors-name">
+                <!--<a href="{{ author_url }}">{{ author.name }}</a>{% if index != authors_size %},{% endif %}-->
+                {{ author.name }}{% if index != authors_size %},{% endif %}
+            </span>
+            {% endfor %}
+        </div>
+
+        <!-- Where is it published -->
+        <div>
+        <span style="font-style:italic;">
+            {% if post.tags contains 'published' %}
+                Published in
+            {% elsif contains 'to_appear' %}
+                To appear in
+            {% elsif contains 'techreport' %}
+            {% endif %}
+            {{ post.journal }}
+        </span><br />
+
+        <!-- Link to material -->
+        {% if post.materials %}
+        <span>
+            {% assign materials_size = {{post.materials.size | minus: 1 }} %}
+            {% for index in (0..materials_size) %}
+                {% assign material = post.materials[index] %}
+                <span><a class="publication-material {{ material.type }}" href="{{ material.url }}">{{ material.name }}</a>{% if index < materials_size %},&nbsp;{% endif %}</span>
+            {% endfor %}
+        </span>
+        {% endif %}
+        </div>
+    </div>
+  </div>
+{% endif %}
+{% endfor %}
+</div><br />
+
+{% endfor %}
 
 ### *Co-supervised* master theses
 
@@ -253,4 +247,4 @@ I helped (unofficially) the following master students:
 </tr>
 </table>
 
-<br />
+
