@@ -1,0 +1,2663 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Bringing an Accurate Fresnel to Real-Time Rendering: a Preintegrable Decomposition</title>
+
+		<link rel="stylesheet" href="css/reset.css" />
+		<link rel="stylesheet" href="css/reveal.css" />
+		<link rel="stylesheet" href="css/white.css" id="theme" />
+		<link rel="stylesheet" href="css/custom.css" />
+		<link rel="stylesheet" href="css/juxtapose.css" />
+
+		<!-- Theme used for syntax highlighted code -->
+		<!-- <link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme"> -->
+
+		<!-- Scripts -->
+		<script src="js/canvas2video.js"></script>
+		<script src="js/plotly-latest.min.js"></script>
+		<script src="js/d3.min.js"></script>
+		<script src="js/fresnel.js"></script>
+		<script src="js/fresnel_mapping.js"></script>
+		<script src="js/ior_plot.js"></script>
+
+		<script src="js/reveal.js"></script>
+		<script src="js/plugin/notes/notes.js"></script>
+		<script src="js/plugin/math/math.js"></script>
+		<!-- <script src="js/plugin/markdown/markdown.js"></script> -->
+		<!-- <script src="js/plugin/highlight/highlight.js"></script> -->
+
+		
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+
+				<!-- <div style="position:absolute; left:982px; top:-5px; z-index:1000; width:231px; height:174px; border:1.5px solid black;"></div> -->
+
+				<!-- Title -->
+				<section class="title">
+					<h3 style="width:100%; text-align:center; padding-top:20%;">
+						Bringing an Accurate Fresnel to Real-Time Rendering<br />
+						<div style="font-size:0.9em;">a Preintegrable Decomposition</div>
+					</h3>
+					<div style="display:flex; justify-content:space-evenly; font-size:0.7em; padding-top:7em;">
+						<div style="width:20%;">
+							<div style="display:flex; justify-content:space-evenly;">
+								<div>Laurent Belcour</div>
+							</div>
+							<div style="font-size:0.9em;">
+								<hr />
+								<center>
+								<img class="plain" style="background: none;" width="160px" src="img/logos/logo-unity.png" />
+								</center>
+							</div>
+						</div>
+						<div style="width:20%;">
+							<div style="display:flex; justify-content:space-evenly;">
+								<div>Megane Bati</div>
+							</div>
+							<div style="font-size:0.9em;">
+								<hr />
+								<center>
+									<img class="plain" style="background: none; position:relative; top:-6px;" width="160px" src="img/logos/logo-iogs.png" />
+								</center>
+							</div>
+						</div>
+						<div style="width:20%;">
+							<div style="display:flex; justify-content:space-evenly;">
+								<div>Pascal Barla</div>
+							</div>
+							<div style="font-size:0.9em;">
+								<hr />
+								<center>
+									<img class="plain" style="background: none;" width="140px" src="img/logos/logo-inria.png" />
+								</center>
+							</div>
+						</div>
+					</div>
+
+					<aside class="notes">
+						Hi there,<br /><br />
+
+						My name is Laurent Belcour, I am a research scientist at Unity
+						technologies and in  this video, I will present the solution
+						we developed to bring accurate Fresnel reflectance to real-time
+						game engines.<br /><br />
+
+						This is a joint work with Mega Bati from IOGS and Pascal Barla
+						from Inria.
+					</aside>
+				</section>
+
+				<!-- Introduction -->
+				<section>
+					<h3>Offline / Real-Time Convergence</h3>
+					<div style="display:flex; justify-content:flex-start; width:100%;">
+						<ul style="width:48%;">
+							<li class="fragment fade-in-then-semi-out" data-fragment-index="1">Goal: use game engines <strong>across</strong> productions
+								<ul>
+									<li>Not just in previz.</li>
+									<li>Not just for backgrounds</li>
+								</ul>
+							</li>
+
+							<li class="fragment fade-in-then-semi-out">Challenge: a <strong>unified</strong> workflow
+								<ul>
+									<li>Assets</li>
+									<li>...</li>
+								</ul>
+							</li>
+
+							<li class="fragment fade-in-then-semi-out">Asset appearance <strong>must match</strong>
+								<ul>
+									<li>That includes material models</li>
+									<li>All models rely on Fresnel reflectance/transmittance</li>
+								</ul>
+							</li>
+						</ul>
+						<div class="fragment" data-fragment-index="1" style="width:45%; margin-top:7%;">
+							<video style="width:499px;border:solid 2px black;" data-autoplay muted >
+								<source src="./videos/love+megatons.mp4?t=11" type="video/mp4" />
+							</video>
+							<!-- <img width="100%" src="img/game_engine_vfx.jpg"><br /> -->
+							<small>Production of <em><a href="https://www.loveandfiftymegatons.com/">Love & 50 Megatons</a></em></small>
+						</div>
+					</div>
+
+					<aside class="notes">
+						One of our goals is the convergence between real-time and offline
+						rendering <strong>*click* </strong> In this context, we aim to allow real-time
+						rendering engines, such as Unity, to be used more in productions
+						that would traditionally use offline rendering software.
+
+						Our goal is to push the use of game engines in all of the
+						different stages of the production pipeline. Not restricting
+						its use to previsualization or background rendering.
+						<strong>*click* </strong>
+
+						However, this poses many challenges. One of them being that
+						the asset workflow must match. Once an artist has authored an
+						asset in a content creation tool, it should be interpreted the same
+						way in both the offline and the real-time worlds.
+						<strong>*click* </strong>
+
+						In this talk, I will focus on appearance. To achieve the
+						same appearance, the PBR material models
+						should match or at least resemble each other closely. While the
+						industry has converged to the use of microfacet theory
+						to unify surface shading, there still is an issue with the match
+						of one of its components, which is Fresnel reflectance.
+					</aside>
+				</section>
+
+				<!-- Small Intro on Fresnel + Gulbrandsen -->
+				<section>
+					<h3>What is Fresnel reflectance?</h3>
+					<ul>
+						<li>Amount of light reflected by a surface
+							<ul>
+								<li>Basic ingredient of Microfacet models</li>
+								<li>Based on the Index of Refraction $\eta + i \kappa$</li>
+							</ul>
+						</li>
+					</ul>
+					<center id="shading_model_01" style="position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:-1; transition: filter 1s; filter:blur(0px);">
+						<object style="padding-top:150px;" data="./img/modelisation.svg" type="image/svg+xml"></object>
+					</center>
+
+					<div>
+						<center id="shading_model_02" class="fragment" style="position:absolute; top:300px; left:200px;">
+							<small><strong>Microfacet model</strong></small><br />
+							<object style="position:relative; top:-25px;" data="./img/microfacets.svg" type="image/svg+xml"></object>
+							<div style="position:absolute; top:105px; left:175px;">
+								$ \theta $
+							</div>
+						</center>
+						<center id="shading_model_03" class="fragment" style="position:absolute; top:300px; left:700px;" >
+							<small><strong>Fresnel reflectance</strong></small><br />
+                            <!-- <object style="position:relative; top:-25px;" data="./img/fresnel_curve.svg" type="image/svg+xml"></object> -->
+							<div id="plot_microfacet_fresnel" style="width:355px;height:355px;position:relative;top:-13px;"></div>
+							<div style="position:absolute; top:380px; left:180px;">
+								$ \theta $
+							</div>
+						</center>
+					</div>
+
+					<script>
+						Reveal.on( 'fragmentshown', event => {
+							// event.fragment = the fragment DOM element
+							if(event.fragment.id == 'shading_model_02') {
+								document.getElementById('shading_model_01').style['filter'] = 'blur(20px)'
+							}
+						} );
+						Reveal.on( 'fragmenthidden', event => {
+							if(event.fragment.id == 'shading_model_02') {
+								document.getElementById('shading_model_01').style['filter'] = 'blur(0px)'
+							}
+                        } );
+
+						var data   = [eval_fresnel(1.5, 0.0)];
+						var layout = {
+							showlegend: false,
+							xaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+                                range: [0.0, 0.5*Math.PI],
+                                dtick: 0.2,
+							},
+							yaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 1.0],
+							},
+							margin: {
+								l: 25,
+								r: 5,
+								b: 20,
+								t: 10,
+								pad: 0
+							},
+							font: {
+								family: 'Comfortaa',
+								size: 15,
+								color: '#7f7f7f'
+							},
+							paper_bgcolor: '#00000000',
+						};
+
+						Plotly.newPlot('plot_microfacet_fresnel', data, layout, {staticPlot: true});
+					</script>
+
+					<aside class="notes">
+						But what is Fresnel reflectance?
+
+						Fresnel reflectance describes the amount of light that
+						is reflected by a planar surface. It is one of the basic
+						components of microfacet theory and is characterized by
+						the index of refraction, which is a complex quantity. Its
+						real part is denoted eta and its imaginary part kappa.
+						<strong>*click* </strong>
+
+						In a microfacet model, light interacts with a surface as
+						if it were composed of tiny mirrors that are randomly oriented.
+						When light reflects off one of these mirrors at a given
+						angle $\theta$, <strong>*click* </strong>
+						its energy is reduced by a factor that is
+						shown in the curve on the right. This curve is called the
+						Fresnel reflectance.
+					</aside>
+				</section>
+				<section>
+					<h3>What is Fresnel reflectance?</h3>
+					<ul>
+						<li style="opacity:50%;">Amount of light reflected by a surface
+							<ul>
+								<li>Basic ingredient of Microfacet models</li>
+								<li>Based on the Index of Refraction $\eta + i \kappa$</li>
+							</ul>
+						</li>
+						<li>A <em>better</em> parameterization exists
+							<ul>
+								<li>Designed for metals <a href="http://jcgt.org/published/0003/04/03/">[Gulbrandsen 2014]</a></li>
+							</ul>
+						</li>
+					</ul>
+					<img width="300px" id="gulbrandsen-paper" style="position:absolute; top:125px; left:800px; transition: filter 1s;" src="img/gulbrandsen-paper.jpg" />
+					<div id="gulbrandsen-parametrization" class="fragment" style="display:flex; justify-content:space-evenly; position:relative; top:-20px;">
+						<center style="width:350px;">
+							<small><strong>Parameterization $(r, g)$</strong></small>
+							<div style="width:350px;height:350px;position:relative;top:-10px;">
+								<svg style="background-color:white; border:1px solid black;" id="gulbransen_parameters" width="320" height="320" viewBox="0 0 1 1">
+									<circle class="node" r="0.05" cx="0.5" cy="0.5" stroke="white" stroke-width="0.045" />
+								</svg>
+								<small style="position:absolute; top:320px; left:0px; width:350px; text-align:center;">$r$</small>
+								<small style="position:absolute; top:150px; left:-170px; width:350px; text-align:center;">$g$</small>
+							</div>
+						</center>
+						  
+						<div style="position:absolute; top:43%; left:39%; width:300px; height:50px;">
+							<div class="arrow"></div>
+						</div>
+						<center style="width:100px; position:relative; top:110px; font-size:0.8em;">
+							<span>$r = $&nbsp;</span><span id="fresnel_gulbransen_r">0.0</span><br />
+							<span>$g = $&nbsp;</span><span id="fresnel_gulbransen_g">0.0</span><br /><br /><br />
+							<span>$\eta = $&nbsp;</span><span id="fresnel_gulbransen_eta">1.5</span><br />
+							<span>$\kappa = $&nbsp;</span><span id="fresnel_gulbransen_kappa">0.0</span>
+						</center>
+						<center style="width:350px;">
+							<small><strong>Fresnel reflectance</strong></small>
+							<div id="plot_gulbrandsen_param" style="width:350px;height:350px;position:relative;top:-20px;"></div>
+						</center>
+					</div>
+					<script>
+						
+						function update_gulbransen_labels(r, g, n, k) {
+							d3.select('#fresnel_gulbransen_r').html( r.toPrecision(2) );
+							d3.select('#fresnel_gulbransen_g').html( g.toPrecision(2) );
+							d3.select('#fresnel_gulbransen_eta').html( n.toPrecision(2) );
+							d3.select('#fresnel_gulbransen_kappa').html( k.toPrecision(2) );
+						}
+
+						var node   = d3.select('.node');
+						var r      = parseFloat(node.attr('cx'))
+						var g      = 1.0 - parseFloat(node.attr('cy'))
+						var nk     = RGtoNK(r, g);
+						update_gulbransen_labels(r, g, nk[0], nk[1]);
+						var data   = [eval_fresnel(nk[0], nk[1])];
+						var layout = {
+							showlegend: false,
+							xaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 0.5*Math.PI],
+                                dtick: 0.2,
+							},
+							yaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 1.0],
+							},
+							margin: {
+								l: 25,
+								r: 5,
+								b: 20,
+								t: 10,
+								pad: 0
+							},
+							font: {
+								family: 'Comfortaa',
+								size: 15,
+								color: '#7f7f7f'
+							},
+							paper_bgcolor: '#00000000',
+						};
+
+						Plotly.newPlot('plot_gulbrandsen_param', data, layout, {staticPlot: true});
+
+						function update_gulbransen_param(eta, kappa) {
+							var data   = [eval_fresnel(eta, kappa)];
+							var config = {
+								transition: {duration: 0},
+                                frame: { duration: 0, redraw: false },
+                                staticPlot: true
+							};
+							Plotly.animate('plot_gulbrandsen_param', { data:data, traces:[0], layout:{} }, config);
+						}
+
+						Reveal.on( 'fragmentshown', event => {
+							if(event.fragment.id == 'gulbrandsen-parametrization') {
+								document.getElementById('gulbrandsen-paper').style['filter'] = 'blur(20px)'
+							}
+						} );
+						Reveal.on( 'fragmenthidden', event => {
+							if(event.fragment.id == 'gulbrandsen-parametrization') {
+								document.getElementById('gulbrandsen-paper').style['filter'] = 'blur(0px)'
+							}
+						} );
+
+
+						var svg = d3.select("#gulbransen_parameters");
+						var drag = d3.drag().on("drag", function() {
+							var cx = parseFloat(d3.select(this).attr("cx")) + d3.event.dx;
+							var cy = parseFloat(d3.select(this).attr("cy")) + d3.event.dy;
+							cx = Math.max(Math.min(cx, 1.0), 0.0);
+							cy = Math.max(Math.min(cy, 1.0), 0.0);
+							d3.select(this).attr("cx", cx).attr("cy", cy);
+							var r = cx;
+							var g = 1.0-cy;
+							var nk = RGtoNK(r, g);
+							// console.log(nk);
+							update_gulbransen_param(nk[0], nk[1]);
+							update_gulbransen_labels(r, g, nk[0], nk[1]);
+						});
+						svg.selectAll('circle').call(drag);
+					</script>
+					<aside class="notes">
+						Now, a problem resides in
+						the fact that editing a complex index of refraction is not
+						artist friendly. Fortunately, we can avoid it by
+						using Ole Gulbrandsen's parameterization instead.
+						<strong>*click*</strong>
+
+						This parameterization exposes two quantities: the
+						reflectance at normal incidence (also called reflectivity),
+						$r$, and the tint at grazing angles (also called edge-tint),
+						$g$. Those two parameters can be converted to $\eta$
+						and $\kappa$ to evaluate the Fresnel reflectance.
+
+						Changing $r$ can shift to higher or lower reflectance,
+						while $g$ impacts the grazing angle behaviour.
+					</aside>
+				</section>
+				<section>
+					<h3>What is Fresnel reflectance?</h3>
+					<ul>
+						<li style="opacity:50%;">Amount of light reflected by a surface
+							<ul>
+								<li>Basic ingredient of Microfacet models</li>
+								<li>Based on the Index of Refraction $\eta + i \kappa$</li>
+							</ul>
+						</li>
+						<li>A <em>better</em> parameterization exists
+							<ul>
+								<li>Designed for metals <a href="http://jcgt.org/published/0003/04/03/">[Gulbrandsen 2014]</a></li>
+								<li><strong>Not linear with respect to edge tint</strong></li>
+							</ul>
+						</li>
+					</ul>
+					<img width="300px" id="gulbrandsen-paper" style="position:absolute; top:125px; left:800px; filter:blur(20px);" src="img/gulbrandsen-paper.jpg" />
+
+					<div style="width:100%; position:relative;">
+						<center class="fragment" style="width:100%; position:absolute; top:0px;">
+							<div style="width:80%; display:flex; justify-content:space-evenly;">
+								<img width="192px" src="img/param_linear/param_gulb_0.png" />
+								<img width="192px" src="img/param_linear/param_gulb_25.png" />
+								<img width="192px" style="border:2px black solid;" src="img/param_linear/param_gulb_50.png" />
+								<img width="192px" src="img/param_linear/param_gulb_75.png" />
+								<img width="192px" src="img/param_linear/param_gulb_100.png" />
+							</div>
+							<strong>
+							<small><br />
+								Gulbrandsen's parameterization, blue to red</small>
+							</strong>
+						</center>
+					</div>
+					<aside class="notes">
+						While this is already much simpler to use than plain eta and kappa, it
+						still has some remaining issues, which Naty already discussed. In this
+						talk, I will concentrate on the major one, in my opinion, which
+						is linearity.
+						<strong>*click*</strong>
+
+						Here is an example of linearly interpolating between two edge-tint
+						values, one that is purely blue to one that is purely red. You would
+						expect that the in-between color would be purple, but instead
+						the edge tint disappears.
+					</aside>
+				</section>
+				<section>
+					<h3>What is Fresnel reflectance?</h3>
+					<ul>
+						<li style="opacity:50%;">Amount of light reflected by a surface
+							<ul>
+								<li>Basic ingredient of Microfacet models</li>
+								<li>Based on the Index of Refraction $\eta + i \kappa$</li>
+							</ul>
+						</li>
+						<li style="opacity:50%;">A <em>better</em> parameterization exists
+							<ul>
+								<li>Designed for metals <a href="http://jcgt.org/published/0003/04/03/">[Gulbrandsen 2014]</a></li>
+								<li><strong>Not linear with respect to edge tint</strong></li>
+							</ul>
+						</li>
+						<li>Approximations exist
+							<ul>
+								<li>The famous <em>Schlick</em> Fresnel <a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/1467-8659.1330233">[Schlick 1994]</a></li>
+								$$
+									\rho = r + (1 - r)\left( 1 - \cos(\theta) \right)^5
+								$$
+								<li class="fragment" data-fragment-index="0"><strong>Not controllable at grazing angles</strong></li>
+							</ul>
+                		</li>
+                    </ul>
+
+                    <center class="fragment" data-fragment-index="0" style="position:absolute; top:150px; left:720px; width:350px;">
+                        <div id="plot_schlick_approx" style="width:400px;height:400px;"></div>
+                    </center>
+
+					<script>
+						var node   = d3.select('.node');
+						var r      = parseFloat(node.attr('cx'))
+						var g      = 1.0 - parseFloat(node.attr('cy'))
+						var data   = [eval_fresnel(nk[0], nk[1]), eval_schlick(r)];
+						var layout = {
+							// showlegend: false,
+							legend: {
+								x: 0.2,
+								y: 1.2
+							},
+							xaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 0.5*Math.PI],
+                                dtick: 0.2,
+							},
+							yaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 1.0],
+							},
+							margin: {
+								l: 25,
+								r: 5,
+								b: 20,
+								t: 10,
+								pad: 0
+							},
+							font: {
+								family: 'Comfortaa',
+								size: 15,
+								color: '#7f7f7f'
+							},
+							paper_bgcolor: '#00000000',
+						};
+
+						Plotly.newPlot('plot_schlick_approx', data, layout, {staticPlot: true});
+
+						function fresnel_update(eta, kappa) {
+							var r      = fresnel(1.0, eta, kappa);;
+							var data   = [eval_fresnel(eta, kappa) , eval_schlick(r)];
+							var config = {
+                                staticPlot: true,
+								transition: {duration: 0},
+								frame: { duration: 0, redraw: false }
+							};
+							Plotly.animate('plot_schlick_approx', { data:data, traces:[0], layout:{} }, config);
+						}
+					</script>
+				<aside class="notes">
+					The overview of Fresnel reflectance wouldn't be complete
+					without mentioning Schlick's approximation of Fresnel
+					reflectance. This was introduced in '94 by Christophe
+					Schlick for performance reasons.
+
+					Schlick Fresnel only exposes the $r$ parameter of the
+					Gulbrandsen parameterization and uses it to LERP
+					between the constant and a power of cosine function.
+					<strong>*click*</strong>
+
+					Because of this restriction, we have no control over the
+					grazing angles, as shown here on the right.
+				</aside>
+				</section>
+
+
+				<!-- Fresnel War  -->
+				<section>
+					<h3>Another Issue: Lack of Unification</h3>
+					<div style="display:flex; justify-content:flex-start; width:100%;">
+						<ul style="width:45%;">
+							<li class="fragment fade-in-then-semi-out" data-fragment-index="0">Multiple <em>"Standards"</em>
+								<ul>
+									<li><strong>Exact Fresnel</strong> with Gulbrandsen's parameterization</li>
+									<li><strong>Approximate Fresnel</strong> using Schlick</li>
+								</ul>
+							</li>
+
+							<li class="fragment fade-in-then-semi-out" data-fragment-index="1">War of the Fresnels (which to choose?)
+								<ul>
+									<li>Some with strong opinion <a href="http://renderwonk.com/publications/mam2019/">[Hoffman 2019]</a></li>
+									<li>My take: this is not my battle</li>
+								</ul>
+							</li>
+
+							<li class="fragment fade-in-then-semi-out" data-fragment-index="2"><strong>No cross-compatibility</strong>
+								<ul>
+									<li>Schlick Fresnel is <strong>not a valid Fresnel</strong></li>
+									<li>Conversion <strong>impacts material perception</strong></li>
+								</ul>
+							</li>
+
+							<li class="fragment fade-in-then-semi-out" data-fragment-index="3">Issue: <strong>game engines only use Schlick</strong>
+								<ul>
+									<li>Restricts the use of game engines in production</li>
+									<li>Let's do something about it!</li>
+								</ul>
+							</li>
+						</ul>
+						<center class="fragment" data-fragment-index="0" style="width:45%; margin-top:0%; position:relative;">
+							<div class="fragment fade-out" data-fragment-index="2" style="position:absolute;">
+							<div>
+								<img style="width:80%;" src="img/arnold-uber.png"><br />
+								<small>Autodesk Standard Surface <a href="https://autodesk.github.io/standard-surface/#closures/metal">[Georgiev et al.]</a></small>
+							</div><br />
+
+							<div>
+								<img style="width:80%;" src="img/disney-pbr.png"><br />
+								<small>Disney's Principled BRDF <a href="https://disney-animation.s3.amazonaws.com/library/s2012_pbs_disney_brdf_notes_v2.pdf">[Burley 2012]</a></small>
+							</div>
+							</div>
+
+							<div class="fragment" data-fragment-index="2" style="position:absolute; left:100px; top:50px;">
+							<div style="display:flex; width:400px; justify-content:center">
+								<div id="compare-fresnel-01" class="juxtapose" style="width:400px; border:1px solid black;">
+									<img data-label="Schlick"   src="./img/mitsuba/shaderball/industrie_vs/industrie_schlick_25.png" />
+									<img data-label="Gulbrandsen (g=1)" src="./img/mitsuba/shaderball/industrie_vs/industrie_gulbran_25.png" />
+								</div>
+							</div>
+							<small style="padding-top:10px;"><strong>Same reflectivity!</strong> (r = 0.25)</small>
+							</div>
+						</center>
+
+
+					</div>
+
+					<aside class="notes">
+						Now the co-existence of both Schlick's and Gulbrandsen's
+						methods creates another problem in my opinion. 
+						<strong>*click*</strong><br /><br />
+	
+						Why so? Because, it creates multiple standards. For
+						example, companies such as Autodesk expose Gulbrandsen's
+						parameterization in their uber shader, while Disney's
+						principled BRDF model uses Schlick. You can even have
+						a combination of both methods.
+						<strong>*click*</strong><br /><br />
+
+						There isn't a consensus to use one or the other within the
+						graphics community.
+
+						My take on this is a little bit different. I don't think
+						it is up to me to decide for the artist which model is 
+						better. If they want to use edge tint, they should
+						have tools and renderers that support it. 
+						<strong>*click*</strong><br /><br />
+
+						My problem though lies with two facts:<br />
+						First: those two models are not compatible. Schlick Fresnel
+						does not represent a valid Fresnel reflectance. Hence,
+						for a given reflectivity (r), there is no edge tint (g) that
+						will produce the same curve as Schlick Fresnel. 
+						As you can see on the right, converting from one to
+						the other might change the appearance. <strong>*click*</strong><br />
+
+						Second: <strong>*click*</strong> games engines (such as Unity)
+						are limited to Schlick Fresnel, which can restrict
+						their use in film or TV production.<br /><br />
+
+						In this talk, I will show how we can change that.
+					</aside>
+				</section>
+
+
+				<!-- Real-Time Constraints -->
+				<section data-auto-animate>
+					<h3>What is the Constraint of Real Time?</h3>
+					<ul class="fragment">
+						<li>Precomputed integrals (e.g., <em>Split-Sum Integral</em> <a href="https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf">[Karis 2013]</a>)</li>
+					</ul>
+					<div class="fragment">
+					<center id="preintegration_01" style="position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:-1; transition: filter 1s; filter:blur(0px);">
+						<object style="padding-top:200px;" data="./img/modelisation.svg" type="image/svg+xml"></object>
+					</center>
+					<center style="padding-top:120px;" class="fragment" id="preintegration_02">
+						<div style="width:40%; height:150px; line-height:150px; border-radius:15px; background-color:#FFFFFFEE;">
+							<div>
+							$$
+							L_o = \int_\Omega \rho(\omega_i, \omega_o) L_i(\omega_i) \mbox{d}\omega_i
+							$$
+							</div>
+							<div style="position:relative; top:-120px; font-size:0.5em; color:red; font-weight:700;">
+							Too hard to evaluate analytically
+							</div>
+						</div>
+					</center>
+					</div>
+					<script>
+						Reveal.on( 'fragmentshown', event => {
+							// event.fragment = the fragment DOM element
+							if(event.fragment.id == 'preintegration_02') {
+								document.getElementById('preintegration_01').style['filter'] = 'blur(10px)'
+							}
+						} );
+						Reveal.on( 'fragmenthidden', event => {
+							if(event.fragment.id == 'preintegration_02') {
+								document.getElementById('preintegration_01').style['filter'] = 'blur(0px)'
+							}
+						} );
+					</script>
+					<aside class="notes">
+						Maybe so far you're not sure why we can't have
+						edge tint in real-time engines. I mean we have
+						the formulas, we only need to evaluate them right?
+						<strong>*click*</strong>
+
+						Well the issue is the fact that modern game
+						engines use precomputed integrals to efficiently
+						evaluate shading.
+						<strong>*click*</strong>
+
+						Say that you want to evaluate light reflected of
+						this object towards the camera.
+						<strong>*click*</strong>
+
+						The rendering equation tells us how to evaluate
+						this quantity, but it requires an integral that has
+						no analytical form, and too many degree of freedom
+						to be stored. It is just too costly.
+						<strong>*click*</strong>
+					</aside>
+				</section>
+				<section>
+					<h3>What is the Constraint of Real Time?</h3>
+					<ul>
+						<li>Precomputed integrals (e.g., <em>Split-Sum Integral</em> <a href="https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf">[Karis 2013]</a>)</li>
+					</ul>
+					<div>
+					<center style="position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:-1; transition: filter 1s; filter:blur(10px);">
+						<object style="padding-top:200px;" data="./img/modelisation.svg" type="image/svg+xml"></object>
+					</center>
+					<center style="padding-top:120px;">
+						<div style="width:60%; height:150px; line-height:150px; border-radius:15px; background-color:#FFFFFFEE;">
+							<div>
+							$$
+							L_o \simeq
+							\color{green}{ \int_\Omega \rho(\omega_i, \omega_o) \mbox{d}\omega_i }
+							\times
+							\color{blue}{ \int_\Omega D(\omega_h) L_i(\omega_i) \mbox{d}\omega_i }
+							$$
+							</div>
+							<div style="position:relative; top:-120px; font-size:0.5em; font-weight:500;">
+							Separate the integral into <span style="color:green;">directional albedo (FGD)</span> and <span style="color:blue;">light terms (LD)</span>.
+							</div>
+						</div>
+					</center>
+					</div>
+					<aside class="notes">
+						As Brian Karis described in the PBS course of 2013, we can
+						decouple this integral and use an approximation, where the
+						contribution of the light is separated from the
+						contribution of the Fresnel reflectance.
+
+						Both integrals can be precomputed and stored for 
+						efficient shading.
+						<strong>*click*</strong>
+					</aside>
+				</section>
+				<section>
+					<h3>What is the Constraint of Real Time?</h3>
+					<ul>
+						<li>Precomputed integrals (e.g., <em>Split-Sum Integral</em> <a href="https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf">[Karis 2013]</a>)</li>
+					</ul>
+					<div>
+					<center style="position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:-1; transition: filter 1s; filter:blur(10px);">
+						<object style="padding-top:200px;" data="./img/modelisation.svg" type="image/svg+xml"></object>
+					</center>
+					<center style="padding-top:120px;">
+						<div style="width:60%; height:150px; line-height:150px; border-radius:15px; background-color:#FFFFFFEE;">
+							<div>
+							$$
+							\color{green}{ \int_\Omega \rho(\omega_i, \omega_o) \mbox{d}\omega_i }
+							$$
+							</div>
+							<div style="position:relative; top:-120px; font-size:0.5em; font-weight:500;">
+							<span style="color:green;">FGD</span> Depends on <strong>roughness</strong>, <strong>view direction</strong>, <strong>reflectivity</strong>, and <strong>edge tint</strong>.
+							</div>
+						</div>
+					</center>
+					</div>
+					<aside class="notes">
+						The issue still is that the integral of the Fresnel term is
+						four dimensional as it depends on both the roughness, view direction,
+						and Fresnel parameters (either eta, kappa or reflectivity, edge tint).
+						Storing and using such a table is out of the question.
+						<strong>*click*</strong>
+					</aside>
+				</section>
+				<section>
+					<h3>What is the Constraint of Real Time?</h3>
+					<ul>
+						<li>Precomputed integrals (e.g., <em>Split-Sum Integral</em> <a href="https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf">[Karis 2013]</a>)</li>
+					</ul>
+					<div>
+					<center style="position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:-1; transition: filter 1s; filter:blur(10px);">
+						<object style="padding-top:200px;" data="./img/modelisation.svg" type="image/svg+xml"></object>
+					</center>
+					<center style="padding-top:120px;">
+						<div style="width:60%; height:150px; line-height:150px; border-radius:15px; background-color:#FFFFFFEE;">
+							<div style="width:100%; height:150px; position:relative;">
+								<div style="width:50%; position:relative; left:-160px;">
+								<div>
+								$$
+								\color{green}{ \int_\Omega \rho(\omega_i, \omega_o) \mbox{d}\omega_i }
+								= r \times \quad\quad\quad\quad + \,\, (1-r) \times \, $$
+								</div>
+								</div>
+								
+								<img style="position:absolute; top:0px; left:350px" width="100px" height="100px" src="img/realtime/FGD_r.png" />
+								<img style="position:absolute; top:0px; left:650px" width="100px" height="100px" src="img/realtime/FGD_g.png" />
+							</div>
+							
+							<div style="position:relative; top:-90px; font-size:0.5em; font-weight:500;">
+							Schlick Fresnel allows us to reduce the dimensionality.
+							</div>
+						</div>
+					</center>
+					</div>
+					<aside class="notes">
+						So instead we use Schlick Fresnel. It has two advantages:
+						First it reduces the number of parameters to 3. But since it
+						is a linear decomposition based on the reflectivity, we can
+						factor this parameter out of the integral and store 2D textures
+						that are easily fetched on GPUs.
+						<strong>*click*</strong>
+					</aside>
+				</section>
+
+				<section>
+					<h3>Requirements for a Cross-Production Fresnel</h3>
+					<object class="fragment" data-fragment-index="8" style="width:60%;position:absolute; left:250px; z-index:100;" data="img/swiss_knife.svg" type="image/svg+xml"></object>
+					<center style="padding-top:150px;">
+					<table class="fragment" data-fragment-index="1">
+						<tr>
+							<td></td>
+							<td class="fragment" data-fragment-index="5">Schlick</td>
+							<td class="fragment" data-fragment-index="6">Gulbrandsen</td>
+							<td class="fragment" data-fragment-index="7">"New model"</td>
+						</tr>
+						<tr class="fragment" data-fragment-index="1">
+							<td><strong>Accuracy</strong></td>
+							<td class="fragment" data-fragment-index="5" style="text-align:center;"><span style="color:red;">&cross;</span></td>
+							<td class="fragment" data-fragment-index="6" style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+							<td class="fragment" data-fragment-index="7" style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+						</tr>
+						<tr class="fragment" data-fragment-index="2">
+							<td><strong>Real Time</strong></td>
+							<td class="fragment" data-fragment-index="5" style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+							<td class="fragment" data-fragment-index="6" style="text-align:center;"><span style="color:red;">&cross;</span></td>
+							<td class="fragment" data-fragment-index="7" style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+						</tr>
+						<tr class="fragment" data-fragment-index="3">
+							<td><strong>Linear parameters</strong></td>
+							<td class="fragment" data-fragment-index="5" style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+							<td class="fragment" data-fragment-index="6" style="text-align:center;"><span style="color:red;">&cross;</span></td>
+							<td class="fragment" data-fragment-index="7" style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+						</tr>
+						<tr class="fragment" data-fragment-index="4">
+							<td><strong>Optional edge tint</strong></td>
+							<td class="fragment" data-fragment-index="5" style="text-align:center;"><span style="color:red;">&cross;</span></td>
+							<td class="fragment" data-fragment-index="6" style="text-align:center;"><span style="color:green;">?</span></td>
+							<td class="fragment" data-fragment-index="7" style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+						</tr>
+					</table>
+					</center>
+
+					<aside class="notes">
+						Let's summarize: "What are the requirements of a Fresnel
+						model that works across production pipelines?
+						<strong>*click*</strong><br /><br />
+
+						First, we would like this model to be accurate, so as to
+						get a close match between real-time and offline use.
+						<strong>*click*</strong><br /><br />
+
+						Second, we would like this model to be compatible with
+						the real-time constraints of the split-sum integral.
+						<strong>*click*</strong><br /><br />
+
+						Third, we would like its parameter to be as linear as
+						possible to avoid the incorrect blending I showed
+						previously.
+						<strong>*click*</strong><br /><br />
+
+						Last, we might want to have an optional edge tint that
+						is a default configuration, where the material behaves
+						similar to Schlick but following a real Fresnel reflectance.
+						<strong>*click*</strong><br /><br />
+
+						As mentioned, Schlick Fresnel fulfills real-time 
+						constraints and has linearity, but it fails to be accurate
+						and does not enable us to control the grazing angles.
+						<strong>*click*</strong><br /><br />
+
+						Gulbrandsen's parameterization on the other hand uses
+						the exact Fresnel formula, so it is accurate and provides
+						an edge tint parameter to control the grazing angles.
+						However, it fails to meet the linearity and real-time
+						requirements.
+						<strong>*click*</strong><br /><br />
+
+						In this talk, I am going to show to build a model that
+						fullfills those criteria.
+						<strong>*click*</strong><br /><br />
+
+						But what I am going to present to not just a model, but
+						rather a framework to build and rectify any Fresnel model
+						you would like. Sort of the swiss knife for building 
+						Fresnel models that work across industries.
+					</aside>
+				</section>
+
+
+				<!-- Insight -->
+				<section>
+					<h3>Did You Say Precomputed?</h3>
+					<ul>
+						<li class="fragment fade-in-then-semi-out">What does it mean?
+							<ul>
+								<li>Fresnel is mostly used through a LUT</li>
+								<li>So, <strong>why bother having an analytical form?</strong></li>
+							</ul>
+						</li>
+
+						<li class="fragment fade-in-then-semi-out">One constraint though
+							<ul>
+								<li>Fresnel must be a linear decomposition</li>
+								<li>This decomposition is known ahead of rendering</li>
+							</ul>
+						</li>
+
+						<li class="fragment fade-in-then-semi-out">This was the starting point for our research
+						</li>
+					</ul>
+
+					<aside class="notes">
+						Remember that real-time renderers precompute the
+						Fresnel reflectance. The insight behind our new model
+						lies in precomputation. What does that mean?
+						<strong>*click*</strong>
+
+						Because the Fresnel reflectance is tabulated and stored
+						in a texture, why should we care about analytical
+						forms such as the complex Fresnel function or Schlick's
+						approximation.
+						<strong>*click*</strong>
+
+						The only constraint we have to care about is that
+						this table stores a decomposition of Fresnel
+						reflectances that we can weight to reproduce Fresnel
+						curves.
+						<strong>*click*</strong>
+
+						This is the key idea behind this project.
+					</aside>
+				</section>
+
+				<!-- Solution in a nutshell -->
+				<!--
+				<section>
+					<h3>What is our Solution?</h3>
+					<ul>
+						<li>Replace Schlick Fresnel with a solution...
+							<ul>
+								<li><strong>compatible</strong> with real-time constraints</li>
+								<li>that <strong>closely matches</strong> the exact Fresnel</li>
+                        <li>that enables it to <strong>work with complex IOR</strong> reparameterizations
+							</ul>
+						</li>
+					</ul>
+					<center class="fragment" data-fragment-index="0" style="width:100%; position:relative; top:-80px;">
+						<div>
+							<img style="transform:scale(0.8);" width="912px" height="520px" class="plain" src="img/unity.png">
+						</div>
+					</center>
+
+					<aside class="notes">
+						Our solution is to replace Schlick Fresnel with a 
+						solution that compatible with real-time rendering
+						constraints, and yet accurately reproduce complex
+						IOR based Fresnel reflectances.
+						<strong>*click*</strong>
+	
+						As you can see here in this capture of the Unity
+						editor, we can reproduce edge-tint effects that
+						woudl appear on the ground truth Fresnel curve.
+						<strong>*click*</strong>
+					</aside>
+				</section>
+				<section>
+					<h3>What is our Solution?</h3>
+					<ul>
+						<li style="opacity:50%;">Replace Schlick Fresnel with a solution...
+							<ul>
+								<li><strong>compatible</strong> with real-time constraints</li>
+								<li>that <strong>closely matches</strong> the exact Fresnel</li>
+                        <li>that enables it to <strong>work with complex IOR</strong> reparameterizations
+							</ul>
+						</li>
+
+						<li class="fragment" data-fragment-index="1" >But we also
+							<ul>
+    	                    	<li>build a <strong>more linear</strong> parameterization</li>
+							</ul>
+						</li>
+					</ul>
+					<div style="width:100%; position:relative;">
+					<center class="fragment fade-in-then-out" data-fragment-index="1" style="width:100%; position:absolute; top:0px;">
+						<div style="width:80%; display:flex; justify-content:space-evenly;">
+							<img width="192px" src="img/param_linear/param_gulb_0.png" />
+							<img width="192px" src="img/param_linear/param_gulb_25.png" />
+							<img width="192px" style="border:2px black solid;" src="img/param_linear/param_gulb_50.png" />
+							<img width="192px" src="img/param_linear/param_gulb_75.png" />
+							<img width="192px" src="img/param_linear/param_gulb_100.png" />
+						</div>
+						<strong>
+						<small><br />
+							Gulbrandsen's parameterization, blue to red</small>
+						</strong>
+					</center>
+					<center class="fragment fade-in-then-out" data-fragment-index="2" style="width:100%; position:absolute; top:0px;">
+						<div style="width:80%; display:flex; justify-content:space-evenly;">
+							<img width="192px" src="img/param_linear/param_ours_0.png" />
+							<img width="192px" src="img/param_linear/param_ours_25.png" />
+							<img width="192px" style="border:2px black solid;" src="img/param_linear/param_ours_50.png" />
+							<img width="192px" src="img/param_linear/param_ours_75.png" />
+							<img width="192px" src="img/param_linear/param_ours_100.png" />
+						</div>
+						<strong>
+						<small><br />
+							Our parameterization, blue to red</small>
+						</strong>
+					</center>
+					</div>
+
+					<aside class="notes">
+						But we also try to take a shoot at one issue with
+						Gulbrandsen's parameterization that is linearity.
+						When you intepolate the edge-tint parameter the
+						resulting appearance is not a linear interpolation
+						of the renderings. As you can see here, by interpolating
+						from blue to red, the edge-tint that should be purple
+						disappears. <strong>*click*</strong>
+
+						Instead I will show how we can correct for this by
+						and preserve better the linearity of the edge-tint.
+					</aside>
+				</section>
+				-->
+
+				<!-- Technical part I -->
+				<section>
+					<h3>An Empirical Fresnel Decomposition</h3>
+					<ul>
+						<li class="fragment fade-in-then-semi-out" data-fragment-index="0">Extract a Fresnel model <strong>from data</strong>
+							<ul>
+								<li>Linear decomposition of Fresnel reflectance
+									$$
+									F(\theta) \simeq \sum_i w_i b_i(\theta)
+									$$
+								</li>
+								<li>What we need is a basis tailored to Fresnel reflectance</li>
+							</ul>
+						</li>
+
+						<li class="fragment fade-in" data-fragment-index="1"><strong>How many</strong> basis functions do we need?
+							<ul class="fragment" data-fragment-index="2">
+								<li>Eigenvalues for dieletrics &rarr; 3</li>
+							</ul>
+						</li>
+					</ul>
+					
+					<center class="fragment" data-fragment-index="2" style="position:absolute; top:170px; left:700px; width:420px;">
+						<small><strong>Eigenvalues for dieletrics</strong></small>
+                        <div id="plot_eigen_values" style="width:420px;height:400px; position:relative; top:-20px;"></div>
+					</center>
+					
+					<script>
+						var data   = [eigen_values];
+						var layout = {
+							// showlegend: false,
+							legend: {
+								x: 0.1,
+								y: 1.1,
+								"orientation": "h"
+							},
+							xaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 10],
+                                dtick: 1,
+							},
+							yaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 1.0],
+							},
+							margin: {
+								l: 25,
+								r: 10,
+								b: 20,
+								t: 10,
+								pad: 0
+							},
+							font: {
+								family: 'Comfortaa',
+								size: 15,
+								color: '#7f7f7f'
+							},
+							paper_bgcolor: '#00000000',
+						};
+
+						Plotly.newPlot('plot_eigen_values', data, layout, {staticPlot: true});
+					</script>
+
+					<aside class="notes">
+						How do we build this decomposition?
+						<strong>*click*</strong>
+
+						We use data! By extracting a basis from a set
+						of Fresnel reflectances, we can build an approximate
+						model that fulfills the split-sum integral constraints.
+						<strong>*click*</strong>
+
+						One caveat is that we don't know how many elements
+						are required.
+						<strong>*click*</strong>
+
+						Fortunately, by analyzing reflectances, we found that
+						with three basis elements we could very accurately reproduce
+						a wide variety of reflectances. In our prototype, we used
+						four basis elements to match RGBA texture.
+						<strong>*click*</strong>
+					</aside>
+				</section>
+				<section>
+					<h3>An Empirical Fresnel Decomposition</h3>
+					<ul>
+						<li style="opacity:0.5;">Extract a Fresnel model <strong>from data</strong>
+							<ul>
+								<li>Linear decomposition of Fresnel reflectance
+									$$
+									F(\theta) = \sum_i w_i b_i(\theta)
+									$$
+								</li>
+								<li>What we need is a basis tailored to Fresnel reflectance</li>
+							</ul>
+						</li>
+
+						<li style="opacity:0.5;"><strong>How many</strong> basis functions do we need?
+							<ul>
+								<li>Eigenvalues for dieletrics &rarr; 3</li>
+							</ul>
+						</li>
+
+						<li>Use the <strong>SVD</strong> to <strong>extract</strong> a basis
+							<ul>
+								<li>But we enforce some constraints</li>
+								<li>And use a <a href="">tailored fitting procedure</a></li>
+							</ul>
+						</li>
+					</ul>
+					
+                    <center class="fragment" style="position:absolute; top:150px; left:700px; width:350px;">
+                        <div id="plot_basis_elements" style="width:400px;height:400px;"></div>
+					</center>
+					
+					<div class="fragment" id="plot_basis_elements_01"></div>
+					<div class="fragment" id="plot_basis_elements_02"></div>
+					<script>
+						var data   = [eval_basis(0), eval_basis(1), eval_basis(2), eval_basis(3)];
+						var layout = {
+							// showlegend: false,
+							legend: {
+								x: 0.1,
+								y: 1.1,
+								"orientation": "h"
+							},
+							xaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 0.5*Math.PI],
+                                dtick: 0.2,
+							},
+							yaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [-1.0, 1.0],
+							},
+							margin: {
+								l: 25,
+								r: 5,
+								b: 20,
+								t: 10,
+								pad: 0
+							},
+							font: {
+								family: 'Comfortaa',
+								size: 15,
+								color: '#7f7f7f'
+							},
+							paper_bgcolor: '#00000000',
+						};
+
+
+						var div    = document.getElementById('plot_basis_elements')
+						div.data   = data;
+						div.layout = layout
+						Plotly.newPlot(div, data, layout, {staticPlot: true});
+
+						Reveal.on( 'fragmentshown', event => {
+							var config = {
+								staticPlot: true,
+								transition: {duration: 500},
+                                // frame: { duration: 0, redraw: false },
+							};
+							
+							var div = document.getElementById('plot_basis_elements')
+
+							if(event.fragment.id == 'plot_basis_elements_01') {
+								div.data[2]['opacity'] = 0.0;
+								div.data[3]['opacity'] = 0.0;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+							else if(event.fragment.id == 'plot_basis_elements_02') {
+								div.data[0]['opacity'] = 0.0;
+								div.data[1]['opacity'] = 0.0;
+								div.data[2]['opacity'] = 1.0;
+								div.data[3]['opacity'] = 1.0;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+						} );
+						Reveal.on( 'fragmenthidden', event => {
+							var config = {
+								staticPlot: true,
+							};
+							var div = document.getElementById('plot_basis_elements')
+
+							if(event.fragment.id == 'plot_basis_elements_01') {
+								div.data[0]['opacity'] = 1.0;
+								div.data[1]['opacity'] = 1.0;
+								div.data[2]['opacity'] = 1.0;
+								div.data[3]['opacity'] = 1.0;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+							else if(event.fragment.id == 'plot_basis_elements_02') {
+								div.data[0]['opacity'] = 1.0;
+								div.data[1]['opacity'] = 1.0;
+								div.data[2]['opacity'] = 0.0;
+								div.data[3]['opacity'] = 0.0;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+                        } );
+					</script>
+					<aside class="notes">
+						To extract the basis functions, we use the SVD in two
+						steps with some constraints. that I won't detail. But you can
+						find a Jupyter notebook in our supplemental materials
+						that goes through the whole process.
+						
+						Here we can fit the Fresnel decomposition to the Fresnel
+						data that we want to reproduce and produce a tailored
+						model.
+						<strong>*click*</strong><br /><br />
+
+						Here are the four basis elements we extracted from a
+						set of g=0 and g=1 data points.
+						<strong>*click*</strong><br /><br />
+
+
+						As you can see, the first two basis elements will
+						control the brightness of the curve (like Schlick's
+						Fresnel). <strong>*click*</strong> While the two last elements
+						only affect grazing angles and will enable us to
+						reconstruct edge tint.
+						<strong>*click*</strong>
+					</aside>
+				</section>
+				<section>
+					<h3>Fitting A Fresnel Reflectance</h3>				
+					<center style="width:1280px; position:relative; top:200px;">
+					<div class="fragment fade-in-then-out" data-fragment-index="1" style="position:absolute; top:35px; left:250px;">
+						$$
+						= c_0
+						$$
+					</div>
+					<div class="fragment fade-in-then-out" data-fragment-index="1" style="position:absolute; top:35px; left:500px;">
+						$$
+						+ \, c_1
+						$$
+					</div>
+					<div class="fragment fade-in-then-out" data-fragment-index="1" style="position:absolute; top:35px; left:740px;">
+						$$
+						+\, c_2
+						$$
+					</div>
+					<div class="fragment fade-in-then-out" data-fragment-index="1" style="position:absolute; top:35px; left:980px;">
+						$$
+						+ \, c_3
+						$$
+					</div>
+					<div class="fragment fade-in-then-out" data-fragment-index="2" style="position:absolute; top:35px; left:250px;">
+						$$
+						= r
+						$$
+					</div>
+					<div class="fragment fade-in-then-out" data-fragment-index="2" style="position:absolute; top:35px; left:480px;">
+						$$
+						+ \,  {\scriptstyle (1-r)} 
+						$$
+					</div>
+					<div class="fragment fade-in-then-out" data-fragment-index="2" style="position:absolute; top:35px; left:740px;">
+						$$
+						+\, c_2
+						$$
+					</div>
+					<div class="fragment fade-in-then-out" data-fragment-index="2" style="position:absolute; top:35px; left:980px;">
+						$$
+						+ \, c_3
+						$$
+					</div>
+                    <div style="display:flex; justify-content:space-evenly;">
+						<div id="plot_decomposition_total" style="width:160px; height:160px;"></div>
+						<div id="plot_decomposition_b0"    style="width:160px; height:160px;" class="fragment" data-fragment-index="1"></div>
+						<div id="plot_decomposition_b1"    style="width:160px; height:160px;" class="fragment" data-fragment-index="1"></div>
+						<div id="plot_decomposition_b2"    style="width:160px; height:160px;" class="fragment" data-fragment-index="1"></div>
+						<div id="plot_decomposition_b3"    style="width:160px; height:160px;" class="fragment" data-fragment-index="1"></div>
+					</div>
+					</center>
+					
+					<script>
+						
+						var layout_B = {
+							// showlegend: false,
+							legend: {
+								x: 0.1,
+								y: 1.1,
+								"orientation": "h"
+							},
+							xaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 0.5*Math.PI],
+                                dtick: 0.5*Math.PI,
+								showticklabels: true,
+							},
+							yaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [-1.0, 1.0],
+								showticklabels: true,
+								dtick: 1.0,
+							},
+							margin: {
+								l: 25,
+								r: 5,
+								b: 20,
+								t: 10,
+								pad: 0
+							},
+							font: {
+								family: 'Comfortaa',
+								size: 15,
+								color: '#7f7f7f'
+							},
+							paper_bgcolor: '#00000000',
+						};
+						var layout_F = {
+							// showlegend: false,
+							legend: {
+								x: 0.1,
+								y: 1.1,
+								"orientation": "h"
+							},
+							xaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 0.5*Math.PI],
+                                dtick: 0.5*Math.PI,
+								showticklabels: true,
+							},
+							yaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 1.0],
+								dtick: 1.0,
+								showticklabels: true,
+							},
+							margin: {
+								l: 25,
+								r: 5,
+								b: 20,
+								t: 10,
+								pad: 0
+							},
+							font: {
+								family: 'Comfortaa',
+								size: 15,
+								color: '#7f7f7f'
+							},
+							paper_bgcolor: '#00000000',
+						};
+
+						var data   = [eval_fresnel(1.7, 0.0)];
+						data[0].line = {color: "black"};
+						var div = document.getElementById('plot_decomposition_total')
+						Plotly.newPlot(div, data, layout_F, {staticPlot: true});
+						
+						var data   = [eval_basis(0)];
+						data[0].line.color = "blue"
+						var div = document.getElementById('plot_decomposition_b0')
+						Plotly.newPlot(div, data, layout_B, {staticPlot: true});
+
+						var data   = [eval_basis(1)];
+						data[0].line.color = "orange"
+						var div = document.getElementById('plot_decomposition_b1')
+						Plotly.newPlot(div, data, layout_B, {staticPlot: true});
+
+						var data   = [eval_basis(2)];
+						data[0].line.color = "green"
+						var div = document.getElementById('plot_decomposition_b2')
+						Plotly.newPlot(div, data, layout_B, {staticPlot: true});
+
+						var data   = [eval_basis(3)];
+						data[0].line.color = "red"
+						var div = document.getElementById('plot_decomposition_b3')
+						Plotly.newPlot(div, data, layout_B, {staticPlot: true});
+					</script>
+					<aside class="notes">
+						Even though I'm skipping some details, I would still like
+						to give you an intuition about some of the
+						parameters. Say I want to represent this curve.
+						<strong>*click*</strong><br /><br />
+
+						What I need to find is four coefficients c0, c1, c2, c3 that
+						will be used to blend the different basis functions.
+						But because we constrained the first basis function to be
+						the constant and the second to start at zero and end at one...
+						<strong>*click*</strong><br /><br />
+
+						Then, c0 and c1 are, respectively, the reflectivity and one
+						minus the reflectivity.
+					</aside>
+				</section>
+				<section>
+					<h3>Results: Curves</h3>
+					<center>
+						<div id="plot_fitting_procedure" style="width:800px;height:400px; padding-top:30px;"></div> <br />
+						<span style="font-size:0.8em;">$\eta $  <input id="plot_fitting_procedure_n" type="range" min="1.05" max="3.0" step="0.01" /></span>
+						<span style="font-size:0.8em;">$\kappa $<input id="plot_fitting_procedure_k" type="range" min="0.00" max="5.0" step="0.01" /></span>
+					</center>
+					
+					<script>
+						document.getElementById('plot_fitting_procedure_n').value = 1.5;
+						document.getElementById('plot_fitting_procedure_k').value = 5.0;
+						var eta    = 1.5;
+						var kappa  = 5.0;
+
+						var r0     = fresnel(1.0, eta, kappa);
+						var data   = [eval_fresnel(eta, kappa), eval_decomposition_nk(eta, kappa), eval_schlick(r0)];
+						data[1]['line'] = { dash: 'dot', width: 4 };
+						data[2]['visible'] = 'legendonly'
+						var layout = {
+							// showlegend: false,
+							legend: {
+								x: 0.1,
+								y: 1.1,
+								"orientation": "h"
+							},
+							xaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 0.5*Math.PI],
+                                dtick: 0.2,
+							},
+							yaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 1.0],
+							},
+							margin: {
+								l: 25,
+								r: 5,
+								b: 20,
+								t: 10,
+								pad: 0
+							},
+							font: {
+								family: 'Comfortaa',
+								size: 15,
+								color: '#7f7f7f'
+							},
+							paper_bgcolor: '#00000000',
+						};
+
+
+						var div = document.getElementById('plot_fitting_procedure')
+						Plotly.newPlot(div, data, layout, {staticPlot: true});
+
+						function update_fitting_procedure(eta, kappa) {
+							var eta    = document.getElementById('plot_fitting_procedure_n').value;
+							var kappa  = document.getElementById('plot_fitting_procedure_k').value;
+							var r0     = fresnel(1.0, eta, kappa);
+							var data   = [eval_fresnel(eta, kappa), eval_decomposition_nk(eta, kappa), eval_schlick(r0)];
+							data[1]['line'] = { dash: 'dot', width: 4 };
+							var config = {
+								transition: {duration: 0},
+                                frame: { duration: 0, redraw: false },
+                                staticPlot: true
+							};
+							Plotly.animate('plot_fitting_procedure', { data:data, layout:{} }, config);
+						}
+						document.getElementById('plot_fitting_procedure_n').addEventListener('input', () => {
+							update_fitting_procedure();
+						});
+						document.getElementById('plot_fitting_procedure_k').addEventListener('input', () => {
+							update_fitting_procedure();
+						});
+					</script>
+					<aside class="notes">
+						Here is a comparison between the ground-truth Fresnel
+						and our decomposition for different $\eta, \kappa$.
+
+						(show Schlick)
+						<strong>*click*</strong>
+					</aside>
+				</section>
+				<section>
+					<h3>Results: Comparison with Schlick Fresnel</h3>
+					<ul>
+						<li>Rhodium (Rh)
+							<!-- <ul>
+								<li>$\eta = 2.59, \kappa = 6.79$</li>
+							</ul> -->
+						</li>
+					</ul>
+
+					<div style="display:flex; width:100%; justify-content:center">
+						<div id="compare-fresnel-01" class="juxtapose" style="width:400px; border:1px solid black;">
+							<img data-label="Ours"      src="./img/mitsuba/shaderball/Rh_smooth_fisher/envmap_ours.png" />
+							<img data-label="Reference" src="./img/mitsuba/shaderball/Rh_smooth_fisher/envmap_ref.png" />
+						</div>
+						<div style="width:30px;"></div>
+						<div class="juxtapose" style="width:400px; border:1px solid black;">
+							<img data-label="Schlick"   src="./img/mitsuba/shaderball/Rh_smooth_fisher/envmap_schlick.png" />
+							<img data-label="Reference" src="./img/mitsuba/shaderball/Rh_smooth_fisher/envmap_ref.png" />
+						</div>
+					</div>
+
+					<aside class="notes">
+						Here are some rendering comparisons using measured IORs.
+						First we have Rhodium. Please concentrate on the edge of the object,
+						since the grazing angle belly will only appear here.
+
+						(show comparison between Schlick and ours).
+						<strong>*click*</strong>
+					</aside>
+				</section>
+				<section>
+					<h3>Results: Comparison with Schlick Fresnel</h3>
+					<ul>
+						<li>Tungsten (W)
+						</li>
+					</ul>
+
+					<div style="display:flex; width:100%; justify-content:center">
+						<div id="compare-fresnel-01" class="juxtapose" style="width:400px; border:1px solid black;">
+							<img data-label="Ours"      src="./img/mitsuba/shaderball/W_rough_fisher/envmap_ours.png" />
+							<img data-label="Reference" src="./img/mitsuba/shaderball/W_rough_fisher/envmap_ref.png" />
+						</div>
+						<div style="width:30px;"></div>
+						<div class="juxtapose" style="width:400px; border:1px solid black;">
+							<img data-label="Schlick"   src="./img/mitsuba/shaderball/W_rough_fisher/envmap_schlick.png" />
+							<img data-label="Reference" src="./img/mitsuba/shaderball/W_rough_fisher/envmap_ref.png" />
+						</div>
+					</div>
+				</section>
+				<section>
+					<h3>Results: Comparison with Schlick Fresnel</h3>
+					<ul>
+						<li>Chromium (Cr)
+						</li>
+					</ul>
+
+					<div style="display:flex; width:100%; justify-content:center">
+						<div id="compare-fresnel-01" class="juxtapose" style="width:400px; border:1px solid black;">
+							<img data-label="Ours"      src="./img/mitsuba/shaderball/Cr_medium_pinetree/envmap_ours.png" />
+							<img data-label="Reference" src="./img/mitsuba/shaderball/Cr_medium_pinetree/envmap_ref.png" />
+						</div>
+						<div style="width:30px;"></div>
+						<div class="juxtapose" style="width:400px; border:1px solid black;">
+							<img data-label="Schlick"   src="./img/mitsuba/shaderball/Cr_medium_pinetree/envmap_schlick.png" />
+							<img data-label="Reference" src="./img/mitsuba/shaderball/Cr_medium_pinetree/envmap_ref.png" />
+						</div>
+					</div>
+				</section>
+				<section>
+					<h3>Where Are We So Far?</h3>
+					
+					<center style="padding-top:150px; position:relative; left:-100px;">
+					<table>
+					<tr>
+						<td></td>
+						<td><em>"New model"</em></td>
+					</tr>
+					<tr>
+						<td><strong>Accuracy</strong></td>
+						<td style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+					</tr>
+					<tr>
+						<td><strong>Real Time</strong></td>
+						<td style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+					</tr>
+					<tr>
+						<td><strong>Linear parameters</strong></td>
+						<td style="text-align:center;"><span>?</span></td>
+					</tr>
+					<tr>
+						<td><strong>Optional edge tint</strong></td>
+						<td style="text-align:center;"><span>?</span></td>
+					</tr>
+					</table>	
+					</center>
+
+					<aside class="notes">
+						Okay, so far we have a real-time compatible and accurate
+						model for Fresnel. Still, two things are missing though:
+						we do not have a complete linear parameterization, and
+						we still need to find a default (no edge tint) behavior.
+					</aside>
+				</section>
+				<section>
+					<h3>where Are We So Far?</h3>
+					
+					<center style="padding-top:150px; position:relative; left:-100px;">
+					<table>
+					<tr>
+						<td></td>
+						<td><em>"New model"</em></td>
+					</tr>
+					<tr style="opacity:0.2;">
+						<td><strong>Accuracy</strong></td>
+						<td style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+					</tr>
+					<tr style="opacity:0.2;">
+						<td><strong>Real Time</strong></td>
+						<td style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+					</tr>
+					<tr>
+						<td><strong>Linear parameters</strong></td>
+						<td style="text-align:center;"><span>?</span></td>
+					</tr>
+					<tr style="opacity:0.2;">
+						<td><strong>Optional edge tint</strong></td>
+						<td style="text-align:center;"><span>?</span></td>
+					</tr>
+					</table>	
+					</center>
+
+					<aside class="notes">
+						Let's focus on the linear parameterization first.
+					</aside>
+				</section>
+
+				<section data-auto-animate>
+					<h3>Building a Parameterization</h3>
+					<ul>
+						<li class="fragment fade-in-then-semi-out" data-fragment-index="1">We could build a color parameterization
+							<ul>
+								<li>Use the zero crossing of $b_3(\theta)$</li>
+								<li>There the reflectance is determined by $c_2$ only</li>
+							</ul>
+						</li>
+
+						<li class="fragment" data-fragment-index="2">Has its drawbacks
+							<ul>
+								<li>Can break energy conservation (need clamping)</li>
+								<li>Can introduce unwanted colours</li>
+							</ul>
+						</li>
+					</ul>
+
+                    <center class="fragment fade-in-then-out" data-fragment-index="1" style="position:absolute; left:0px; top:290px; width:100%;">
+                        <div id="plot_basis_zeros" style="width:400px;height:400px;"></div>
+					</center>
+					<center class="fragment fade-in-then-out" data-fragment-index="2" style="position:absolute; left:0px; top:400px; width:100%;">
+                        <object style="width:60%;" class="plain" data="img/issue_f78.svg" type="image/svg+xml"></object>
+					</center>
+					
+					<script>
+						var data   = [eval_basis(3)];
+						var layout = {
+							showlegend: true,
+							legend: {
+								x: 0.1,
+								y: 1.1,
+								"orientation": "h"
+							},
+							xaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 0.5*Math.PI],
+                                dtick: 0.2,
+							},
+							yaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [-1.0, 1.0],
+							},
+							margin: {
+								l: 25,
+								r: 5,
+								b: 20,
+								t: 10,
+								pad: 0
+							},
+							font: {
+								family: 'Comfortaa',
+								size: 15,
+								color: '#7f7f7f'
+							},
+							paper_bgcolor: '#00000000',
+							annotations: [
+								{
+									visible: true,
+									x: 1.36,
+									y: 0.0,
+									xref: 'x',
+									yref: 'y',
+									text: '~78&deg;',
+									showarrow: true,
+									arrowhead: 7,
+									ax: 0,
+									ay: 100
+								},
+							]
+						};
+
+
+						var div = document.getElementById('plot_basis_zeros')
+						Plotly.newPlot(div, data, layout, {staticPlot: true});
+						// div.data.show = false;
+					</script>
+					<aside class="notes">
+						Let's focus on the linear parameterization first.<strong>*click*</strong><br /><br />
+
+						We could build a parametrization based on a colour similar to the
+						extented Lazanyi. And for that we only need to look for the zero
+						crossing of the last basis element which is at roughly 78 degrees.<br /><br />
+
+						At this specific point, for a given reflectivity, the Fresnel
+						reflectance is solely determined by the c_2 parameter. Which
+						makes F(78) a valid parametrization.<strong>*click*</strong><br /><br />
+
+						Now I wont go into the details of this parameterization, because
+						Naty already talked about this idea in the previous part of the course.
+						Since it is equivalent to the extended Lazanyi parametrization it
+						will share its drawbacks: it requires care to avoid breaking energy
+						conservation. It can also introduce unwanted colours such as the
+						bluish tint at the grazing angle here when a gray grazing colour is
+						specified.
+					</aside>
+				</section>
+
+				<section data-auto-animate>
+					<h3>Building a Parameterization</h3>
+					<ul>
+						<li class="fragment" data-fragment-index="1">Take advantage of $(c_0, c_2)$ space
+							<ul>
+								<li>Our model is linear with respect to $c_i$</li>
+								<li>Any non-linearity will show in this space</li>
+							</ul>
+						</li>
+						<li class="fragment" data-fragment-index="2" id="display_coeff_space">Display the Gulbrandsen parameterization
+							<ul>
+								<li>Regular grid of $(r,g)$ shows the non-linearity</li>
+								<li>Any Fresnel reflectance is constrained to this space</li>
+							</ul>
+						</li>
+						<li class="fragment" data-fragment-index="3">Find $c_2(r, \beta)$, then $c_3(r, c_2)$
+
+						</li>
+					</ul>
+
+					<div class="fragment" data-fragment-index="1" data-id="anim_rg_to_coeffs" style="position:absolute; top:190px; left:650px;">
+						<div id="plot_rg_to_coeffs" style="width:450px;height:450px; position:relative; top:-20px;"></div>
+						<span style="position:absolute; top:435px; left:225px; font-size:0.7em; opacity:0.7;">$c_0 = r$</span>
+						<span style="position:absolute; top:190px; left:-30px; font-size:0.7em; opacity:0.7;">$c_2$</span>
+					</div>
+					<script>
+						var data   = gulbrandsen_coeffs();
+
+						var layout = {
+							showlegend: false,
+							legend: {
+								x: 0.1,
+								y: 1.1,
+								"orientation": "h"
+							},
+							xaxis: {
+								// title: 'η',
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 1.0],
+                                // dtick: 0.2,
+							},
+							yaxis: {
+								// title: 'κ',
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [-0.3, 0.3],
+							},
+							margin: {
+								l: 35,
+								r: 5,
+								b: 20,
+								t: 10,
+								pad: 0
+							},
+							font: {
+								family: 'Comfortaa',
+								size: 15,
+								color: '#7f7f7f'
+							},
+							paper_bgcolor: '#00000000',
+						};
+
+						data[0]['visible'] = false;
+						data[1]['visible'] = false;
+						data[2]['visible'] = false;
+
+						var div = document.getElementById('plot_rg_to_coeffs')
+						div.data = data;
+						div.layout = layout;
+						Plotly.newPlot(div, data, layout, {staticPlot: true});
+
+						Reveal.on( 'fragmentshown', event => {
+							var config = {
+								staticPlot: true,
+							};
+							var div  = document.getElementById('plot_rg_to_coeffs')
+
+							if(event.fragment.id == 'display_coeff_space') {
+								div.data[0]['visible'] = true;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+						} );
+						Reveal.on( 'fragmenthidden', event => {
+							var config = {
+								staticPlot: true,
+							};
+							
+							var div  = document.getElementById('plot_rg_to_coeffs')
+
+							if(event.fragment.id == 'display_coeff_space') {
+								div.data[0]['visible'] = false;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+                        } );
+					</script>
+					<aside class="notes">
+						So instead I will show you how we can rectify the
+						non-linearity in Gulbrandsen's parameterization.
+						<strong>*click*</strong><br /><br />
+
+						And for that, we are going to use the space of
+						coefficient as a way to ensure this linearity.
+						Remember that coefficient behave linearly. So
+						any non linearity of the parameters, will show
+						in the space of coefficients. Here on the right
+						is the coefficient space with c_0 the x-axis and
+						c_2 the y-axis.
+						<strong>*click*</strong><br /><br />
+
+						What I can do in this space is to display Gulbrandsen's
+						parameterization. To do so, I transform a regular grid
+						over (r,g) in coefficient space. Each point
+						corresponds to the first and third coefficient when
+						fitting an (r, g) pair. We can see that dots are not
+						space regularly along the y-axis, meaning there is
+						a non linearity.
+						
+						We can also see that all of Fresnel reflectances mapped
+						by the parameterization are enclosed in a wave shape.
+						<strong>*click*</strong><br /><br />
+
+						And this particular point will allow us to develop
+						our new parameterization. We are going to linearize
+						with respect to the c2 coefficient and retreive the
+						remainging coeffcient afterwards.
+						<strong>*click*</strong>
+					</aside>
+				</section>
+				<section data-auto-animate>
+					<h3>Building a Parameterization</h3>
+					
+					<div data-id="anim_rg_to_coeffs" style="position:absolute; top:190px; left:400px;">
+						<div id="plot_rb_to_coeffs2" style="width:450px;height:450px; position:relative; top:-20px;"></div>
+						<span style="position:absolute; top:435px; left:225px; font-size:0.7em; opacity:0.7;">$c_0 = r$</span>
+						<span style="position:absolute; top:190px; left:-30px; font-size:0.7em; opacity:0.7;">$c_2$</span>
+					</div>
+					<div class="fragment" id="animate_remapping_01"></div>
+					<div class="fragment" id="animate_remapping_02"></div>
+					<div class="fragment" id="animate_remapping_03"></div>
+					<div class="fragment" id="animate_remapping_04"></div>
+					<script>
+						
+
+						var layout = {
+							showlegend: false,
+							legend: {
+								x: 0.1,
+								y: 1.1,
+								"orientation": "h"
+							},
+							xaxis: {
+								// title: 'η',
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 1.0],
+                                // dtick: 0.2,
+							},
+							yaxis: {
+								// title: 'κ',
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [-0.3, 0.3],
+							},
+							margin: {
+								l: 35,
+								r: 5,
+								b: 20,
+								t: 10,
+								pad: 0
+							},
+							font: {
+								family: 'Comfortaa',
+								size: 15,
+								color: '#7f7f7f'
+							},
+							paper_bgcolor: '#00000000',
+							annotations: [
+								{
+									visible: false,
+									x: 0.8,
+									y: mapping_curves[Math.floor(0.8*256)][1],
+									xref: 'x',
+									yref: 'y',
+									text: 'g = 1',
+									showarrow: true,
+									arrowhead: 7,
+									ax: 0,
+									ay: -50
+								},
+								{
+									visible: false,
+									x: 0.2,
+									y: mapping_curves[Math.floor(0.2*256)][0],
+									xref: 'x',
+									yref: 'y',
+									text: 'g = 0',
+									showarrow: true,
+									arrowhead: 7,
+									ax: 0,
+									ay: 80,
+									font: { color: 'red' },
+									arrowcolor: 'red'
+								},
+								{
+									visible: false,
+									x: 0.5,
+									y: mapping_curves[Math.floor(0.5*256)][0],
+									xref: 'x',
+									yref: 'y',
+									text: 'r = 0.5',
+									showarrow: true,
+									arrowhead: 7,
+									ax: 0,
+									ay: 40,
+									font: { color: 'gray' },
+									arrowcolor: 'rgba(0.0, 0.0, 0.0, 0.0)'
+								},
+								{
+									visible: false,
+									x: 0.5,
+									y: 0.5*mapping_curves[Math.floor(0.5*256)][0]+0.5*mapping_curves[Math.floor(0.5*256)][1],
+									xref: 'x',
+									yref: 'y',
+									text: 'lerp(b = 0.5)',
+									showarrow: true,
+									arrowhead: 7,
+									ax: 60,
+									ay: 0,
+									font: { color: 'gray' },
+									arrowcolor: 'rgba(0.0, 0.0, 0.0, 0.0)'
+								}
+							]
+						};
+
+						var prev  = document.getElementById('plot_rg_to_coeffs')
+
+						var data = new_param_coeffs();
+						var div  = document.getElementById('plot_rb_to_coeffs2')
+						data[0]['visible'] = false;
+						data[1]['visible'] = false;
+						data[2]['visible'] = false;
+
+						var pts = mapping_curves[128];
+						var plt = { x: [0.5, 0.5, 0.5], y: [pts[0], pts[1], pts[0]], marker: { color: 'black' }, visible:false };
+					
+						data = data.concat([plt, prev.data[0]])
+						data[3]['visible'] = false;
+						data[4]['visible'] = true;
+
+						Plotly.newPlot(div, data, layout, {staticPlot: true});
+
+						div.data = data;
+						div.layout = layout;
+						
+						Reveal.on( 'fragmentshown', event => {
+							var config = {
+								staticPlot: true,
+							};
+							var div  = document.getElementById('plot_rb_to_coeffs2')
+
+							if(event.fragment.id == 'animate_remapping_01') {
+								div.data[0]['visible'] = false;
+								div.data[1]['visible'] = true;
+								div.data[2]['visible'] = true;
+								div.layout['annotations'][0]['visible'] = true;
+								div.layout['annotations'][1]['visible'] = true;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+							else if(event.fragment.id == 'animate_remapping_02') {
+								div.data[3]['visible'] = true;
+								div.data[4]['visible'] = false;
+								div.layout['annotations'][0]['visible'] = false;
+								div.layout['annotations'][1]['visible'] = false;
+								div.layout['annotations'][2]['visible'] = true;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+							else if(event.fragment.id == 'animate_remapping_03') {
+								div.data[3]['y'][2] = 0.5*div.data[3]['y'][0] + 0.5*div.data[3]['y'][1];
+								div.layout['annotations'][3]['visible'] = true;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+							else if(event.fragment.id == 'animate_remapping_04') {
+								div.data[0]['visible'] = true;
+								div.data[3]['visible'] = false;
+								div.layout['annotations'][3]['visible'] = false;
+								div.layout['annotations'][2]['visible'] = false;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+						} );
+						Reveal.on( 'fragmenthidden', event => {
+							var config = {
+								staticPlot: true,
+							};
+							var div  = document.getElementById('plot_rb_to_coeffs2')
+
+							if(event.fragment.id == 'animate_remapping_01') {
+								div.data[1]['visible'] = false;
+								div.data[2]['visible'] = false;
+								div.layout['annotations'][0]['visible'] = false;
+								div.layout['annotations'][1]['visible'] = false;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+							else if(event.fragment.id == 'animate_remapping_02') {
+								div.data[3]['visible'] = false;
+								div.data[4]['visible'] = true;
+								div.layout['annotations'][0]['visible'] = true;
+								div.layout['annotations'][1]['visible'] = true;
+								div.layout['annotations'][2]['visible'] = false;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+							else if(event.fragment.id == 'animate_remapping_03') {
+								div.data[3]['y'][2] = div.data[3]['y'][0];
+								div.layout['annotations'][3]['visible'] = false;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+							else if(event.fragment.id == 'animate_remapping_04') {
+								div.data[0]['visible'] = false;
+								div.data[3]['visible'] = true;
+								div.layout['annotations'][2]['visible'] = true;
+								div.layout['annotations'][3]['visible'] = true;
+								Plotly.animate(div, { data:div.data, layout:div.layout }, config);
+							}
+                        } );
+					</script>
+					<aside class="notes">
+						Let's have a look at how we can build this.
+						<strong>*click*</strong>
+
+						First, we noticed that this wave space is enclosed by
+						two curves corresponding to g=0 and g=1.
+						<strong>*click*</strong>
+
+						This means that, for any $r$ (here 0.5), all of the Fresnel
+						curves with a 0.5 reflectivity are in the line between
+						these two points (show with cursor).
+						<strong>*click*</strong>
+
+						So, we parameterize the edge tint by interpolating between
+						the point on g=0 and the point on g=1, using a parameter
+						beta (here 0.5).
+						<strong>*click*</strong>
+
+						By constructing the grid with this parameter, we 
+						obtain our new parameterization.
+						<strong>*click*</strong>
+					</aside>
+				</section>
+
+				<!-- Technical part II -->
+				<section>
+					<h3>Offline Renders</h3>
+					<center>
+						<div style="width:80%; display:flex; justify-content:space-evenly;">
+							<img width="192px" src="img/param_linear/param_gulb_0.png" />
+							<img width="192px" src="img/param_linear/param_gulb_25.png" />
+							<img width="192px" style="border:2px black solid;" src="img/param_linear/param_gulb_50.png" />
+							<img width="192px" src="img/param_linear/param_gulb_75.png" />
+							<img width="192px" src="img/param_linear/param_gulb_100.png" />
+						</div>
+						<strong>
+						<small><br />
+							Gulbrandsen's parameterization, blue to red</small>
+						</strong>
+					</center>
+					<center>
+						<div style="width:80%; display:flex; justify-content:space-evenly;">
+							<img width="192px" src="img/param_linear/param_ours_0.png" />
+							<img width="192px" src="img/param_linear/param_ours_25.png" />
+							<img width="192px" style="border:2px black solid;" src="img/param_linear/param_ours_50.png" />
+							<img width="192px" src="img/param_linear/param_ours_75.png" />
+							<img width="192px" src="img/param_linear/param_ours_100.png" />
+						</div>
+						<strong>
+						<small><br />
+							Our parameterization, blue to red</small>
+						</strong>
+					</center>
+					<aside class="notes">
+						As you can see from these renders, the new beta
+						parameter is much more linear. But what is particularly interesting
+						is that it spans the same space of Fresnel reflectances as the
+						old g parameter.
+						<strong>*click*</strong>
+					</aside>
+				</section>
+				<section>
+					<h3>Performance</h3>
+					<ul>
+						<li>OpenGL demo
+							<ul>
+								<li>Running on an Nvidia RTX 2070 at 720p</li>
+								<li>0.02&nbsp;ms overhead compared to Karis' split-sum integral</li>
+							</ul>
+						</li>
+					</ul>
+					<aside class="notes">
+						To measure performance, we also built a small OpenGL
+						demo that implements the split-sum integral of Karis for
+						Image Based Lighting.
+
+						We found a maximum overhead of roughly 0.02ms there
+						for a 720p resolution.
+						<strong>*click*</strong>
+					</aside>
+				</section>
+				<section>
+					<video height="720px" width="1280px" data-autoplay loop style="position:absolute;top:0px;left:0px;">
+						<source data-src="./videos/demo_recording_perfs.mp4" />
+					</video>
+					<aside class="notes">
+						Here is our benchmark.
+						<strong>*click*</strong>
+					</aside>
+				</section>
+				<section>
+					<h3>Unity Demo</h3>
+					<ul>
+						<li>Editing session
+							<ul>
+								<li>Implementation by <a href="https://twitter.com/thomasdeliot">Thomas Deliot</a></li>
+								<li>Custom Forward shader in Unity HDRP</li>
+								<li>Running on an Nvidia RTX 2070</li>
+							</ul>
+						</li>
+					</ul>
+					<video style="position:absolute; top:0px; left: 330px; margin: 0; border: none; box-shadow: none; height:720px; max-width: 100%; max-height: 100%; z-index: -500;" height="720px" width="100%" data-autoplay loop src="./videos/travelling_edge_tint.mp4"></video>
+					<div style="position:absolute; top:0; left: 0px; margin: 0; max-width: 100%; max-height: 100%; z-index: -5; width: 720px; height:720px; background-color: #ddd; box-shadow: 2px 2px 5px black; "></div>
+					<aside class="notes">
+						Thomas Deliot, our research engineer, implemented this solution
+						in the Unity engine. Here is a demo showing the editing of the
+						edge tint for the robot asset on the right.
+						<strong>*click*</strong>
+					</aside>
+				</section>
+				<section>
+					<video height="720px" width="1280px" data-autoplay loop style="position:absolute;top:0px;left:0px;">
+						<source data-src="./videos/editing_clip.mp4" />
+					</video>
+					<aside class="notes">
+						<strong>*click*</strong>
+					</aside>
+				</section>
+
+				<!-- Optional edge tint -->
+				<section>
+					<h3>where Are We So Far?</h3>
+					
+					<center style="padding-top:150px; position:relative; left:-100px;">
+					<table>
+					<tr>
+						<td></td>
+						<td><em>"New model"</em></td>
+					</tr>
+					<tr style="opacity:0.2;">
+						<td><strong>Accuracy</strong></td>
+						<td style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+					</tr>
+					<tr style="opacity:0.2;">
+						<td><strong>Real Time</strong></td>
+						<td style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+					</tr>
+					<tr style="opacity:0.2;">
+						<td><strong>Linear parameters</strong></td>
+						<td style="text-align:center;"><span style="color:green;">&#10003;</span></td>
+					</tr>
+					<tr>
+						<td><strong>Optional edge tint</strong></td>
+						<td style="text-align:center;"><span>?</span></td>
+					</tr>
+					</table>	
+					</center>
+
+					<aside class="notes">
+						Ok, the last point we have to cover is how to provide
+						a reasonable default parameter if one doesn't need
+						edge tint.
+					</aside>
+				</section>
+				<section>
+					<h3>No Edge Tint Default</h3>
+					<ul>
+						<li id="default_behaviour_02">Many possibilities
+							<ul>
+								<li class="fragment" data-fragment-index="0">$\beta_o = 0$ is a bad idea</li>
+								<li class="fragment" data-fragment-index="1">$\beta_o = \text{argmin}\left(c_2^2 + c_3^2 \right)$ <span class="fragment">→ bad with edge-tint control</span></li>
+							</ul>
+						</li>
+						<li id="default_behaviour_01" class="fragment">Best solution we found: $\beta_o = 0.75$
+							<ul>
+								<li class="fragment">No grazing angle componnent</li>
+								<li class="fragment">Allows back-and-forth edits of r and g</li>
+							</ul>
+						</li>
+					</ul>
+
+					<div style="position:relative; z-index:100;">
+						<center class="fragment fade-in-then-out" id="show_default_g_mitsuba" style="width:100%; position:absolute; top:0px; left:0px;">
+							<div style="width:80%; display:flex; justify-content:space-evenly;">
+								<img width="192px" src="img/mitsuba/shaderball/default_g/industrie_gulbran_1.png" />
+								<img width="192px" src="img/mitsuba/shaderball/default_g/industrie_gulbran_25.png" />
+								<img width="192px" src="img/mitsuba/shaderball/default_g/industrie_gulbran_50.png" />
+								<img width="192px" src="img/mitsuba/shaderball/default_g/industrie_gulbran_75.png" />
+								<img width="192px" src="img/mitsuba/shaderball/default_g/industrie_gulbran_99.png" />
+							</div>
+							<strong>
+							<small><br />
+								Default	using Gulbrandsen (g = 0.75)
+							</small>
+							</strong>
+						</center>
+						<center class="fragment fade-in-then-out" style="width:100%; position:absolute; top:0px; left:0px;">
+							<div style="width:80%; display:flex; justify-content:space-evenly;">
+								<img width="192px" src="img/mitsuba/shaderball/default_g/industrie_schlick_1.png" />
+								<img width="192px" src="img/mitsuba/shaderball/default_g/industrie_schlick_25.png" />
+								<img width="192px" src="img/mitsuba/shaderball/default_g/industrie_schlick_50.png" />
+								<img width="192px" src="img/mitsuba/shaderball/default_g/industrie_schlick_75.png" />
+								<img width="192px" src="img/mitsuba/shaderball/default_g/industrie_schlick_99.png" />
+							</div>
+							<strong>
+							<small><br />
+								Schlick with Equivalent r
+							</small>
+							</strong>
+						</center>
+					</div>
+
+					<center id="default_behaviour" class="fragment" data-fragment-index="0" style="width:400px; position:absolute; top:180px; left:650px;">
+						<div id="plot_default_behaviour" style="width:400px;height:400px;"></div> <br />
+						<span style="font-size:0.7em;">$r $  <input id="plot_default_behaviour_r" type="range" min="0.01" max="0.99" step="0.01" /></span>
+						<span style="font-size:0.7em;">$\beta $<input id="plot_default_behaviour_b" type="range" min="0.00" max="1.00" step="0.01" /></span>
+					</center>
+					<script>
+						document.getElementById('plot_default_behaviour_r').value = 0.2;
+						document.getElementById('plot_default_behaviour_b').value = 0.0;
+
+						var r = parseFloat(document.getElementById('plot_default_behaviour_r').value);
+						var b = parseFloat(document.getElementById('plot_default_behaviour_b').value);
+						var c = evaluateMapping(r, b);
+						var d = [eval_decomposition_coeffs(c), eval_schlick(r)];
+						var layout = {
+							// showlegend: false,
+							legend: {
+								x: 0.1,
+								y: 1.1,
+								"orientation": "h"
+							},
+							xaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 0.5*Math.PI],
+                                dtick: 0.2,
+							},
+							yaxis: {
+								showgrid: true,
+								gridcolor: '#bdbdbd',
+								gridwidth: 1,
+								zeroline: true,
+								showline: true,
+								mirror: 'ticks',
+								range: [0.0, 1.0],
+							},
+							margin: {
+								l: 25,
+								r: 5,
+								b: 20,
+								t: 10,
+								pad: 0
+							},
+							font: {
+								family: 'Comfortaa',
+								size: 15,
+								color: '#7f7f7f'
+							},
+							paper_bgcolor: '#00000000',
+						};
+
+
+						var div = document.getElementById('plot_default_behaviour')
+						Plotly.newPlot(div, d, layout, {staticPlot: true});
+
+						function update_default_behaviour() {
+							var r = parseFloat(document.getElementById('plot_default_behaviour_r').value);
+							var b = parseFloat(document.getElementById('plot_default_behaviour_b').value);
+							var c = evaluateMapping(r, b);
+							var d = [eval_decomposition_coeffs(c), eval_schlick(r)];
+							var config = {
+								transition: {duration: 0},
+                                frame: { duration: 0, redraw: false },
+                                staticPlot: true
+							};
+							Plotly.animate('plot_default_behaviour', { data:d, layout:{} }, config);
+						}
+						document.getElementById('plot_default_behaviour_r').addEventListener('input', () => {
+							update_default_behaviour();
+						});
+						document.getElementById('plot_default_behaviour_b').addEventListener('input', () => {
+							update_default_behaviour();
+						});
+
+
+						Reveal.on( 'fragmentshown', event => {
+							if(event.fragment.id == 'default_behaviour_01') {
+								document.getElementById('plot_default_behaviour_b').value = 0.75;
+								document.getElementById('default_behaviour_02').style.opacity = 0.5;
+								update_default_behaviour();
+							}
+
+							if(event.fragment.id == 'show_default_g_mitsuba') {
+								document.getElementById('default_behaviour').style.opacity = 0.0;
+							}
+						} );
+						Reveal.on( 'fragmenthidden', event => {
+							if(event.fragment.id == 'default_behaviour_01') {
+								document.getElementById('plot_default_behaviour_b').value = 0.0;
+								document.getElementById('default_behaviour_02').style.opacity = 1.0;
+								update_default_behaviour();
+							}
+
+							if(event.fragment.id == 'show_default_g_mitsuba') {
+								document.getElementById('default_behaviour').style.opacity = 1.0;
+							}
+                        } );
+
+					</script>
+					<aside class="notes">
+						We found that there are practically as many potential
+						ways to obtain a default parameter for the edge tint
+						as you can think of.
+						<strong>*click*</strong><br /><br />
+
+						Of course, setting beta to 0 is a bad idea.
+						<strong>*click*</strong><br /><br />
+
+						At some point, we experimented with the idea of looking
+						for the beta parameter that minimizes the impact of the belly.
+						While this works well (sorry for not showing it),
+						I think it has a practical drawback if you want to include
+						edge-tint control in the model. The issue is that the default
+						beta parameter is dependent on the reflectivity.
+						<strong>*click*</strong><br /><br />
+
+						For example, let's say that an artist paints a reflectivity map
+						and then edits the edge tint map with the default value as
+						the base color. If they later want to edit the reflectivity,
+						they might introduce an edge tint in regions that were not
+						intended to have one.
+						<strong>*click*</strong><br /><br />
+
+						So instead, we settled on beta = 0.75, since it provides a
+						Schlick-like behavior.
+						<strong>*click*</strong><br /><br />
+						
+						There is no grazing angle appearing on the curve for this parameter
+						<strong>*click*</strong><br /><br />
+
+						and it prevents the issue with the edge tint 'leaking' during
+						editing.
+						<strong>*click*</strong><br /><br />
+
+						Here are renderings of using this default beta for different
+						reflectivity.
+						<strong>*click*</strong><br /><br />
+
+						We can compare this default with Schlick and it provides pretty
+						similar results.
+					</aside>
+				</section>
+				<section>
+					<h3>Standardize Fresnel?</h3>
+					<ul>
+						<li class="fragment fade-in-then-semi-out">Let's start a community discussion about it!
+						</li>
+
+						<li class="fragment fade-in-then-semi-out">Use Fresnel models coherently!
+							<ul>
+								<li><strong>Replace</strong> Schlick by a no edge tint default?</li>
+								<li>Add edge tint in a <strong>opt-in/out fashion</strong></li>
+							</ul>
+						</li>
+
+						<li class="fragment fade-in-then-semi-out">An editing format for artists
+							<ul>
+								<li>Linear edge-tint</strong> parameter?</li>
+								<li>Artistic $F(X^{\circ})$?</li>
+								<li>Your parameterization here?</li>
+							</ul>
+						</li>
+
+						<li class="fragment fade-in-then-semi-out">An exchange format
+							<ul>
+								<li>Even share coefficients?</li>
+								<li>Compression / conversion / ... should be defined</li>
+							</ul>
+						</li>
+
+					</ul>
+
+					<object style="position:absolute; top:150px; left:750px; opacity:50%;" class="plain" width="400px" height="400px" data="img/standard.svg" type="image/svg+xml"></object>
+
+					<aside class="notes">
+						Before concluding, I would like to start a discussion
+						on our use of Fresnel and how we could look in the future
+						and avoid the pitfall of mixing Shlick and the analytical
+						Fresnel I described in the beginning.
+						<strong>*click*</strong><br /><br />
+
+						It is quite unfortunate that due to recent events we
+						cannot have this discussion in one room, but that
+						doesn't mean we can't still have it. What follows is
+						a brain dump and should not be considered a set of
+						guidelines, but more as the catalyst for a discussion.
+						<strong>*click*</strong><br /><br />
+
+						My first point is that mixing models with non overlaping
+						default is a bad idea. Now we could build an extended
+						Schlick Fresnel as Naty pointed (or constraint our 
+						decomposition to include Schlick Fresnel). But a possibility
+						could be to replace Schlick entirely from our pipeline.
+						And use a a no-edge-tint default in place. I mean, we 
+						shouldn't be tied to the exact
+						formula of Schlick Fresnel, but rather aim for
+						Fresnels that offer a range of dieletric and conductors
+						over a unique reflectivity range. In that sens, we could
+						even build a specific model using the decomposition method.
+						<br /><br />
+
+						More importantly, I think this would allow users/artists
+						to choose if they are fine with a model that has
+						no edge tint. And provide this feature in an opt-in.
+						<strong>*click*</strong><br /><br />
+
+						Then there is the issue of the parameterization if
+						we want to include grazing angle control in the model.
+						Since the edge-tint parameterization and the artistic colour
+						parameterization can produce the same unwanted colour
+						issues. So maybe a not-so-strict definition of the
+						grazing angles that is the edge-tint is fine.
+						<br /><br />
+
+						Maybe there is a parameterization out there that
+						is still to be discovered and will solve all our 
+						issues.<br /><br />
+
+						But in the end, maybe this is a choice that only affects the
+						production of assets and not its use for rendering.
+						<strong>*click*</strong><br /><br />
+
+						Because maybe what we could use is another format
+						that is used to exchange assets between engines in
+						a principled way. There as probably many forms
+						that this format could take, as long as it enable
+						to accurately reproduce the desired reflectivity.
+						But any operation on this exchange format should
+						be well defined.
+					</aside>
+				</section>
+
+				<!-- Summary -->
+				<section style="display:table; overflow:hidden; height:680px;">
+					<h2>Summary</h2>
+					<video style="position:absolute; top:0px; left: 330px; margin: 0; border: none; box-shadow: none; height:720px; max-width: 100%; max-height: 100%; z-index: -500;" height="720px" width="100%" data-autoplay loop src="./videos/travelling_edge_tint.mp4"></video>
+					<div style="position:absolute; top:0; left: 0px; margin: 0; max-width: 100%; max-height: 100%; z-index: -5; width: 720px; height:720px; background-color: #ddd; box-shadow: 2px 2px 5px black; ">
+					</div>
+
+					<ul>
+						<li>A <strong>framework</strong> to build Fresnel model
+							<ul>
+								<li>Compatible with <strong>real-time</strong> rendering</li>
+								<li><strong>Accurate</strong> with respect to reference Fresnel</li>
+							</ul>
+						</li>
+
+						<li><strong>Improve</strong> Fresnel parameterization
+							<ul>
+								<li>More <strong>linear</strong> than Gulbrandsen's</li>
+								<li>Or <strong>with</strong> colour control</li>
+							</ul>
+						</li>
+
+						<li>More details at <a href="https://belcour.github.io/blog/research/publication/2020/08/26/brdf-fresnel-decompo.html">belcour.github.io/blog</a>
+							<ul>
+								<li>Source code, notebook, ...</li>
+							</ul>
+						</li>
+					</ul>
+
+					<div style="width:630px; padding-left:3.5%; font-size: 0.6em; padding-top:100px;">
+						<strong>Thanks to:</strong> <a href="https://twitter.com/thomasdeliot">Thomas Deliot</a> for the Unity prototype. Eric Heitz, Jonathan Dupuy, and Kenneth Vanhoey for feedbacks. Naty Hoffman, Stephen Hill, Emmanuel Turquin, and Sebastien Lagarde for discussions on Fresnel.<br /><br />
+						Slides use <a href="revealjs.com">reveal.js</a> framework with <a href="https://juxtapose.knightlab.com/">juxtapose</a> for image comparisons. <a href="https://www.blendswap.com/blend/11086">Studio</a> and <a href="https://www.blendswap.com/blend/18023">shader ball</a> assets available at <a href="https://www.blendswap.com/">blendswap</a>.
+					</div>
+					
+					<aside class="notes">
+						That concludes my talk.<br /><br />
+
+						If you are interested to try out this new framework,
+						there is a jupyter notebook as well as source code available
+						on my website. <br /><br />
+						
+						That's it for me. Thank you for your attention.
+					</aside>
+				</section>
+			</div>
+		</div>
+
+
+		<script src="js/juxtapose.min.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+				width: 1280,
+				height: 720,
+				margin: 0,
+				showNotes: true,
+				slideNumber: "c/t",
+				transition: 'fade',
+
+				pdfMaxPagesPerSlide: 1,
+				pdfSeparateFragments: false,
+
+				math: {
+					config: 'TeX-AMS_SVG-full',
+				},
+
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				// plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+				plugins: [ 	RevealNotes,
+							RevealMath ]
+			});
+		</script>
+	</body>
+</html>
