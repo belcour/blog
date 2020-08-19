@@ -22,6 +22,7 @@ materials: [
     { type: "pdf", name: "abstract", url: "https://hal.inria.fr/hal-02883680v1/document" },
     { type: "pdf", name: "supp. pdf", url: "https://hal.inria.fr/hal-02883680v2/file/pdf_supplemental.pdf" },
     { type: "zip", name: "code", url: "https://hal.inria.fr/hal-02883680v2/file/code_mitsuba.zip" },
+    { type: "html", name: "notebook", url: "https://nbviewer.jupyter.org/github/belcour/sig2020_fresnel_decomposition/blob/master/notebook.ipynb"},
     
     #{ type: "slides", name: "slides", url: "http://onrendering.com/data/papers/ms16/slides/index.html#/" },
 ]
