@@ -7,7 +7,7 @@ authors: [
             { name: "Megane Bati", affiliation: "IOGS" },
             { name: "Pascal Barla", affiliation: "Inria" }
         ]
-journal: "ACM SIGGRAPH Talk and Course"
+journal: "ACM SIGGRAPH 2020 Talks and Courses"
 categories: [
     "research",
     "publication"
@@ -30,7 +30,7 @@ materials: [
 
 <img width="100%" style="border:solid 1px black;" src="{{ site.url | append: site.baseurl }}/data/images/teaser_BrdfFresnelDecompo.svg" />
 
-[Fresnel equations](https://en.wikipedia.org/wiki/Fresnel_equations) describe the amount of light reflected by a planar surface and are basic components of microfacet models that drive physically based shading today. However, real-time constraints prevent us from using the accurate form of Fresnel equations in game engines and force us to use [Schlick's approximation](https://en.wikipedia.org/wiki/Schlick%27s_approximation). In this work, we provide a framework to build accurate Fresnel models that are compatible with real-time constraints. We show that our method permits to use parameterization for Fresnel that are traditionally restricted to offline rendering engines in real-time game engines (such as [Ole Gulbrandsen's parameterisation](http://jcgt.org/published/0003/04/03/)). We further show that our framework can be used to rectify non-linearity in such parameterizations to produce better artist friendly Fresnel models.
+[Fresnel equations](https://en.wikipedia.org/wiki/Fresnel_equations) describe the amount of light reflected by a planar surface and are basic components of microfacet models that drive physically based shading today. However, real-time constraints prevent us from using the accurate form of Fresnel equations in game engines and force us to use [Schlick's approximation](https://en.wikipedia.org/wiki/Schlick%27s_approximation). In this work, we provide a framework to build accurate Fresnel models that are compatible with real-time constraints. We show that our method permits to use parameterization for Fresnel that are traditionally restricted to offline rendering engines in real-time game engines (such as [Ole Gulbrandsen's parameterization](http://jcgt.org/published/0003/04/03/)). We further show that our framework can be used to rectify non-linearity in such parameterizations to produce better artist friendly Fresnel models.
 
 <p>
 Here is a comparison of how close we can get to Fresnel equations with our decomposition compared to Schlick's approximation:
@@ -45,7 +45,7 @@ document.getElementById('img2').src = "{{ site.url | append: site.baseurl }}/dat
 </p>
 
 <p>
-Our solution is quite easy to integrate in a modern game engine since it only requires to change the current split-sum LUT (RG texture) with a bnew RGBA LUT. Here are the different color channels of this LUT:
+Our solution is quite easy to integrate in a modern game engine since it only requires to change the split-sum LUT (RG texture) that is taylored to Schlick Fresnel with a new RGBA LUT. Here are the different color channels of this LUT:
 <center>
 <img width="15%" style="border:solid 1px black;" src="{{ site.url | append: site.baseurl }}/slides/2020-brdf-fresnel-decompo/img/realtime/FGD_r.png" />
 <img width="15%" style="border:solid 1px black;" src="{{ site.url | append: site.baseurl }}/slides/2020-brdf-fresnel-decompo/img/realtime/FGD_ours_g.png" />
