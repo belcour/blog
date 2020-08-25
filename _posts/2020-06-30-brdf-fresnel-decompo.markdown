@@ -20,11 +20,12 @@ thumbnail: "/data/images/thumbnail_BrdfFresnelDecompo.png"
 materials: [
     { type: "html", name: "course webpage", url: "https://blog.selfshadow.com/publications/s2020-shading-course/" },
     { type: "latex", name: "bib", url: "https://hal.inria.fr/hal-02883680v2/bibtex" },
-    { type: "pdf", name: "abstract", url: "https://hal.inria.fr/hal-02883680v1/document" },
+    { type: "pdf", name: "abstract", url: "https://hal.inria.fr/hal-02883680v2/document" },
     { type: "pdf", name: "supp. pdf", url: "https://hal.inria.fr/hal-02883680v2/file/pdf_supplemental.pdf" },
     { type: "zip", name: "code", url: "https://hal.inria.fr/hal-02883680v2/file/code_mitsuba.zip" },
     { type: "html", name: "notebook", url: "https://nbviewer.jupyter.org/github/belcour/sig2020_fresnel_decomposition/blob/master/notebook.ipynb"},
-    { type: "slides", name: "slides", url: "https://belcour.github.io/blog/slides/2020-brdf-fresnel-decompo/index.html"},   
+    { type: "slides", name: "slides", url: "https://belcour.github.io/blog/slides/2020-brdf-fresnel-decompo/index.html"},
+    { type: "slides", name: "video", url: "https://hal.inria.fr/hal-02883680v2/file/recording.mp4"},
 ]
 ---
 
