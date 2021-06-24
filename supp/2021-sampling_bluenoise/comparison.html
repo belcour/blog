@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Side-by-Side Comparison</title>
+   <meta charset="utf-8">
+    <link href="css/twentytwenty.css" rel="stylesheet" type="text/css" />    
+</head>
+<body>
+   <center>
+      <h1>Side-by-Side Comparison</h1>
+      <script>
+        SetNewSPP = function(obj, id) {
+            var spp = obj.value;  
+            $("img").each(function(){
+                var element = $(this);
+                var filename = element.attr('src');
+                console.log(filename)
+                var newname = filename.replace(new RegExp("spp=[0-9]+"), "spp="+spp);
+                element.attr('src', newname);
+            });
+        }
+    
+        SetNewScene = function(obj, id) {
+            var scene = obj.value;  
+            $("img").each(function(){
+                var element = $(this);
+                var filename = element.attr('src');
+                var newname = filename.replace(new RegExp("/[a-zA-Z0-9]+_"), "/"+scene+"_");
+                element.attr('src', newname);
+                $(window).trigger("resize.twentytwenty");
+            });
+            
+        }
+    </script>
+    
+    <div>
+        Comparing  
+        <select class="combo" onChange="SetNewScene(this, 'img')">
+            <option value="boxed3" selected>Boxed 3</option>
+            <option value="cbox">Cornell Box</option>
+            <option value="teapot">Teapot</option>
+            <option value="staircase2">Staircase 2</option>
+        </select>
+        at
+        <select class="combo" onChange="SetNewSPP(this, 'img')">
+            <option value="1" > 1 spp</option>
+            <option value="2" > 2 spp</option>
+            <option value="4" > 4 spp</option>
+            <option value="8" > 8 spp</option>
+            <option value="16" selected>16 spp</option>
+            <option value="32">32 spp</option>
+            <option value="64">64 spp</option>
+            <option value="128">128 spp</option>
+        </select>
+    </div>
+      <div class="twentytwenty-container" id="cbox">
+         <img src="fig/comparisons/boxed3_tile_ours_spp=16.jpg" alt="Ours" class="img-responsive"/>
+         <img src="fig/comparisons/boxed3_tile_heitz2019_spp=16.jpg" alt="[Heitz et al. 2019]" class="img-responsive"/>
+   </div>
+   <br/>
+   </center>
+   <br />
+   <script src="js/jquery.min.js"></script>
+   <script src="js/jquery.cycle2.min.js"></script>
+   <script src="js/bootstrap.min.js"></script>
+   <script src="js/utils.js"></script>
+   <script src="js/jquery.event.move.js"></script>
+   <script src="js/jquery.twentytwenty.js"></script>
+   <script>
+   $(window).load(function(){$(".twentytwenty-container").twentytwenty({default_offset_pct: 0.5});});
+   </script>  
+</body>
+</html>

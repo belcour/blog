@@ -1,0 +1,315 @@
+<meta lang="en" charset="utf-8">
+
+                            **Lessons Learned and Improvements when Building Screen-Space Samplers with Blue-Noise Error Distribution**
+                            ***Supplemental material***
+
+                            
+
+
+Convergence rates
+=======================================================================================
+
+Here, we compare the convergence rates of the Sobol sequence with Owen
+scambling compared to the Rank-1 Lattice. We used those sequence the same way
+we use them in the screen-space sampler (with scrambling and padding). The
+Sobol sequence uses XOR scrambling (that preserves convergence) and the Rank-1
+sequence uses Cranley-Patterson Rotations
+
+<script>    
+    ConvergenceSetNewScene = function(obj, id) {
+        var scene = obj.value;  
+        var element = document.getElementById(id);
+        var filename = element.src;
+        var newname = filename.replace(new RegExp("[a-zA-Z0-9]+.svg"), scene+".svg");
+        element.src = newname;
+    }
+</script>
+
+<div>
+    Convergence for 
+    <select class="combo" onChange="ConvergenceSetNewScene(this, 'img_swap_convergence')">
+        <option value="boxed3" selected>Boxed 3</option>
+        <option value="cbox">Cornell Box</option>
+        <option value="teapot">Teapot</option>
+        <option value="staircase2">Staircase 2</option>
+    </select>:
+</div>
+
+
+<img id="img_swap_convergence" src="./fig/convergence/boxed3.svg" />
+
+
+!!! Tip
+   **In summary**, we found that while the Sobol sequence with Owen scrambling
+   ensures superior convergence properties (thanks to multi-stratification),
+   **in practice Rank-1 Lattice perform as par on rendering integrands** after
+   dimension padding and per pixel scrambling.
+
+
+Implementation
+=======================================================================================
+
+Our new screen-space sampler is still easy to implement in a modern rendering
+engine. It requires a few lines of code to work:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ C
+// Return the k-th sample for the d-th dimension of the sequence
+// at pixel p of the tile. Assumes that pixel coordinates, sampling
+// count and dimensions are wrapped to the tile dimensions.
+//
+float sample(int2 p, int k, int d) {
+    float shift = m_tile(p.x, p.y)[d];
+    return mod(m_direction[d]*k + shift,  1.0)
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Blur Criterion on Test Integrands
+=======================================================================================
+
+To assess the quality of this new screen-space sampler, we developped an
+quantifiable criterion in order to make a rational decision. This quantifiable
+criterion is the average variance of tiles of the test integrands (randomly
+oriented heavisides). It is defined as:
+$$
+\mbox{RMSE} = \mbox{Var}[
+         k_\sigma \circledast e^{p}_t
+         ]
+$$
+where $e^{p}_t = {1\over N} \sum_k f_t(\mathbf{s}_p^k) - \int f_t(\mathbf{x})
+\mbox{d}\mathbf{x}$ is the tile of the Monte-Carlo estimation of the test
+integrand $f_t(\mathbf{x})$ for each pixel $p$ of the tile.
+<script>
+    CriteriaSetNewSPP = function(obj, id) {
+        var spp = obj.value;  
+        var element = document.getElementById(id);
+        var filename = element.src;
+        var newname = filename.replace(new RegExp("_[0-9]+spp.svg"), "_" + spp + "spp.svg");
+        element.src = newname;
+    }
+</script>
+
+<div>
+    Convergence at
+    <select class="combo" onChange="CriteriaSetNewSPP(this, 'img_swap_blur')">
+        <option value="1" > 1 spp</option>
+        <option value="2" > 2 spp</option>
+        <option value="4" > 4 spp</option>
+        <option value="8" > 8 spp</option>
+        <option value="16" selected>16 spp</option>
+        <option value="32">32 spp</option>
+        <option value="64">64 spp</option>
+        <option value="128">128 spp</option>
+    </select>
+</div>
+<img id="img_swap_blur" src="./fig/criteria/convergence_heavisides_16spp.svg" />
+
+For small sample counts, the two sequences are reducing the RMSE with roughly
+the same slope. However, as we increase the number of samples, the Rank-1 based
+screen-space sampler reduce the variance faster than the Sobol with Owen
+scrambling one.
+
+
+Blur Criterion on Rendering Scenes
+=======================================================================================
+
+We validate that the objectivable criterion on the test integrand is
+correlated with the denoising quality for actual renderings. Here we
+report the RMSE of our screen-space samplers after a screen space blur
+of varying size:
+$$
+    \mbox{RMSE} =
+      \left\lVert 
+        \left( k_\sigma \circledast I_{{ref}} \right)
+      - \left( k_\sigma \circledast I         \right)
+      \right\rVert_2,
+$$
+where $I$ is the rendered image with our screen-space sampler, $I_{ref}$
+is the reference image, and $k_\sigma$ is a Gaussian blur kernel of
+standard deviation $\sigma$.
+
+If the rendering noise has localy a constant amplitude, using a sampler
+that distribute the error as a blue-noise will ensure a reduced RMSE
+for various kernel sizes.
+
+<script>
+    DenoisingSetNewSPP = function(obj, id) {
+        var spp = obj.value;  
+        var element = document.getElementById(id);
+        var filename = element.src;
+        var newname = filename.replace(new RegExp("_[0-9]+.svg"), "_"+spp+".svg");
+        element.src = newname;
+    }
+
+    DenoisingSetNewScene = function(obj, id) {
+        var scene = obj.value;  
+        var element = document.getElementById(id);
+        var filename = element.src;
+        var newname = filename.replace(new RegExp("blur_[a-zA-Z0-9]+_"), "blur_"+scene+"_");
+        element.src = newname;
+    }
+</script>
+
+<div>
+    Convergence for 
+    <select class="combo" onChange="DenoisingSetNewScene(this, 'img_swap_denoising_blur')">
+        <option value="boxed3" selected>Boxed 3</option>
+        <option value="cbox">Cornell Box</option>
+        <option value="teapot">Teapot</option>
+        <option value="staircase2">Staircase 2</option>
+    </select>
+    at
+    <select class="combo" onChange="DenoisingSetNewSPP(this, 'img_swap_denoising_blur')">
+        <option value="1" > 1 spp</option>
+        <option value="2" > 2 spp</option>
+        <option value="4" > 4 spp</option>
+        <option value="8" > 8 spp</option>
+        <option value="16" selected>16 spp</option>
+        <option value="32">32 spp</option>
+        <option value="64">64 spp</option>
+        <option value="128">128 spp</option>
+    </select>
+</div>
+<img id="img_swap_denoising_blur" src="./fig/denoising/denoising_blur_boxed3_16.svg" />
+
+
+!!! Tip
+   **In summary**, we observe that the results of computing the RMSE
+   on rendering integrands follows the same behaviour as for the test
+   integrands. 
+
+!!! Warning
+   You can find a side-by-side comparison to visually validate that
+   this criterion produces better looking images as well
+   <a href="comparison.html">here</a>.
+
+<iframe style="position:relative; left:-5%; width:110%; height:850px;" src="comparison.html" scrolling='no'> 
+</iframe>
+
+
+Eigenvectors of an Optimization
+=======================================================================================
+
+The optimization loss is defined from the L2-norm of the matrix of error. Since
+this matrix of error is build on the vectors of estimates, it lies in a
+N-dimensional vector space. Changing the main sequence will change the values
+in the vectors of estimates, and results in a different vector space.
+
+We extracted the eigenvectors $\mathbf{v}^k$ and eigenvalues $\lambda^k$ of
+such vector space for different main sequences (independent, Sobol with Owen
+scrambling and Rank-1). Each eigenvector defines an eigenintegrand:
+$$
+   g_k(\mathbf{x}) = \sum_t v^k_t f_t(\mathbf{x}),
+$$
+and the associated eigenvalue, tells us how much this integrand is important
+for the optimization. This link shed some light regarding the noise
+distribution of some sampler.
+
+For example, in the following we display the eigenvectors resulting from the
+optimization of 1024 test integrands at 16 spp. We display the first 3
+eigenvectors with the cumulative sum of absolute eigenvalues $\mbox{cum}_e$.
+
+For an indepdendant sampler (where each sample is obtained from a random number
+generator) we obtain the following eigenvectors:
+
+<div style="position:relative; left:-5%; width:110%; display: flex; flex-direction: row; justify-content:space-between;">
+    <center>
+        <img width="128px" style="border: black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-independent_16spp_0vector_0.2991166076861194.png" />
+        <br />
+        $c_1 = 0.299$
+    </center>
+    <center>
+        <img width="128px" style="border: black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-independent_16spp_1vector_0.59569900318872.png" />
+        <br />
+        $c_2 = 0.595$
+    </center>
+    <center>
+        <img width="128px" style="border: black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-independent_16spp_2vector_0.6508579793947779.png" />
+        <br />
+        $c_3 = 0.650$
+    </center>
+    <center>
+        <img width="128px" style="border: black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-independent_16spp_3vector_0.7025914603151581.png" />
+        <br />
+        $c_4 = 0.702$
+    </center>
+    <center>
+        <img width="128px" style="border: black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-independent_16spp_4vector_0.7420913656442217.png" />
+        <br />
+        $c_5 = 0.740$
+    </center>
+</div>
+
+
+For our previous screen-space sampler with a Sobol sequence with Owen
+scrambling as main sequence we obtain the following eigenvectors:
+
+<div style="position:relative; left:-5%; width:110%; display: flex; flex-direction: row; justify-content:space-between;">
+    <center>
+        <img width="128px" style="border:black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-owen+xor_16spp_0vector_0.21758540939516244.png" />
+        <br />
+        $c_1 = 0.217$
+    </center>
+    <center>
+        <img width="128px" style="border:black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-owen+xor_16spp_1vector_0.4021611602939282.png" />
+        <br />
+        $c_2 = 0.402$
+    </center>
+    <center>
+        <img width="128px" style="border:black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-owen+xor_16spp_2vector_0.4505668372297504.png" />
+        <br />
+        $c_3 = 0.450$
+    </center>
+    <center>
+        <img width="128px" style="border:black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-owen+xor_16spp_4vector_0.5088412394663967.png" />
+        <br />
+        $c_4 = 0.508$
+    </center>
+    <center>
+        <img width="128px" style="border:black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-owen+xor_16spp_5vector_0.5239705350184767.png" />
+        <br />
+        $c_5 = 0.523$
+    </center>
+</div>
+
+Using our improved screen-space sampler with Rank-1 main sequence we
+obtain the following eigenvectors:
+
+<div style="position:relative; left:-5%; width:110%; display: flex; flex-direction: row; justify-content:space-between;">
+    <center>
+        <img width="128px" style="border:black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-rank1+cpr_16spp_0vector_0.2195458822962075.png" />
+        <br />
+        $c_1 = 0.219$
+    </center>
+    <center>
+        <img width="128px" style="border:black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-rank1+cpr_16spp_1vector_0.37969997344823025.png" />
+        <br />
+        $c_2 = 0.379$
+    </center>
+    <center>
+        <img width="128px" style="border:black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-rank1+cpr_16spp_2vector_0.4639197397276243.png" />
+        <br />
+        $c_3 = 0.463$
+    </center>
+    <center>
+        <img width="128px" style="border:black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-rank1+cpr_16spp_3vector_0.5440208806926484.png" />
+        <br />
+        $c_4 = 0.544$
+    </center>
+    <center>
+        <img width="128px" style="border:black solid 1px; margin-bottom:0.5em;" src="./fig/eigenvectors/tile-rank1+cpr_16spp_4vector_0.6060167267089855.png" />
+        <br />
+        $c_5 = 0.606$
+    </center>
+</div>
+
+!!! Tip
+   **In summary**, we observe that the main sequence we used previously [Heitz et al. 2019]
+   produces eigenintegrands with higher-frequencies than the one of the independent sampler
+   and the Rank-1 main sequence. We conjecture that this is linked with the quality of the
+   error distribution performances of the screen-space sampler.
+
+
+<!-- Markdeep: -->
+<!-- <link rel="stylesheet" href="https://morgan3d.github.io/markdeep/latest/latex.css?"> -->
+<style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="js/markdeep.min.js" charset="utf-8"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
