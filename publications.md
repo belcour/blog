@@ -20,6 +20,14 @@ simulation or to adapt the sampling budget locally.
 
 <table>
 <tr>
+  <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_RayCones.png" alt="ray-cones" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></td>
+  <td style="vertical-align:top;"><b>Improved Shader and Texture Level of Detail Using Ray Cones</b> <br />
+      Tomas Akenine-Möller, Cyril Crassin, Jakub Boksansky, Laurent Belcour, Alexey Panteleev, Oli Wright <br />
+      <em>JCGT</em>, 2021 <a href="http://www.jcgt.org/published/0010/01/01/paper.pdf">pdf</a> <a href="https://github.com/NVIDIAGameWorks/Falcor">code</a>
+      <!--<a href="todo">paper</a> <a href="todo">bib</a>-->
+  </td>
+</tr>
+<tr>
   <td><img src="{{ site.url | append: site.baseurl }}/data/images/thumbnail_FreqBssrdf.png" alt="frequency-bssrdf" width="90" height="90" style="margin-bottom:10px;margin-right:10px;border:0.7px solid black;"/></td>
   <td style="vertical-align:top;"><b>A Frequency Analysis and Dual Hierarchy for Efficient Rendering of Subsurface Scattering</b> <br />
       David Milaenen, Laurent Belcour, Jean-Philippe Guertin, Toshiya Hachisuka, and Derek Nowrouzezahrai <br />
@@ -201,8 +209,10 @@ simulation or to adapt the sampling budget locally.
             {% elsif contains 'to_appear' %}
                 To appear in
             {% elsif contains 'techreport' %}
+              Technical Report
             {% endif %}
             {{ post.journal }}
+            {{ post.conference }}
         </span><br />
 
         <!-- Link to material -->
