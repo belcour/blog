@@ -21,6 +21,7 @@ materials: [
    { type: "url", name: "supp. mat.", url: "https://belcour.github.io/blog/supp/2021-sampling-bluenoise/" },
    { type: "code",  name: "code",  url: "https://github.com/unity-grenoble/sampling_bluenoise_sig21"},
    { type: "video", name: "video", url: "https://youtu.be/rJRYvwX7kQQ"},
+   { type: "slides", name: "slides", url: "https://belcour.github.io/blog/slides/2021-sampling-bluenoise" },
 ]
 url_outside: https://unity-grenoble.github.io/website/publication/2021/06/24/sampling_bluenoise_sig21.html
 ---
