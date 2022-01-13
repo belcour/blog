@@ -1,0 +1,27 @@
+.arrow {
+    position: absolute;
+    top: 0px;
+    width: 90%;
+    height: 100%;
+    background-color: #fff;
+    opacity:0.5;
+  }
+  
+  .arrow::after, .arrow::before {
+    content: '';
+    position: absolute;
+    width: 60%;
+    height: 100%;
+    right: -12%;
+    background-color: #fff;
+  }
+  
+  .arrow::after {
+    top: -80%;
+    transform: rotate(45deg);
+  }
+  
+  .arrow::before {
+    top: 80%;
+    transform: rotate(-45deg);
+  }

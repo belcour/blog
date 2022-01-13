@@ -1,0 +1,2701 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Lessons Learned and Improvements
+			when Building Screen-Space Samplers
+			with Blue-Noise Error Distribution</title>
+
+		<!-- Stylesheets -->
+		<link rel="stylesheet" href="css/reset.css" />
+		<link rel="stylesheet" href="css/reveal.css" />
+		<link rel="stylesheet" href="css/white.css" id="theme" />
+		<link rel="stylesheet" href="css/custom.css" />
+		<link rel="stylesheet" href="css/juxtapose.css" />
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="js/plugin/highlight/monokai.css" id="highlight-theme">
+
+		<!-- Scripts -->
+		<script src="js/plotly-latest.min.js"></script>
+		<script src="js/d3.min.js"></script>
+		<script src="js/snap.svg-min.js"></script>
+		<script src="js/jquery.min.js"></script>
+		
+		<!-- Reveal.JS -->
+		<script src="js/reveal.js"></script>
+		<script src="js/plugin/notes/notes.js"></script>
+		<script src="js/plugin/math/math.js"></script>
+		
+		<!-- Custom scripts -->
+		<script src="js/dithermask.js"></script>
+		<script src="js/sobol.js"></script>
+		<script src="js/fft.js"></script>
+		<script src="js/utils.js"></script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+<!-- Title -->
+<section class="title">
+	<h3 style="width:100%; text-align:center; padding-top:12%;">
+		Lessons Learned and Improvements<br />
+		when Building Screen-Space Samplers<br />
+		with Blue-Noise Error Distribution
+		<!-- <div style="font-size:0.9em;">a Preintegrable Decomposition</div> -->
+	</h3>
+	<div style="display:flex; justify-content:space-evenly; font-size:0.7em; padding-top:7em;">
+		<div style="width:20%;">
+			<div style="display:flex; justify-content:space-evenly;">
+				<div>Laurent Belcour</div>
+			</div>
+			<div style="font-size:0.9em;">
+				<hr />
+				<center>
+				<img class="plain" style="background: none;" width="160px" src="img/logos/logo-unity.png" />
+				</center>
+			</div>
+		</div>
+		<div style="width:20%;">
+			<div style="display:flex; justify-content:space-evenly;">
+				<div>Eric Heitz</div>
+			</div>
+			<div style="font-size:0.9em;">
+				<hr />
+				<center>
+					<img class="plain" style="background: none;" width="140px" src="img/logos/logo-unity.png" />
+				</center>
+			</div>
+		</div>
+	</div>
+
+	<aside class="notes">
+		Hi, my name is Laurent Belcour. I am a research scientist at Unity Technologies.
+		In this talk, I am going to present the improvements we made and the insights we got, me and my colleague Eric Heitz,
+		when working on our screen-space sampler.
+	</aside>
+</section>
+
+<!-- Warning -->
+<section class="title">
+	<h3 style="width:100%; text-align:center; padding-top:22%;">
+		⚠️
+		What You See Is Maybe Not What You Should
+		⚠️
+	</h3>
+
+
+	<aside class="notes">
+		First, I would like to warn you that video compression might deteriorate the quality
+		of the images. We are going to look at noisy images and compression does not play
+		nice with them. <br /><br />
+
+		I encourage you to go and check the slides directly on our website.
+	</aside>
+</section>
+
+
+<!-- Introduction  Two years ago -->
+<section>
+	<h3>Two Years Ago ...</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:48%;">
+			<li class="fragment fade-in-then-semi-out" data-fragment-index="1">Blue-noise screen-space sampler
+			</li>
+		</ul>
+		<div class="fragment" data-fragment-index="1" style="width:45%; margin-top:2%;">
+			<center>
+				<img style="width:50%;border:solid 1px black;" src="./img/two_years/heitz2019.png"  /><br />
+				<small>[<em><a href="">Heitz et al. 2019</a></em>]</small>
+			</center>
+		</div>
+	</div>
+
+	<aside class="notes">
+		To give you more context about this talk,<br /><br />
+		
+		<strong>*click*</strong>
+		Two years ago we had a siggraph talk about
+		building a sampler to distributes the error
+		of Monte-Carlo integration as a blue-noise in
+		screen-space. What does that mean ?
+	</aside>
+</section>
+<section data-background="black">
+	<div class="fragment" data-fragment-index="0" id="twoyears_littlest_tokyo_00"></div>
+	<div class="fragment" data-fragment-index="1" id="twoyears_littlest_tokyo_01"></div>
+	<div class="fragment" data-fragment-index="2" id="twoyears_littlest_tokyo_02"></div>
+	<div style="width:100%; height:100%; position:absolute; top:0px; z-index: 0;">
+		<center>
+		<!-- Rendering video in canvas -->
+		<div id="twoyears_tokyo_border" style="position:absolute;top:-2px;left:-2px;z-index:1; width:1282px; height:100%; transition: width 2s; border-right: solid 2px white;" ></div>
+		<img class="pixelated" src="img/two_years/littlest-tokyo_whitenoise.png" id="twoyears_tokyo_source_heitz" style="position:absolute;top:0;left:0;z-index:-1; width:1280px; height:720px; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); transition: clip-path 2s;" width="1280" height="720"></canvas>
+		<img class="pixelated" src="img/two_years/littlest-tokyo_ours.png" id="twoyears_tokyo_source_ours"  style="position:absolute;top:0;left:0;z-index:-2; width:1280px; height:720px;" width="1280" height="720"></canvas>
+
+		<!-- Inset -->
+		<div class="fragment" data-fragment-index="0" style="position:absolute; top:300px; left:600px; width:64px; height:64px; border:red solid 1px;"></div>
+
+		<!-- Text -->
+		<p style="position:absolute; left:-10px; top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;">LittlestTokyo - 4 spp</p>
+		<p class="fragment fade-out" data-fragment-index="1" style="position:absolute; left:-10px  ;top:650px; color:azure; text-shadow:1px 1px 2px black;">Random Scrambling</p>
+		<p class="fragment fade-in-then-out"  data-fragment-index="1" style="position:absolute; left:-10px  ;top:650px; color:azure; text-shadow:1px 1px 2px black;">Heitz et al. [<a href="">2019</a>]</p>
+		<p class="fragment fade-in" data-fragment-index="2" style="position:absolute; left:-10px  ;top:650px; color:azure; text-shadow:1px 1px 2px black;">Random Scrambling</p>
+		<p class="fragment fade-in"  data-fragment-index="2" style="position:absolute; left:1010px  ;top:650px; color:azure; text-shadow:1px 1px 2px black; text-align: right;">Heitz et al. [<a href="">2019</a>]</p>
+		<!-- <img class="pixelated" style="width:1280px; height:720px; margin-top:0px;" src="./img/two_years/littlest-tokyo_whitenoise.png"  /><br />
+		<p style="position:absolute; left:-10px  ;top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;">LittlestTokyo - 4 spp</p>
+		<p style="position:absolute; left:-10px  ;top:650px; color:azure; text-shadow:1px 1px 2px black;">Random Scrambling</p> -->
+
+		<p class="fragment fade-out" data-fragment-index="2" style="position:absolute; left:1060px;top:665px; color:azure; text-shadow:1px 1px 2px black; font-size:0.5em;">3D model by <a href="https://www.artstation.com/glenatron">Glen Fox</a></p>
+		</center>
+	</div>
+
+	<!-- Big Inset -->
+	<div class="fragment" data-fragment-index="0" style="position:absolute; top: 70px; left:1020px; width:200px; height:200px;">
+		<canvas id="canvas_tokyo_intro_inset" style="width:100%; height:100%; border:solid 2px red;box-shadow:5px 5px 5px rgba(0, 0, 0, 0.2);" width="64" height="64"></canvas>
+		<div style="width:100%; text-align:center; font-size:0.7em; color:white; text-shadow:1px 1px 2px black;">Inset</div>
+	</div>
+
+	<!-- Power Spectrum -->
+	<div class="fragment" data-fragment-index="0" style="position:absolute; top:330px; left:1020px; width:200px; height:200px" >
+		<canvas class="pixelated" id="canvas_tokyo_intro_fft" style="width:100%; height:100%; border:solid 2px red; box-shadow:5px 5px 5px rgba(0, 0, 0, 0.2);" width="64" height="64"></canvas>
+		<div style="width:100%; text-align:center; font-size:0.7em; color:white; text-shadow:1px 1px 2px black;">Power Spectrum</div>
+	</div>
+
+	<h3 style="color:azure; text-shadow:1px 1px 2px black; position:relative;">Two Years Ago ...</h3>
+
+	<aside class="notes">
+		Traditionnally, path tracers use sequences of (quasi)-random numbers per
+		pixels for Monte-Carlo integration. To avoid aliasing, those sequences
+		are uncorrelated to each other. Usualy using what we call random scrambling of 
+		a main sequence. <strong>*click*</strong><br /><br />
+
+		As you can see on the right random scrambling produces an error that distributes like
+		a white-noise in screen-space. The power spectrum contains energie in all
+		frequencies. <strong>*click*</strong><br /><br />
+
+		Inspired by Iliyan Georgiev and Marcos Fajardo's 2016 Siggraph talk, we introduced
+		a sampler that correlates sequences of (quasi)-random number across pixels to
+		distributes the error closer to a blue-noise. <strong>*click*</strong><br /><br />
+
+		This sampler produces images that look more converged than random scrambling ones.
+		Though in fact, the error with respect to the ground truth is the same.
+		<strong>*click*</strong><br /><br />
+	</aside>
+	<script>
+		var tokyo_i=600, tokyo_j=300 - 15;
+
+		function updateFourierInsets(source, cnv, fft, i, j) {
+			var cnv = document.getElementById(cnv);
+			var ctx = cnv.getContext('2d');
+			ctx.drawImage(document.getElementById(source), i, j, 64, 64, 0, 0, 64, 64);
+			
+			var fft_cnv = document.getElementById(fft);
+			var fft_ctx = fft_cnv.getContext('2d');
+			fft_ctx.drawImage(document.getElementById(source), i, j, 64, 64, 0, 0, 64, 64);
+			canvasFFT(fft_cnv, 50);
+		}
+
+		Reveal.addEventListener( 'ready', function( event ) {
+			$('#twoyears_tokyo_source_heitz').ready(function() {
+				updateFourierInsets('twoyears_tokyo_source_heitz', 'canvas_tokyo_intro_inset', 'canvas_tokyo_intro_fft', tokyo_i, tokyo_j);
+			});
+		});
+		Reveal.addEventListener( 'fragmentshown', function( event ) {
+			if(event.fragment.id == "twoyears_littlest_tokyo_01") {
+				var canvas = document.getElementById("twoyears_tokyo_source_heitz");
+				canvas.style.clipPath = 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)';
+				$('#twoyears_tokyo_border').css('width', '0%');
+
+				updateFourierInsets('twoyears_tokyo_source_ours', 'canvas_tokyo_intro_inset', 'canvas_tokyo_intro_fft', tokyo_i, tokyo_j);
+			}
+			else if(event.fragment.id == "twoyears_littlest_tokyo_02") {
+				var canvas = document.getElementById("twoyears_tokyo_source_heitz");
+				canvas.style.clipPath = 'polygon(0% 0%, 49.5% 0%, 49.5% 100%, 0% 100%)';
+				$('#twoyears_tokyo_border').css('width', '49.5%');
+			}
+		});
+		Reveal.addEventListener( 'fragmenthidden', function( event ) {
+			if(event.fragment.id == "twoyears_littlest_tokyo_01") {
+				var canvas = document.getElementById("twoyears_tokyo_source_heitz");
+				canvas.style.clipPath = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)';
+				$('#twoyears_tokyo_border').css('width', '1282px');
+
+				updateFourierInsets('twoyears_tokyo_source_heitz', 'canvas_tokyo_intro_inset', 'canvas_tokyo_intro_fft', tokyo_i, tokyo_j);
+			}
+			else if(event.fragment.id == "twoyears_littlest_tokyo_02") {
+				var canvas = document.getElementById("twoyears_tokyo_source_heitz");
+				canvas.style.clipPath = 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)';
+				$('#twoyears_tokyo_border').css('width', '0%');
+			}
+		});
+	</script>
+</section>
+<section>
+	<h3>Two Years Ago ...</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:48%;">
+			<li style="opacity:0.5;">Blue-noise screen-space sampler
+			</li>
+
+			<li>Please refer to our 2019 talk
+				<ul>
+					<li><a href="https://belcour.github.io/blog">https://belcour.github.io/blog</a></li>
+				</ul>
+			</li>
+		</ul>
+
+		<div style="width:40%; margin-top:2%;">
+			<center>
+			<img style="width:100%; border:transparent;" src="./img/two_years/previous.png"  /><br />
+			</center>
+		</div>
+
+	</div>
+
+	<aside class="notes">
+		I am not going to dive into all the details of this method
+		and I encourage you to go to this project's webpage.
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+<section>
+	<h3>Two Years Ago ...</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:48%;">
+			<li style="opacity:0.5;">Blue-noise screen-space sampler
+			</li>
+
+			<li style="opacity:0.5;">Please refer to our 2019 talk
+				<ul>
+					<li><a href="https://belcour.github.io/blog">https://belcour.github.io/blog</a></li>
+				</ul>
+			</li>
+			<li>Many people seems to like it
+				<ul>
+					<li>Already in Unity's HDRP and Lightmapper</li>
+					<li class="fragment">A lot of feedbacks <span class="fragment"> and misunderstandings</span></li>
+				</ul>
+			</li>
+		</ul>
+
+		<div style="width:35%; margin-top:2%;">
+			<center>
+			<img style="width:100%; border:transparent;" src="./img/users/bluenoise.gif"  /><br />
+			<small>Unity's Lightmapper</small>
+			</center>
+		</div>
+	
+	</div>
+
+	<aside class="notes">
+		When we released this sampler, we had no idea that people would find it
+		so appealing. Quickly, it became the standard sampler for unity path tracing
+		routines. For example, the ray tracing in the HDRP or in the lightmap baker
+		use this sampler. <strong>*click*</strong> <br /><br />
+
+		But it went further than mere technological adoption. We got a lot of
+		questions, feedbacks about the core ideas.
+		<strong>*click*</strong> <br /><br />
+
+		We also discovered that people sometimes used it incorrectly.
+		<br /><br />
+
+		Thanks to all the feedback we got, we were able to improve on our
+		2019 sampler. Sometimes, questions lead us to new
+		understandings we would like to share with you.
+	</aside>
+</section>
+
+
+
+<!-- In the midtime -->
+<section data-background="black">
+	<div class="fragment" data-fragment-index="1" id="video_littlest_tokyo_01"></div>
+	<div class="fragment" data-fragment-index="2" id="video_littlest_tokyo_02"></div>
+	<div class="fragment" data-fragment-index="3" id="video_littlest_tokyo_03"></div>
+
+	<div style="width:100%; height:100%; position:absolute; top:0px; z-index: 0;">
+		<!-- Rendering video in canvas -->
+		<div id="video_tokyo_border" style="position:absolute;top:-2px;left:-2px;z-index:1; width:1282px; height:100%; transition: width 2s; border-right: solid 2px white;" ></div>
+		<img src="img/two_years/viking_tile_heitz2019_spp=64.png" id="midtime_tokyo_source_heitz" style="position:absolute;top:0;left:0;z-index:-1; width:1280px; height:720px; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); transition: clip-path 2s;" width="1280" height="720"></canvas>
+		<img src="img/two_years/viking_tile_ours_spp=64.png" id="midtime_tokyo_source_ours"  style="position:absolute;top:0;left:0;z-index:-2; width:1280px; height:720px;" width="1280" height="720"></canvas>
+
+		<!-- Inset -->
+		<div class="fragment fade-in" data-fragment-index="1" style="position:absolute; top:560px; left:570px; width:64px; height:64px; border:red solid 1px;"></div>
+
+		<!-- Text -->
+		<p style="position:absolute; left:-10px  ;top:600px; color:azure; text-shadow:1px 1px 2px black; font-size: 1.5em; font-variant-caps: small-caps;">Viking - 32 spp</p>
+		<p class="fragment fade-out" data-fragment-index="2" style="position:absolute; left:-10px  ;top:650px; color:azure; text-shadow:1px 1px 2px black;">Heitz et al. [<a href="">2019</a>]</p>
+		<p class="fragment fade-in-then-out"  data-fragment-index="2" style="position:absolute; left:-10px  ;top:650px; color:azure; text-shadow:1px 1px 2px black;">Ours</p>
+		<p class="fragment fade-in" data-fragment-index="3" style="position:absolute; left:-10px  ;top:650px; color:azure; text-shadow:1px 1px 2px black;">Heitz et al. [<a href="">2019</a>]</p>
+		<p class="fragment fade-in"  data-fragment-index="3" style="position:absolute; left:1150px  ;top:650px; color:azure; text-shadow:1px 1px 2px black; text-align: right;">Ours</p>
+
+		<!-- CC-by -->
+		<p class="fragment fade-out" data-fragment-index="3" style="position:absolute; left:1040px;top:665px; color:azure; text-shadow:1px 1px 2px black; font-size:0.5em;">3D model by <a href="https://sketchfab.com/nigelgoh">nigelgoh</a></p>
+	</div>
+
+	<!-- Big Inset -->
+	<div class="fragment fade-in" data-fragment-index="1" style="position:absolute; top: 70px; left:1020px; width:200px; height:200px;">
+		<canvas id="canvas_viking_intro_inset" style="width:100%; height:100%; border:solid 2px red; box-shadow:5px 5px 5px rgba(0, 0, 0, 0.2);" width="64" height="64"></canvas>
+		<div style="width:100%; text-align:center; font-size:0.7em; color:white; text-shadow:1px 1px 2px black;">Inset</div>
+	</div>
+
+	<!-- Power Spectrum -->
+	<div class="fragment fade-in" data-fragment-index="1" style="position:absolute; top:330px; left:1020px; width:200px; height:200px" >
+		<canvas class="pixelated" id="canvas_viking_intro_fft" style="width:100%; height:100%; border:solid 2px red; box-shadow:5px 5px 5px rgba(0, 0, 0, 0.2);" width="64" height="64"></canvas>
+		<div style="width:100%; text-align:center; font-size:0.7em; color:white; text-shadow:1px 1px 2px black;">Power Spectrum</div>
+	</div>
+
+
+	<aside class="notes">
+		As a teasing, here is a rendering using our previous sampler. 
+		<strong>*click*</strong> <br /><br />
+
+		Though the rendering is better than pure random scrambling (take my words),
+		the quality of the error distribution is not that great.
+		<strong>*click*</strong> <br /><br />
+
+		Our new sampler achieves a much better job in this scene.
+		<strong>*click*</strong> <br /><br />
+
+		Lets talk about how we moved from the left-side sampler to the new one.
+		<strong>*click*</strong><br /><br />
+	</aside>
+
+	<script>
+		var viking_i=570, viking_j=560 - 15;
+		Reveal.addEventListener( 'ready', function( event ) {
+			$('#midtime_tokyo_source_heitz').ready(function() {
+				updateFourierInsets('midtime_tokyo_source_heitz', 'canvas_viking_intro_inset', 'canvas_viking_intro_fft', viking_i, viking_j);
+			});
+		});
+
+		Reveal.addEventListener( 'fragmentshown', function( event ) {
+			if(event.fragment.id == "video_littlest_tokyo_01") {
+				updateFourierInsets('midtime_tokyo_source_heitz', 'canvas_viking_intro_inset', 'canvas_viking_intro_fft', viking_i, viking_j);
+			}
+			if(event.fragment.id == "video_littlest_tokyo_02") {
+				var canvas = document.getElementById("midtime_tokyo_source_heitz");
+				canvas.style.clipPath = 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)';
+				$('#video_tokyo_border').css('width', '0%');
+				updateFourierInsets('midtime_tokyo_source_ours', 'canvas_viking_intro_inset', 'canvas_viking_intro_fft', viking_i, viking_j);
+			}
+			else if(event.fragment.id == "video_littlest_tokyo_03") {
+				var canvas = document.getElementById("midtime_tokyo_source_heitz");
+				canvas.style.clipPath = 'polygon(0% 0%, 47.25% 0%, 47.25% 100%, 0% 100%)';
+				$('#video_tokyo_border').css('width', '47.25%');
+			}
+			else if(event.fragment.id == "video_littlest_tokyo_04") {
+				var bluenoise  = document.getElementById("midtime_tokyo_source_ours");
+				var whitenoise = document.getElementById("midtime_tokyo_source_heitz");
+				whitenoise.style.clipPath = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)';
+				$('#video_tokyo_border').css('width', '1282px');
+				var white = document.getElementById('midtime_tokyo_source_heitz');
+				window.clearInterval(white.timerId);
+			}
+		});
+		Reveal.addEventListener( 'fragmenthidden', function( event ) {
+			if(event.fragment.id == "video_littlest_tokyo_02") {
+				var canvas = document.getElementById("midtime_tokyo_source_heitz");
+				canvas.style.clipPath = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)';
+				$('#video_tokyo_border').css('width', '1282px');
+				updateFourierInsets('midtime_tokyo_source_heitz', 'canvas_viking_intro_inset', 'canvas_viking_intro_fft', viking_i, viking_j);
+			}
+			else if(event.fragment.id == "video_littlest_tokyo_03") {
+				var canvas = document.getElementById("midtime_tokyo_source_heitz");
+				canvas.style.clipPath = 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)';
+				$('#video_tokyo_border').css('width', '0%');
+			}
+			else if(event.fragment.id == "video_littlest_tokyo_04") {
+				var canvas = document.getElementById("midtime_tokyo_source_heitz");
+				canvas.style.clipPath = 'polygon(0% 0%, 45% 0%, 45% 100%, 0% 100%)';
+				$('#video_tokyo_border').css('width', '45%');
+			}
+		});
+	</script>
+</section>
+
+<!-- First a Quick Recap -->
+<section>
+	<h3>First A Quick Recap</h3>
+
+	<!-- Define all the fragments -->
+	<div id="quick_recap_frag_0" class="fragment" data-fragment-index="0"></div>
+	<div id="quick_recap_frag_1" class="fragment" data-fragment-index="1"></div>
+	<div id="quick_recap_frag_2" class="fragment" data-fragment-index="2"></div>
+	<div id="quick_recap_frag_3" class="fragment" data-fragment-index="3"></div>
+	<div id="quick_recap_frag_4" class="fragment" data-fragment-index="4"></div>
+	<div id="quick_recap_frag_5" class="fragment" data-fragment-index="5"></div>
+	<div id="quick_recap_frag_6" class="fragment" data-fragment-index="6"></div>
+	<div id="quick_recap_frag_7" class="fragment" data-fragment-index="7"></div>
+
+	<svg class="fragment" data-fragment-index="5" style="position:absolute; top:250px; left:20px; width:100%;"  width="100%" height="400px">
+		<g>
+			<path
+			style="opacity:1;fill:#e7e7e7;fill-opacity:1;stroke:none;stroke-width:1.99999988;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+			d="M 482.90765,-22.871094 V 0 L 0,0 v 113.13672 l 482.90765,0 v 22.87305 L 551.70452,96.289062 620.50335,56.568359 551.70452,16.847656 Z"
+			transform="translate(350, 50)"
+			id="rect817" />
+		</g>
+	</svg>
+
+	<div style="display:flex; justify-content:space-evenly;">
+		<!-- Scrambling and sorting masks -->
+		<center class="fragment" data-fragment-index="1"  style="width:30%; font-size:0.7em;">
+			<div>
+				<div style="position:relative; width:200px; height:200px;">
+					<canvas class="pixelated" id="quick_scrambling_mask_cnv" width="16px" height="16px" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
+					<div class="fragment" data-fragment-index="2" id="quick_recap_pixelA" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:10px; height:10px; border:solid 5px blue;"></div>
+				</div>
+				<br />
+				<div style="width:200px; text-align:center; font-size:0.6em;">Scrambling mask</div>
+			</div><br />
+
+			<div>
+				<div style="position:relative; width:200px; height:200px;">
+					<canvas class="pixelated" id="summary_sorting_mask_cnv" width="16px" height="16px" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
+					<div class="fragment" data-fragment-index="2" id="quick_recap_pixelB" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:10px; height:10px; border:solid 5px red;"></div>
+				</div>
+				<br />
+				<div style="width:200px; text-align:center; font-size:0.6em;">Sorting mask</div>
+			</div>
+		</center>
+
+		<!-- Central part of the slide -->
+		<div style="width:30%; font-size:0.7em; padding-top:110px; padding-left: 0px; position: relative;">
+
+			<!-- Samples -->
+			<center style="position:absolute; width:200px; left:100px;"  id="quick_recap_samples_div" >
+				<div class="fragment" data-fragment-index="0" >
+					<img style="border: solid 1px black;" width="200px" src="img/criterion/TestFunction2DHeavisideXY.jpg" />
+					<svg id="quick_recap_samples_svg" style="position:absolute; top:0px; left:0px; margin: 15px 0px 0px 0px; border: solid 1px black;" width="200px" height="200px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+						<g id="unit">
+							<rect x="0" y="0" width="512" height="512" style="fill:white;" />
+						</g>
+					</svg>
+					<div id="recap_samples_title" style="width:200px; text-align:center; font-size:0.6em;">Sobol samples</div>
+				</div>
+			</center>
+
+
+			<!-- Source code -->
+			<center style="position:absolute; width:400px; opacity: 0;"  id="quick_recap_code_div">
+				<pre style="margin-bottom:5px;"><code class="js" data-line-numbers>function screen_space_sampler(i, j, index, dimension)
+{
+// Fetch keys associated with pixel (i,j)
+scramble = scrambling_keys(i,j)
+sort = sorting_keys(i,j)
+
+// XOR the index
+index  = index ^ sort
+sample = sobol_owen(index, dimension)
+
+// XOR the sample
+sample = sample ^ scramble
+
+return sample
+}
+				</code></pre>
+				<div style="width:200px; text-align:center; font-size:0.6em;">2 texture fetches + 2 XORs</div>
+			</center>
+
+			
+		</div>
+
+		<!-- Result -->
+		<center class="fragment" data-fragment-index="5"  style="width:30%; font-size:0.7em; padding-top:120px;">
+			<div style="position:relative; width:200px; height:200px;">
+				<img class="pixelated" id="summary_result_cnv" width="64px" height="64px" src="./img/improving/teapot_tile_heitz2019_spp=16.jpg" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;" />
+			</div>
+			<br />
+			<div style="width:200px; text-align:center; font-size:0.6em;">QMC Integration</div>
+		</center>
+
+		<!-- Optimization step -->
+		<div style="position:absolute; top:0px; left:0px;" class="fragment" data-fragment-index="7">
+			<div style="position:relative; top:130px; width:250px; height:520px; left:100px; border:solid red 2px;"> </div><br />
+			<center style="position:relative; top:110px; width:250px; left:100px; color:red;"><small>Optimized on test integrands</small></center>
+		</div>
+
+		
+	</div>
+	<br />
+	<div class="fragment" data-fragment-index="2"  style="font-size:0.6em; width:90%; text-align:right;">
+		See [<a href="">Heitz et al. 2019</a>] for more details
+	</div>
+
+	<script>
+
+		/* Utilitary function to move a pixel (a div) in its parent at position
+		 * (i,j) as if it was the pixel coordinates.
+		 */
+		function movePixelTo(id, i, j, W=16, H=16) {
+			var div = $('#' + id);
+			var par = div.parent();
+			// console.log(div, par);
+			div.animate({ top: (j*par.width()/W), left: (i*par.height()/H) }, 500);
+		}
+
+		function resetPoints(base='quick') {
+			var snap = Snap('#' + base + '_recap_samples_svg');
+			if(snap) {
+				var svg  = document.getElementById(base + '_recap_samples_svg');
+				var unit = snap.select('#unit');
+				var list = snap.selectAll('circle');
+				var cnv  = document.getElementById(base+'_scrambling_mask_cnv');
+
+				for(var k=0; k<16; ++k) {
+					var elem = list[k];
+					var new_x = svg.points[k][0];
+					var new_y = svg.points[k][1];
+					color = 'hsb( 100%, 0%, ' + k*100/15 + '% )' 
+					elem.animate({'cx': new_x, 'cy': new_y, fill: color}, 500);
+				}
+			}
+		}
+
+		/* This function scamble the samples in the `scrambling_mask_integrand_svg` svg
+		 * element according to the 2D scramble located in canvas `scrambling_mask_cnv`.
+		 * If one provides a negative pixel coordinate, no xor is applied.
+		 */
+		 function movePointFromPixelScramble(i, j, base='quick') {
+			var snap = Snap('#' + base + '_recap_samples_svg');
+			if(snap) {
+				var svg  = document.getElementById(base + '_recap_samples_svg');
+				var unit = snap.select('#unit');
+				var list = snap.selectAll('circle');
+				var cnv  = document.getElementById(base+'_scrambling_mask_cnv');
+				var ctx  = cnv.getContext('2d');
+				var img  = ctx.getImageData(0, 0, cnv.width, cnv.height);
+				var data = img.data;
+
+				var xor_x = 0;
+				if(i >= 0) {
+					xor_x = data[4*(i + j*cnv.width) + 0];
+				}
+				var xor_y = 0;
+				if(j >= 0) {
+					xor_y = data[4*(i + j*cnv.height) + 1];
+				}
+				for(var k=0; k<16; ++k) {
+					var elem = list[k];
+					var new_x = svg.points[k][0] ^ xor_x;
+					var new_y = svg.points[k][1] ^ xor_y;
+					color = 'hsb( 100%, 0%, ' + (k^(xor_x%16))*100/15 + '% )' 
+					elem.animate({'cx': new_x, 'cy': new_y, fill: color}, 500);
+				}
+			}
+
+			if(i >= 0 || j >= 0) {
+				$('#' + base + '_recap_pixelA').animate({ top: (j*200/16), left: (i*200/16) }, 500);
+				$('#' + base + '_recap_pixelB').animate({ top: (j*200/16), left: (i*200/16) }, 500);
+				$('#' + base + '_recap_pixelC').animate({ top: (j*200/16), left: (i*200/16) }, 500);
+			}
+		}
+
+
+		Reveal.addEventListener( 'ready', function( event ) {
+			/* Generate the scrambling mask */
+			var cnv = document.getElementById('quick_scrambling_mask_cnv');
+			var width  = cnv.width;
+			var height = cnv.height;
+			var ctx = cnv.getContext('2d');
+			var img = ctx.createImageData(width, height);
+			for(var j=0; j<height; ++j)
+				for(var i=0; i<width; ++i)
+				{
+					var r  = Math.random();
+					var g  = Math.random();
+					var id = 4*(j*width + i);
+					img.data[id + 0]  = 255.0*r;
+					img.data[id + 1]  = 255.0*g;
+					img.data[id + 2]  = 0.0;
+					img.data[id + 3]  = 255.0;
+				}
+			ctx.putImageData(img, 0, 0);
+			cnv.image = img;
+
+			var cnv = document.getElementById('quick2_scrambling_mask_cnv');
+			var ctx = cnv.getContext('2d');
+			ctx.putImageData(img, 0, 0);
+			cnv.image = img;
+
+
+			/* Generate the sorting mask */
+			var cnv = document.getElementById('summary_sorting_mask_cnv');
+			var width  = cnv.width;
+			var height = cnv.height;
+			var ctx = cnv.getContext('2d');
+			var img = ctx.createImageData(width, height);
+			for(var j=0; j<height; ++j)
+				for(var i=0; i<width; ++i)
+				{
+					var g  = Math.random();
+					var id = 4*(j*width + i);
+					img.data[id + 0]  = 255.0*g;
+					img.data[id + 1]  = 255.0*g;
+					img.data[id + 2]  = 255.0*g;
+					img.data[id + 3]  = 255.0;
+				}
+			ctx.putImageData(img, 0, 0);
+			cnv.image = img;
+
+			// Update next slides sorting mask
+			var cnv = document.getElementById('quick2_sorting_mask_cnv');
+			var ctx = cnv.getContext('2d');
+			ctx.putImageData(img, 0, 0);
+			cnv.image = img;
+
+			/* Generate sobol points */
+			$('#quick_recap_samples_svg').ready(function() {
+				var svg  = document.getElementById('quick_recap_samples_svg');
+				var snap = Snap('#quick_recap_samples_svg');
+				var unit = snap.select('#unit');
+				var bbox = snap.attr('viewBox');
+				const width  = bbox.width;
+				const height = bbox.height;
+				// console.log(bbox);
+				svg.points = [];
+				for(var i=0; i<16; ++i){
+					var u = sobol.sample(i, 0);
+					var v = sobol.sample(i, 1);
+					var x = u*width;
+					var y = v*height;
+					svg.points[i] = [x, y];
+					var xi = snap.circle(x, y, 6.0);
+					color = 'hsb( 100%, 0%, ' + i*100/15 + '% )' 
+					xi.attr({ fill: color, stroke: '#666', strokeWidth: 4.0 });
+				}
+			});
+		});
+
+		Reveal.addEventListener( 'fragmentshown', function( event ) {
+			if(event.fragment.id == "quick_recap_frag_2") {
+				var i = 5;
+				var j = 5;
+				movePointFromPixelScramble(i, j);
+				$('#recap_samples_title').text("Sobol+XOR samples");
+			}
+			if(event.fragment.id == "quick_recap_frag_3") {
+				var i = 7;
+				var j = 14;
+				movePointFromPixelScramble(i, j);
+			}
+			else if(event.fragment.id == "quick_recap_frag_4") {
+				var i = 10;
+				var j = 6;
+				movePointFromPixelScramble(i, j);
+			}
+			else if(event.fragment.id == "quick_recap_frag_5") {
+				$('#quick_recap_pixelA').animate({ opacity: 0 });
+				$('#quick_recap_pixelB').animate({ opacity: 0 });
+			}
+			else if(event.fragment.id == "quick_recap_frag_6") {
+				$('#quick_recap_samples_div').animate({ opacity: 0 });
+				$('#quick_recap_code_div').animate({ opacity: 1 });
+			}
+		});
+
+		Reveal.addEventListener( 'fragmenthidden', function( event ) {
+			if(event.fragment.id == "quick_recap_frag_2") {
+				resetPoints();
+				$('#recap_samples_title').text("Sobol samples");
+			}
+			if(event.fragment.id == "quick_recap_frag_3") {
+				var i = 5;
+				var j = 5;
+				movePointFromPixelScramble(i, j);
+			}
+			else if(event.fragment.id == "quick_recap_frag_4") {
+				var i = 7;
+				var j = 14;
+				movePointFromPixelScramble(i, j);
+			}
+			else if(event.fragment.id == "quick_recap_frag_5") {
+				$('#quick_recap_pixelA').animate({ opacity: 1 });
+				$('#quick_recap_pixelB').animate({ opacity: 1 });
+			}
+			else if(event.fragment.id == "quick_recap_frag_6") {
+				$('#quick_recap_samples_div').animate({ opacity: 1 });
+				$('#quick_recap_code_div').animate({ opacity: 0 });
+			}
+		});
+
+	</script>
+	<aside class="notes">
+		To do so, I will need to give you a glance of our 2019 talk.
+		<strong>*click*</strong><br /><br />
+
+		This sampler use as input the sobol sequence ...
+		<strong>*click*</strong><br /><br />
+
+		and two textures that we call the scrambling and the sorting masks.
+		<strong>*click*</strong><br /><br />
+
+		Every pixel of the scrambling and sorting masks (in blue and red)
+		scramble the sobol sequence. In practice, we XOR the Sobol sequence
+		with the value in the scrambling mask and shuffle the indexing
+		with the value in sorting mask.
+		<strong>*click*</strong><br /><br />
+
+		So, different pixels correspond to different sequences.
+		<strong>*click*</strong><br /><br />
+
+		<strong>*click*</strong><br /><br />
+
+		When we use this sampler in a path tracer,
+		we obtain renderings where the correlation of the pixels depends
+		on the correlation between the sequences.
+		<strong>*click*</strong><br /><br />
+
+		This sampler is quite straighforward to include in a path
+		tracer and the code is two texture fetches and two XORs.
+		<strong>*click*</strong><br /><br />
+
+		Now, the key point of improving the quality of rendering, is to
+		optimize the masks. But to make them scene agnostic, we optimize
+		them with respect to a database of test integrands.
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+<section data-auto-animate>
+	<h3>First A Quick Recap</h3>
+	<!-- Main frame -->
+	<div style="display:flex; justify-content:space-evenly; z-index:1; padding-top:110px;">
+			
+		<!-- Test integrands -->
+		<center style="width:30%; position:relative;">
+			<img data-id="quick2_test_integrands_img" width="200px" height="200px"  src="img/two_years/integrand-0.png" />
+			<div data-id="quick_recap_animate_text1" style="width:200px; text-align:center; font-size:0.4em;">Test integrand</div>
+		</center>
+	</div>
+	<aside class="notes">
+		This database is made of randomly oriented heavisides.
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+<section data-auto-animate>
+
+	<!-- Define all the fragments -->
+	<div id="quick2_recap_frag_1" class="fragment" data-fragment-index="1"></div>
+	<div id="quick2_recap_frag_2" class="fragment" data-fragment-index="2"></div>
+
+	<h3>First A Quick Recap</h3>
+
+	<!-- Arrow -->
+	<svg style="position:absolute; top:250px; left:20px; width:100%; z-index:-1;"  width="100%" height="400px">
+		<g>
+			<path
+			style="opacity:1;fill:#e7e7e7;fill-opacity:1;stroke:none;stroke-width:1.99999988;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+			d="M 482.90765,-22.871094 V 0 L 0,0 v 113.13672 l 482.90765,0 v 22.87305 L 551.70452,96.289062 620.50335,56.568359 551.70452,16.847656 Z"
+			transform="translate(350, 50)"
+			id="rect817" />
+		</g>
+	</svg>
+
+	<!-- Main frame -->
+	<div style="display:flex; justify-content:space-evenly; z-index:1;">
+			
+		<!-- Test integrands -->
+		<center style="width:30%; position:relative; padding-top:110px;">
+			<div class="fragment" data-fragment-index="2">
+				<img width="200px" height="200px" style="position:absolute; top: 50px; left:150px;"  src="img/two_years/integrand-6.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 60px; left:140px;"  src="img/two_years/integrand-5.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 70px; left:130px;"  src="img/two_years/integrand-4.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 80px; left:120px;"  src="img/two_years/integrand-3.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 90px; left:110px;"  src="img/two_years/integrand-2.png" />
+				<img width="200px" height="200px" style="position:absolute; top:100px; left:100px;"  src="img/two_years/integrand-1.png" />
+			</div>
+			<img data-id="quick2_test_integrands_img" id="quick2_test_integrands_img" width="200px" height="200px" style="position:relative; top:0px; left:0px;"  src="img/two_years/integrand-0.png" />
+			
+			<div data-id="quick_recap_animate_text1" style="width:200px; text-align:center; font-size:0.4em;">Test integrand</div>
+		</center>
+
+		<!-- Scrambling and sorting masks -->
+		<center style="width:30%;">
+			<div>
+				<div style="position:relative; width:200px; height:200px;">
+					<canvas class="pixelated" id="quick2_scrambling_mask_cnv" width="16px" height="16px" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
+					<div class="fragment" data-fragment-index="3" id="quick2_recap_pixelA" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:10px; height:10px; border:solid 3px blue;"></div>
+					<div class="fragment" data-fragment-index="3" id="quick2_recap_pixelA2" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:10px; height:10px; border:solid 3px blue;"></div>
+				</div>
+				<br />
+				<div style="width:200px; text-align:center; font-size:0.4em;">Scrambling mask</div>
+			</div><br />
+
+			<div>
+				<div style="position:relative; width:200px; height:200px;">
+					<canvas class="pixelated" id="quick2_sorting_mask_cnv" width="16px" height="16px" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:200px; height:200px;"></canvas>
+					<div class="fragment" data-fragment-index="3" id="quick2_recap_pixelB" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:10px; height:10px; border:solid 3px red;"></div>
+					<div class="fragment" data-fragment-index="3" id="quick2_recap_pixelB2" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:10px; height:10px; border:solid 3px red;"></div>
+				</div>
+				<br />
+				<div style="width:200px; text-align:center; font-size:0.4em;">Sorting mask</div>
+			</div>
+		</center>
+
+		<!-- Resulting images -->
+		<center style="width:30%; padding-top:110px; position:relative;">
+			<div class="fragment" data-fragment-index="2">
+				<img width="200px" height="200px" style="position:absolute; top: 50px; left:150px;"  src="img/two_years/tile-before_000006.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 60px; left:140px;"  src="img/two_years/tile-before_000005.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 70px; left:130px;"  src="img/two_years/tile-before_000004.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 80px; left:120px;"  src="img/two_years/tile-before_000003.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 90px; left:110px;"  src="img/two_years/tile-before_000002.png" />
+				<img width="200px" height="200px" style="position:absolute; top:100px; left:100px;"  src="img/two_years/tile-before_000001.png" />
+			</div>
+			<div style="position:relative; width:200px; height:200px;">
+				<img id="quick2_test_renderings_img" width="200px" height="200px" class="pixelated" style="position:relative;" src="img/two_years/tile-before_000000.png" />
+				<div class="fragment" data-fragment-index="3" id="quick2_recap_pixelC" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:10px; height:10px; border:solid 3px red;"></div>
+				<div class="fragment" data-fragment-index="3" id="quick2_recap_pixelC2" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:10px; height:10px; border:solid 3px red;"></div>
+				<div style="width:200px; text-align:center; font-size:0.4em; ">Test 'rendering'</div>
+			</div>
+		</center>
+	</div>
+
+	<script>
+		/* Define the animation function for the test integrands */
+		var quick2_src = 0;
+		var test_integrands_refresh = function() {
+			quick2_src = (quick2_src+1) % 16;
+			console.log("img/two_years/integrand-" + quick2_src + ".png");
+			var img = document.getElementById('quick2_test_integrands_img').src = "img/two_years/integrand-" + quick2_src + ".png";
+			var img = document.getElementById('quick2_test_renderings_img').src = "img/two_years/tile-before_" + ("000000" + quick2_src).slice(-6) + ".png";
+		}
+
+		/* At the init, recopy the content of the previous frame canvas */
+		Reveal.addEventListener( 'ready', function( event ) {
+			var i=10, j=6;
+			var k=4, l=9;
+			movePixelTo('quick2_recap_pixelA',  i, j, 16, 16);
+			movePixelTo('quick2_recap_pixelB',  i, j, 16, 16);
+			movePixelTo('quick2_recap_pixelC',  i, j, 16, 16);
+			movePixelTo('quick2_recap_pixelA2', k, l, 16, 16);
+			movePixelTo('quick2_recap_pixelB2', k, l, 16, 16);
+			movePixelTo('quick2_recap_pixelC2', k, l, 16, 16);
+		});
+
+		/* Fragments handling */
+		var results_test_integrands_timerId;
+		Reveal.addEventListener( 'fragmentshown', function( event ) {
+			if(event.fragment.id == "quick2_recap_frag_1") {
+				window.clearInterval(results_test_integrands_timerId);
+				results_test_integrands_timerId = window.setInterval(test_integrands_refresh, 1000.0);
+				setTimeout(function(){ window.clearInterval(results_test_integrands_timerId); }, 8000.0);
+			}
+			else if(event.fragment.id == "quick2_recap_frag_2") {
+				window.clearInterval(results_test_integrands_timerId);
+			}
+		});
+		Reveal.addEventListener( 'fragmenthidden', function( event ) {
+			if(event.fragment.id == "quick2_recap_frag_1") {
+				window.clearInterval(results_test_integrands_timerId);
+			}
+			else if(event.fragment.id == "quick2_recap_frag_2") {
+				window.clearInterval(results_test_integrands_timerId);
+				results_test_integrands_timerId = window.setInterval(test_integrands_refresh, 1000.0);
+				setTimeout(function(){ window.clearInterval(results_test_integrands_timerId); }, 8000.0);
+			}
+		});
+	</script>
+	<aside class="notes">
+		Given this test function, we can use our sampler to produce an image
+		where each pixel is the integral of the test function with the
+		corresponding sequence. <strong>*click*</strong><br /><br />
+
+		By changing the test function, we obtain different realisations
+		of the test renderings. <strong>*click*</strong><br /><br />
+
+		Our idea was to stack a very large number of those realisations.
+		In fact, we used 2^16 randomly choosen heaviside and
+		got 2^16 realisations. <strong>*click*</strong><br /><br />
+
+		To distribute the integration error as a blue-noise, we optimized
+		the two masks to obtain blue-noise images out of the test renderings.
+		The optimization was using a genetic algorithm that swapped pixels
+		according to a loss. <strong>*click*</strong><br /><br />
+	</aside>
+</section>
+
+
+<!-- Misunderstanding #1: it is optimized for discontinuities -->
+<section>
+	<div style="width:60%; padding:15% 0% 0% 20%;">Misunderstanding #1 </div><br />
+	<div style="width:60%; padding:0% 0% 0% 25%;">
+
+	<div style="width:650px; display:flex; flex-flow:wrap; justify-content:flex-start;">
+
+		<div style="width:50px; align-self:end; margin-right:15px; font-size:2em;">
+			👨‍💻
+		</div>
+		<div style="width:500px; border-radius: 30px 30px 30px 0px; background-color:rgb(205,205,205); padding:30px; font-size: 0.8em;;">
+			I bet the <strong>blue-noise won't work on smooth integrands</strong> since it is optimized for discontinuities.
+		</div>
+
+		<div style="width:50px; align-self:end; margin-right:15px;">	
+		</div>
+		<div style="width:500px; font-size:0.5em;">
+			<a href="">@pedanticMathematician</a> - very late in the night.
+		</div> 
+	</div>
+	</div>
+	<aside class="notes">
+		When we talked about this idea, people were skeptical that the
+		blue-noise distribution would transfer to other types of integrands.
+		Since the masks were optimized for discontinuous integrands, it
+		was thought that it would not produce a valid blue-noise distribution
+		on continuous integrands. <strong>*click*</strong><br /><br />
+	</aside>
+</section>
+<section data-auto-animate>
+	<h3>Insight #1: Optimizing Vectors</h3>
+
+	<!-- Main frame -->
+	<div style="display:flex; justify-content:center; z-index:1;">
+			
+		<!-- Resulting images -->
+		<center data-id="insight1_block" style="width:30%; padding-top:110px; position:relative;">
+			<div>
+				<img width="200px" height="200px" style="position:absolute; top: 50px; left:150px;"  src="img/two_years/tile-before_000006.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 60px; left:140px;"  src="img/two_years/tile-before_000005.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 70px; left:130px;"  src="img/two_years/tile-before_000004.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 80px; left:120px;"  src="img/two_years/tile-before_000003.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 90px; left:110px;"  src="img/two_years/tile-before_000002.png" />
+				<img width="200px" height="200px" style="position:absolute; top:100px; left:100px;"  src="img/two_years/tile-before_000001.png" />
+			</div>
+			<div style="position:relative; width:200px; height:200px;">
+				<img id="insight1_test_renderings_img" width="200px" height="200px" class="pixelated" style="position:relative;" src="img/two_years/tile-before_000000.png" />
+				<div data-id="insight1_text1" style="width:200px; text-align:center; font-size:0.4em; ">Test 'rendering'</div>
+			</div>
+		</center>
+	</div>
+	<aside class="notes">
+		Yet, it performs very well on continuous integrands.
+		Here is the reason why.
+		Let's start from the test integrands' realisations.
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+<section data-auto-animate>
+	<h3>Insight #1: Optimizing Vectors</h3>
+
+	<!-- Main frame -->
+	<div style="display:flex; justify-content:center; z-index:1;">
+			
+		<!-- Resulting images -->
+		<center style="width:30%; padding-top:110px; position:relative;">
+			<div   data-id="insight1_block">
+				<img width="200px" height="200px" style="position:absolute; top: 50px; left:150px;"  src="img/two_years/tile-before_000006.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 60px; left:140px;"  src="img/two_years/tile-before_000005.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 70px; left:130px;"  src="img/two_years/tile-before_000004.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 80px; left:120px;"  src="img/two_years/tile-before_000003.png" />
+				<img width="200px" height="200px" style="position:absolute; top: 90px; left:110px;"  src="img/two_years/tile-before_000002.png" />
+				<img width="200px" height="200px" style="position:absolute; top:100px; left:100px;"  src="img/two_years/tile-before_000001.png" />
+			</div>
+			<div style="position:relative; width:200px; height:200px;">
+				<img id="insight1_test_renderings_img" width="200px" height="200px" class="pixelated" style="position:relative;" src="img/two_years/tile-before_000000.png" />
+				<div id="insight1_recap_pixelC" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:10px; height:10px; border:solid 3px red;"></div>
+				<div data-id="insight1_text1" style="width:200px; text-align:center; font-size:0.4em; ">Test 'rendering'</div>
+			</div>
+		</center>
+
+		<center style="width:20%; padding-top:70px;">
+			<div style="position:relative; height:265px; display:flex; justify-content:center;">
+				<div style="width:10px; height:10px; border:solid 3px red; align-self:center;"></div>
+				<div style="align-self:center; padding-left:10px;">=</div>
+				<div style="align-self:center;">
+					$$\begin{bmatrix} \\ \vdots \\ \vdots \\  \\ \end{bmatrix}$$
+				</div>
+			</div>
+			<div data-id="insight1_text1" style="width:200px; text-align:center; font-size:0.4em; ">Vector of realization</div>
+		</center>
+	</div>
+
+
+	<div class="fragment" style="position:absolute; top:200px; left:800px;">
+	<div style="position:absolute; top:95px; left:66px; width:200px; height:30px; border-top: 2px solid red;"></div>
+	<img style="position:absolute; top:-30px; left:200px; border: 1.5px solid red;" width="150px" src="img/two_years/integrand-0.png" />
+	<div style="position:absolute; top:195px; left:66px; width:200px; height:30px; border-top: 2px solid green;"></div>
+	<img style="position:absolute; top:140px; left:200px; border: 1.5px solid green;" width="150px" src="img/two_years/integrand-12.png" />
+	<div style="position:absolute; top:80px; left:34px; width:30px; height:30px; border: 2px solid red;"></div>
+	<div style="position:absolute; top:180px; left:34px; width:30px; height:30px; border: 2px solid green;"></div>
+	</div>
+	<script>
+		/* Init slide */
+		Reveal.addEventListener( 'ready', function( event ) {
+			var i=9, j=5;
+			movePixelTo('insight1_recap_pixelC',  i, j, 16, 16);
+		});
+	</script>
+	<aside class="notes">
+		Each pixel can be seen as a vector containing the integral values
+		of all test functions with respect to a single sequence.
+		<strong>*click*</strong><br /><br />
+
+		Each entry in the vector correspond to a different test function.
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+<section>
+	<h3>Insight #1: Optimizing Vectors</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:48%;">
+			<li class="fragment fade-in-then-semi-out" data-fragment-index="1">We are swapping <strong>2<sup>16</sup>D vectors</strong>!
+				<ul>
+					<li>Requires a specific loss</li>
+				</ul>
+			</li>
+
+			<li class="fragment fade-in-then-semi-out" data-fragment-index="2"><strong>Equivalent</strong> to swapping PCA coordinates
+				<ul>
+				</ul>
+			</li>
+
+			<li class="fragment" data-fragment-index="4" style="margin-bottom:0px;"><strong>Eigen-test integrands</strong> from PCA
+				<ul>
+					<li class="fragment" data-fragment-index="4">They are quite smooth!</li>
+				</ul>
+			</li>
+	</div>
+
+
+	<!-- Equivalence between eigen-function -->
+	<div  class="fragment fade-in-then-out" data-fragment-index="2" style="position:absolute; top:320px; left:40px; display:flex; justify-content:space-evenly; width:100%;">
+		<center style="width:20%;">
+			<div style="position:relative; height:265px; display:flex; justify-content:center;">
+				<div style="align-self:center;">
+					$$\begin{bmatrix} \\ \vdots \\ \vdots \\  \\ \end{bmatrix} = R_\theta \begin{bmatrix} \\ \vdots \\ \vdots \\  \\ \end{bmatrix}$$
+				</div>
+			</div>
+
+			<div>
+			<div style="position:absolute; top:95px; left:200px; width:350px; height:30px; border-top: 2px solid red;"></div>
+			<img style="position: absolute; top:-30px; left:200px; border: 1.5px solid red;" width="150px" src="img/two_years/integrand-0.png" />
+			<div style="position:absolute; top:195px; left:200px; width:350px; height:30px; border-top: 2px solid green;"></div>
+			<img style="position: absolute; top:140px; left:200px; border: 1.5px solid green;" width="150px" src="img/two_years/integrand-12.png" />
+			<div style="position:relative; top:-187px; left:-75px; width:30px; height:30px; border: 2px solid red;"></div>
+			<div style="position:relative; top:-120px; left:-75px; width:30px; height:30px; border: 2px solid green;"></div>
+
+
+			<div style="position:absolute; top:95px; left:730px; width:140px; height:30px; border-top: 2px solid red;"></div>
+			<div style="position:absolute; top:54px; left:880px; color:red">$$ f_3(x)$$	</div>
+			<!-- <img style="position: absolute; top:-30px; left:900px; border: 1.5px solid red;" width="150px" src="img/eigenvectors/tile-owen+xor_16spp_0vector_0.21758540939516244.png" /> -->
+			<div style="position:absolute; top:195px; left:730px; width:140px; height:30px; border-top: 2px solid green;"></div>
+			<div style="position:absolute; top:154px; left:880px; color:green">$$ f_{49}(x)$$	</div>
+			<!-- <img style="position: absolute; top:140px; left:900px; border: 1.5px solid g	reen;" width="150px" src="img/eigenvectors/tile-owen+xor_16spp_1vector_0.4021611602939282.png" /> -->
+			<div style="position:relative; top:-253px; left:75px; width:30px; height:30px; border: 2px solid red;"></div>
+			<div style="position:relative; top:-187px; left:75px; width:30px; height:30px; border: 2px solid green;"></div>
+			</div>
+		</center>
+	</div>
+
+	<!-- Eigen-test-functions -->
+	<div class="fragment" data-fragment-index="4" style="position:absolute; left:100px; top:400px; display:flex; justify-content:space-evenly; width:80%;">
+		<center style="height:230px; width:10px; position:relative;writing-mode: vertical-lr; font-size: 0.6em;;">
+			Sobol + XOR
+		</center>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-owen+xor_16spp_0vector_0.21758540939516244.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_0  $$</div>
+		</div>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-owen+xor_16spp_1vector_0.4021611602939282.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_1  $$</div>
+		</div>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-owen+xor_16spp_2vector_0.4505668372297504.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_2  $$</div>
+		</div>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-owen+xor_16spp_3vector_0.4798349864012879.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_3  $$</div>
+		</div>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-owen+xor_16spp_4vector_0.5088412394663967.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_4  $$</div>
+		</div>
+	</div>
+	<aside class="notes">
+		The insight we got from this point of view is that
+		<strong>*click*</strong><br /><br />
+
+		the optimization process is simply swapping vectors of
+		very large dimensions (in fact 2^16 D!!). Looking at
+		this vector space, we can extract its principal directions
+		using an eigen decomposition.
+		<strong>*click*</strong><br /><br />
+
+		When we optimize the masks, we equivalently optimize the
+		spatial distribution of another set of vectors in the
+		space of the PCA. And this space is given by a rotation
+		matrix in this high dimensional space.
+		<strong>*click*</strong><br /><br />
+
+		So the optimizer is optimizing the realization of
+		a different set of functions that are defined by the eigenvectors.
+		We call them eigen-test-functions.
+		Each eigen-test-function is the weighted sum of all the
+		test functions weighted by the values in the eigenvector.
+		<br /><br />
+
+		And because there is so many discontinuous
+		function, we end up with eigen-test-functions that are
+		pretty smooths. !
+		<strong>*click*</strong><br /><br /> 
+	</aside>
+</section>
+<section>
+	<h3>The Limits of Owen's Scrambled Sobol</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:48%;">
+			<li>But <strong>not that smooth</strong> ...
+			</li>
+		</ul>
+	</div>
+
+	<div style="position:absolute; left:100px; top:190px; display:flex; justify-content:space-evenly; width:80%;">
+		<center style="height:230px; width:10px; position:relative;writing-mode: vertical-lr; font-size: 0.6em;;">
+			Sobol + XOR
+		</center>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-owen+xor_16spp_0vector_0.21758540939516244.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_0  $$</div>
+		</div>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-owen+xor_16spp_1vector_0.4021611602939282.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_1  $$</div>
+		</div>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-owen+xor_16spp_2vector_0.4505668372297504.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_2  $$</div>
+		</div>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-owen+xor_16spp_3vector_0.4798349864012879.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_3  $$</div>
+		</div>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-owen+xor_16spp_4vector_0.5088412394663967.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_4  $$</div>
+		</div>
+	</div>
+
+	<div style="position:absolute; left:100px; top:420px; display:flex; justify-content:space-evenly; width:80%;">
+		<center style="height:230px; width:10px; position:relative;writing-mode: vertical-lr; font-size: 0.6em;;">
+			independent
+		</center>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-independent_16spp_0vector_0.2991166076861194.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_0  $$</div>
+		</div>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-independent_16spp_1vector_0.59569900318872.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_1  $$</div>
+		</div>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-independent_16spp_2vector_0.6508579793947779.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_2  $$</div>
+		</div>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-independent_16spp_3vector_0.7025914603151581.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_3  $$</div>
+		</div>
+		<div>
+			<img width="180px" src="img/eigenvectors/tile-independent_16spp_4vector_0.7420913656442217.png" />
+			<div style="width:180px; height:10px; font-size:small; margin:0px; position:relative; top:-10px;">$$ f_4  $$</div>
+		</div>
+	</div>
+	</center>
+
+	<aside class="notes">
+		We compared the eigen-test-functions from the Sobol sampler to the
+		eigen-test-functions from an independent sampler, using the`
+		same optimizer.
+
+		We found that the independent sampler would yeld even smoother
+		eigen-test-functions. And it seems to be linked to the ability of the
+		sampler to produce a good blue-noise distribution.
+		<strong>*click*</strong><br /><br />		
+	</aside>
+</section>
+<section>
+	<h3>The Limits of Owen's Scrambled Sobol</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:48%;">
+			<li>But <strong>not that smooth</strong> ...
+				<ul>
+					<li>Impacts the quality of the blue-noise</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+
+	<center>
+	<div style="display:flex; justify-content:space-evenly; width:40%;">
+		<!-- Owen+CPR -->
+		<div style="width:180px; height:180px;">
+			<small style="width:100%; text-align: center;">Sobol+XOR</small>
+			<img id="limits_owen_img_01" class="pixelated" style="margin:0px; width:100%;" src="img/limits_owen/owen+xor-cos-after.png" />
+			<canvas id="limits_owen_fft_01" style="width:100%; height:100%; border: 1.0px solid #222; box-shadow:5px 5px 5px rgba(0, 0, 0, 0.2);" width="128" height="128"></canvas>
+		</div>
+		<!-- Independent -->
+		<div style="width:180px; height:180px;">
+			<small style="width:100%; text-align: center;">Independent</small>
+			<img id="limits_owen_img_02" class="pixelated" style="margin:0px; width:100%;" src="img/limits_owen/independent-cos-after.png" />
+			<canvas id="limits_owen_fft_02" style="width:100%; height:100%; border: 1.0px solid #222; box-shadow:5px 5px 5px rgba(0, 0, 0, 0.2);" width="128" height="128"></canvas>
+		</div>
+	</div>
+	</center>
+
+	<script>
+	Reveal.addEventListener( 'ready', function( event ) {
+		$('#limits_owen_img_01').ready(function() {
+			var fft_cnv = document.getElementById('limits_owen_fft_01');
+			var fft_ctx = fft_cnv.getContext('2d');
+			fft_ctx.drawImage(document.getElementById('limits_owen_img_01'), 0, 0, 128, 128, 0, 0, 128, 128);
+			canvasFFT(fft_cnv, 5000);
+		});
+
+		$('#limits_owen_img_02').ready(function() {
+			var fft_cnv = document.getElementById('limits_owen_fft_02');
+			var fft_ctx = fft_cnv.getContext('2d');
+			fft_ctx.drawImage(document.getElementById('limits_owen_img_02'), 0, 0, 128, 128, 0, 0, 128, 128);
+			canvasFFT(fft_cnv, 400);
+		});
+	});
+	</script>
+
+	<aside class="notes">
+		Indeed, when we compare the sobol sampler to the
+		independent sampler on a simple smooth function
+		like a cosine, we obtain the following result.
+		While the independent sequence has higher variance,
+		the sobol sampler has lost its blue-noise property.
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+
+<section>
+	<h3>The Limits of Owen's Scrambled Sobol</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:48%;">
+			<li style="opacity:0.5;">But <strong>not that smooth</strong> ...
+				<ul>
+					<li>Impacts the quality of the blue-noise</li>
+				</ul>
+			</li>
+			<li class="fragment fade-in-then-semi-out" data-fragment-index="1">Difference seems due to scrambling
+				<ul>
+					<li>Sobol+XOR produces few variations</li>
+					<li>Independent produces an infinite set sequences</li>
+				</ul>
+			</li>
+			<li class="fragment fade-in" data-fragment-index="3">Works with a different scrambling
+				<ul>
+					<li class="fragment fade-in" data-fragment-index="4">Wait! <strong>Cranley-Patterson Rotations???</strong></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+
+
+	<center style="position:absolute; width:100%; top:180px; left:280px" class="fragment fade-in"  data-fragment-index="1">
+		<div style="display:flex; justify-content:space-evenly; width:45%;">
+			<!-- Owen+CPR -->
+			<div style="width:180px; height:180px;">
+				<small style="width:100%; text-align: center;">Sobol+XOR</small>
+				<img id="limits2_owen_img_01" class="pixelated" style="margin:0px; width:100%;" src="img/limits_owen/owen+xor-cos-after.png" />
+				<canvas id="limits2_owen_fft_01" style="width:100%; height:100%; border: 1.0px solid #222; box-shadow:5px 5px 5px rgba(0, 0, 0, 0.2);" width="128" height="128"></canvas>
+				<div class="fragment fade-in"  data-fragment-index="4">
+				<small style="color:green;">✔ convergence </small><br/>
+				<small style="color:red;">✘ blue-noise</small>
+				</div>
+			</div>
+			<!-- Independent -->
+			<div style="width:180px; height:180px;">
+				<small style="width:100%; text-align: center;">Independent</small>
+				<img id="limits2_owen_img_02" class="pixelated" style="margin:0px; width:100%;" src="img/limits_owen/independent-cos-after.png" />
+				<canvas id="limits2_owen_fft_02" style="width:100%; height:100%; border: 1.0px solid #222; box-shadow:5px 5px 5px rgba(0, 0, 0, 0.2);" width="128" height="128"></canvas>
+				<div class="fragment fade-in"  data-fragment-index="4">
+					<small style="color:red;">✘ convergence </small><br/>
+					<small style="color:green;">✔ blue-noise</small>
+				</div>
+			</div>
+			<!-- Owen+CPR -->
+			<div class="fragment" data-fragment-index="3" style="width:180px; height:180px;">
+				<small style="width:100%; text-align: center;">Sobol+CPR</small>
+				<img id="limits2_owen_img_03" class="pixelated" style="margin:0px; width:100%;" src="img/limits_owen/owen+cpr-cos-after.png" />
+				<canvas id="limits2_owen_fft_03" style="width:100%; height:100%; border: 1.0px solid #222; box-shadow:5px 5px 5px rgba(0, 0, 0, 0.2);" width="128" height="128"></canvas>
+				<div class="fragment fade-in"  data-fragment-index="4">
+					<small style="color:red;">✘ convergence </small><br/>
+					<small style="color:green;">✔ blue-noise</small>
+				</div>
+			</div>
+		</div>
+		</center>
+	
+		<script>
+		Reveal.addEventListener( 'ready', function( event ) {
+			$('#limits2_owen_img_01').ready(function() {
+				var fft_cnv = document.getElementById('limits2_owen_fft_01');
+				var fft_ctx = fft_cnv.getContext('2d');
+				fft_ctx.drawImage(document.getElementById('limits2_owen_img_01'), 0, 0, 128, 128, 0, 0, 128, 128);
+				canvasFFT(fft_cnv, 5000);
+			});
+	
+			$('#limits2_owen_img_02').ready(function() {
+				var fft_cnv = document.getElementById('limits2_owen_fft_02');
+				var fft_ctx = fft_cnv.getContext('2d');
+				fft_ctx.drawImage(document.getElementById('limits2_owen_img_02'), 0, 0, 128, 128, 0, 0, 128, 128);
+				canvasFFT(fft_cnv, 400);
+			});
+	
+			$('#limits2_owen_img_03').ready(function() {
+				var fft_cnv = document.getElementById('limits2_owen_fft_03');
+				var fft_ctx = fft_cnv.getContext('2d');
+				fft_ctx.drawImage(document.getElementById('limits2_owen_img_03'), 0, 0, 128, 128, 0, 0, 128, 128);
+				canvasFFT(fft_cnv, 1100);
+			});
+		});
+		</script>
+
+	<aside class="notes">
+		So we concluded that not all sequences are equal when we
+		want to optimize them to distribute error as a blue-noise.
+		<strong>*click*</strong><br /><br />
+
+		In fact, the scrambling mechanism seems to be the culprit.
+		Our intuition is that when XORng the sobol sequence, We do
+		not produce a large variety of sequences. In contrast, the
+		independent sampler produces very different sequences.
+		<strong>*click*</strong><br /><br />
+
+		In contrast, if we change the scrambling mechanism of
+		the sobol sequence for cranley-patterson rotations (that
+		is shift modulo one), we obtain a power spectra
+		with good blue-noise property.
+		<strong>*click*</strong><br /><br />
+
+		However, if we use a Cranley-Patterson rotation, we break
+		the stratification of the Sobol sequence. This is what We
+		advised against two years ago.
+	</aside>
+</section>
+
+
+<!-- Question #1 -->
+<section>
+	<div style="width:60%; padding:15% 0% 0% 20%;">Question #1 </div><br />
+	<div style="width:60%; padding:0% 0% 0% 25%;">
+
+	<div style="width:650px; display:flex; flex-flow:wrap; justify-content:flex-start;">
+		<img width="50px" style=" border-radius:25px; width:50px; align-self:end; margin-right:15px; font-size:2em;" src="img/users/keller.JPG" />
+		<div style="width:500px; border-radius: 30px 30px 30px 0px; background-color:rgb(205,205,205); padding:30px; font-size: 0.8em;;">
+			Can I use my own sequence?
+		</div>
+
+		<div style="width:50px; align-self:end; margin-right:15px;">	
+		</div>
+		<div style="width:500px; font-size:0.5em;">
+			<a href="">@QMC_Master</a> - mod(noon * k, 1).
+		</div> 
+	</div>
+	</div>
+	<aside class="notes">
+		So we have seen that our ability to optimize the blue-noise
+		distribution of the error depends on the capacity of the
+		scrambling mechanism to produce a large variety of scrambled
+		sequences. We fail to have a such a scrambling for sobol,
+		so we decided to change the sequence.
+		<strong>*click*</strong><br /><br /> 
+	</aside>
+</section>
+
+<section>
+	<h3>Changing The Sequence</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:48%;">
+			<li>Rank-1 Lattices [<a href="">Keller 2019</a>]
+			</li>
+		</ul>
+	</div>
+	<aside class="notes">
+		And we looked at sequences that conserve convergence
+		when shifted modulo one. And those sequences are rank-1
+		lattices.
+		I won't go into the details of those sequences,
+		Alexander Keller detailled them in his SIGGRAPH course
+		my favorite samples. I advise you got and check his slides.
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+<section>
+	<!-- Fragments -->
+	<div class="fragment" data-fragment-index="4" id="compare_teapot_frag-04"></div>
+	<div class="fragment" data-fragment-index="5" id="compare_teapot_frag-05"></div>
+
+	<h3>Changing The Sequence</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:48%;">
+			<li>Rank-1 Lattices [<a href="">Keller 2019</a>]
+				<ul>
+					<li>Wrapped 1D points</li>
+					<li class="fragment fade-in-then-semi-out" data-fragment-index="1">Empirically <strong>do no alter convergence</strong></li>
+				</ul>
+			</li>
+
+			<li class="fragment fade-in" data-fragment-index="3">But provides better results
+				<ul>
+					<li>Large space of variations</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	
+	<div class="fragment fade-in-then-out" data-fragment-index="1" style="position:absolute; left:0px; top:350px; width:100%; display: flex; justify-content:space-around;">
+		<div style="position:relative; width:20%;">
+			<img width="100%" src="img/convergence/boxed3.svg" /><br />
+			<img style="position:absolute; left:-10%; top:-10%;" width="30%" src="img/convergence/boxed3_tile_heitz2019_spp=128.jpg" />
+		</div>
+		<div style="position:relative; width:20%;">
+			<img width="100%" src="img/convergence/cbox.svg" /><br />
+			<img style="position:absolute; left:-10%; top:-10%;" width="30%" src="img/convergence/cbox_tile_heitz2019_spp=128.jpg" />
+		</div>
+		<div style="position:relative; width:20%;">
+			<img width="100%" src="img/convergence/staircase2.svg" /><br />
+			<img style="position:absolute; left:-10%; top:-10%;" width="30%" src="img/convergence/staircase2_tile_heitz2019_spp=128.jpg" />
+		
+		</div>
+		<div style="position:relative; width:20%;">
+			<img width="100%" src="img/convergence/teapot.svg" /><br />
+			<img style="position:absolute; left:-10%; top:-10%;" width="30%" src="img/convergence/teapot_tile_heitz2019_spp=128.jpg" />
+		</div>
+	</div>
+
+	<center class="fragment fade-in" data-fragment-index="3" style="position:absolute; left:650px; top:170px; width:40%;">
+		<div style="padding-bottom:10px;">
+			<div id="compare-fresnel-01" class="juxtapose" style="width:450px; border:1px solid black;">
+				<img data-label="[Heitz et al. 2019]" class="pixelated" src="./img/improving/teapot_tile_heitz2019_spp=16.jpg"  />
+				<img data-label="Ours" class="pixelated" src="./img/improving/teapot_tile_ours_spp=16.jpg"  />
+			</div>
+		</div>
+		<small>Rendering of <span style="font-variant-caps: small-caps;">Teapot</span> at 16 spp</small>
+	</center>
+
+	<script>
+		/* Fragments handling */
+		Reveal.addEventListener( 'fragmentshown', function( event ) {
+			if(event.fragment.id == "compare_teapot_frag-04") {
+				juxtapose.sliders[0].updateSlider(10, true);
+			}
+			else if(event.fragment.id == "compare_teapot_frag-05") {
+				juxtapose.sliders[0].updateSlider(80, true);
+			}
+		});
+		Reveal.addEventListener( 'fragmenthidden', function( event ) {
+			if(event.fragment.id == "compare_teapot_frag-04") {
+				juxtapose.sliders[0].updateSlider(50, true);
+			}
+			else if(event.fragment.id == "compare_teapot_frag-05") {
+				juxtapose.sliders[0].updateSlider(10, true);
+			}
+		});
+	</script>
+	<aside class="notes">
+		The only thing I will mention about Rank-1 lattices is that
+		they are points wrapped in the unit domain. So shift modulo one is a no brainer.
+		<strong>*click*</strong><br /><br />
+
+		Still, we were concerned about one thing.
+		Rank-1 lattice might be inferior in convergence compared to sobol.
+		And it is true that for smooth functions the sobol sequence is
+		superior. However, in practice, for
+		rendering scenarios and moderate sample counts both have very
+		similar convergence properties.
+		<strong>*click*</strong><br /><br />
+
+		But, once optimized, a screen-space sampler with rank-1 sequence leads
+		to visually better renderings.
+	</aside>
+</section>
+
+
+<!-- La PCA nous permet de voir qu'on peut faire une optimisation dans l'espace restreint. -->
+<!--
+<section>
+	<div style="width:60%; padding:15% 0% 0% 20%;">Question #2 </div><br />
+	<div style="width:60%; padding:0% 0% 0% 25%;">
+
+	<div style="width:650px; display:flex; flex-flow:wrap; justify-content:flex-start;">
+		<img width="50px" style=" border-radius:25px; width:50px; align-self:end; margin-right:15px; font-size:2em;" src="img/users/iliyang.png" />
+		<div style="width:500px; border-radius: 30px 30px 30px 0px; background-color:rgb(205,205,205); padding:30px; font-size: 0.8em;;">
+			Why not use Ilyan's superior loss?
+		</div>
+
+		<div style="width:50px; align-self:end; margin-right:15px;">	
+		</div>
+		<div style="width:500px; font-size:0.5em;">
+			<a href="">@Ilyang</a> - it's obvious when.
+		</div> 
+	</div>
+	</div>
+	<aside class="notes">
+		Another point in the optimization of the sequences distribution
+		is that we had to use a loss that less sensitive to dimensionality
+		that the one used in the Blue-Noise Dither Sampling of Georgiev
+		and Fajardo.
+	</aside>
+</section>
+<section>
+	<h3>Insight #2</h3>
+	<ul>
+		<li style="margin-bottom: 0px;">Test functions are 'low dimensional'
+		</li>
+	</ul>
+
+	<center>
+		<div style="display:flex; justify-content:space-evenly; width:80%; position:relative; top:10px;">
+			<center style="height:150px; width:10px; position:relative;writing-mode: vertical-lr; font-size: 0.6em;;">
+				Sobol + XOR
+			</center>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-owen+xor_16spp_0vector_0.21758540939516244.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_0 = 0.21  $$</div>
+			</div>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-owen+xor_16spp_1vector_0.4021611602939282.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_1 = 0.40  $$</div>
+			</div>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-owen+xor_16spp_2vector_0.4505668372297504.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_2 = 0.45  $$</div>
+			</div>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-owen+xor_16spp_3vector_0.4798349864012879.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_3 = 0.47  $$</div>
+			</div>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-owen+xor_16spp_4vector_0.5088412394663967.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_4 = 0.50  $$</div>
+			</div>
+		</div>
+	
+		<div style="display:flex; justify-content:space-evenly; width:80%; position:relative; top:-25px;">
+			<center style="height:150px; width:10px; position:relative;writing-mode: vertical-lr; font-size: 0.6em;;">
+				independent
+			</center>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-independent_16spp_0vector_0.2991166076861194.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_0 = 0.29 $$</div>
+			</div>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-independent_16spp_1vector_0.59569900318872.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_1 = 0.59 $$</div>
+			</div>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-independent_16spp_2vector_0.6508579793947779.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_2 = 0.65 $$</div>
+			</div>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-independent_16spp_3vector_0.7025914603151581.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_3 = 0.70 $$</div>
+			</div>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-independent_16spp_4vector_0.7420913656442217.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_4 = 0.74 $$</div>
+			</div>
+		</div>
+
+		<div style="display:flex; justify-content:space-evenly; width:80%; position:relative; top:-60px;">
+			<center style="height:150px; width:10px; position:relative;writing-mode: vertical-lr; font-size: 0.6em;;">
+				Rank-1
+			</center>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-rank1+cpr_16spp_0vector_0.2195458822962075.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_0 = 0.21 $$</div>
+			</div>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-rank1+cpr_16spp_1vector_0.37969997344823025.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_1 = 0.37 $$</div>
+			</div>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-rank1+cpr_16spp_3vector_0.5440208806926484.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_2 = 0.54 $$</div>
+			</div>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-rank1+cpr_16spp_4vector_0.6060167267089855.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_3 = 0.60 $$</div>
+			</div>
+			<div>
+				<img width="150px" style="margin-top:0px;" src="img/eigenvectors/tile-rank1+cpr_16spp_5vector_0.6438934196917416.png" />
+				<div style="width:100px; height:18px; border-radius:5px; font-size:small; margin:0px; position:relative; top:-50px; color:white; background-color: #00000055;">$$ c_4 = 0.64 $$</div>
+			</div>
+		</div>
+	</center>
+	<aside class="notes">
+		We have seen that the test integrands generate a space
+		of continuous functions. But it also generates a space with
+		a rather small effective dimensionality.<br /><br />
+
+		In fact, when we look at the cumulative sum of the eigen-values
+		of the different eigen-integrands most of the energie lies in
+		the first 10 dimensions, not 100.
+	</aside>
+</section>
+<section>
+	<h3>Let's Change the Optimization Loss!</h3>
+		<ul>
+			<li>Maybe use BNDS's loss? [<a href="">Georgiev and Fajardo 2016</a>]
+					<ul>
+						<li class="fragment">In the space of the PCA</li>
+						<li class="fragment">Nope ... it isn't as good 😫 </li>
+					</ul>
+			</li>
+
+	<aside class="notes">
+		So our idea was to use the BNDS loss to optimize our mask.
+		<strong>*click*</strong> <br /><br />
+
+		But this time in the space of the PCA.
+		<strong>*click*</strong> <br /><br />
+
+		Unfortunately, this does not work well. This space is proably
+		still too high dimensional for the data we have.
+		<strong>*click*</strong> <br /><br />
+	</aside>
+</section>
+<section>
+	<h3>Changing the Optimization Loss</h3>
+		<ul>
+			<li>Originaly, Squared L2 on test integrands
+					
+			</li>
+
+		</ul><br />
+		<center style="width:100%;">
+			$$L = \sum_{(i,j) \neq (k,l)} e^{-\dfrac{||(i,j) - (k,l)||^2}{\sigma^2}} || E^{i,j} - E^{k,l} ||^2 $$
+			<br />
+			<div style="position:relative; width:20%; height:20%;"  class="fragment" data-fragment-index="2">
+				<img class="pixelated" width="100%" style="margin-top:0px;;" src="img/optimizer/tile.png">
+				<div class="fragment" data-fragment-index="3" style="position:absolute; top:50px; left:65px; width:13px; height:13px; border:solid red 2px; background-color:#FF000066;"></div>
+				<div class="fragment" data-fragment-index="3" style="position:absolute; top:145px; left:145px; width:13px; height:13px; border:solid red 2px; background-color:#FF000066;"></div>
+			</div>
+		</center>
+
+	<aside class="notes">
+		Instead, we started from our 2019 loss that you can see here.
+		<strong>*click*</strong> <br /><br />
+
+		When we test two pixels to swap, we evaluate the loss at
+		each pixel center.
+		<strong>*click*</strong> <br /><br />
+
+		Here in red.
+		<strong>*click*</strong> <br /><br />
+	</aside>
+</section>
+<section>
+	<h3>Changing the Optimization Loss</h3>
+		<ul>
+			<li>Originaly, Squared L2 on test integrands
+					
+			</li>
+
+		</ul><br />
+		<center style="width:100%;">
+			$$L = \sum_{(i,j) \neq (k,l)} \color{red}{e^{-\dfrac{||(i,j) - (k,l)||^2}{\sigma^2}}} || E^{i,j} - E^{k,l} ||^2 $$
+			<br />
+			<div style="position:relative; width:20%; height:20%;">
+				<img class="pixelated" width="100%" style="margin-top:0px;;" src="img/optimizer/tile.png">
+				<div style="position:absolute; top:35px; left:52px; border-radius:40px; width:40px; height:40px; border:solid red 2px; background-color:#FF000066;"></div>
+				<div style="position:absolute; top:132px; left:132px; border-radius:40px; width:40px; height:40px; border:solid red 2px; background-color:#FF000066;"></div>
+			</div>
+
+		</center>
+	<aside class="notes">
+		The first part of the loss is a gaussian kernel that restricts the 
+		influence of the other pixels of the mask. Only neighboring pixels
+		will be accounted.
+		<strong>*click*</strong> <br /><br />
+	</aside>
+</section>
+<section >
+	<h3>Changing the Optimization Loss</h3>
+		<ul>
+			<li>Originaly, Squared L2 on test integrands
+					
+			</li>
+
+		</ul><br />
+
+		<img class="pixelated" width="20%" style="position:absolute; margin-top:0px; left:540px; top: 385px;" src="img/optimizer/dither.jpg">
+		<img class="pixelated" width="20%" style="position:absolute; margin-top:0px; left:525px; top: 400px;" src="img/optimizer/dither.jpg">
+		
+
+		<center style="width:100%;">
+			$$L = \sum_{(i,j) \neq (k,l)} \color{red}{e^{-\dfrac{||(i,j) - (k,l)||^2}{\sigma^2}}} \color{green}{|| E^{i,j} - E^{k,l} ||^2} $$
+			<br />
+			<div style="position:relative; width:20%; height:20%;">
+				<img class="pixelated" width="100%" style="margin-top:0px;;" src="img/optimizer/dither.jpg">
+				<div style="position:absolute; top:35px; left:52px; border-radius:40px; width:40px; height:40px; border:solid red 2px; background-color:#FF000066;"></div>
+				<div style="position:absolute; top:132px; left:132px; border-radius:40px; width:40px; height:40px; border:solid red 2px; background-color:#FF000066;"></div>
+			</div>
+			<div style="position: absolute; top:415px; left:510px;">
+				<div style="position:relative; left:135px; top:-115px; font-size: 2.0em; width:300px; transform:rotate(-90deg);">
+				}
+				</div>
+				<div style="position:relative; left:135px; top:-130px; font-size: 0.6em; width:300px;">
+					center of filter
+				</div>
+			</div>
+		</center>
+
+		
+	<aside class="notes">
+		The second part of the loss -here in green- computes the difference between
+		the vector of realization (that are computed using the test integrands)
+		of the center of the filter and the other pixels in the kernel. <br /><br />
+
+		For this part, we used a squared L2 distance.
+		<strong>*click*</strong> <br /><br />
+	</aside>
+</section>
+<section>
+	<h3>Changing the Optimization Loss</h3>
+		<ul>
+			<li style="opacity:0.5;">Originaly, Squared L2 on test integrands</li>
+		</ul>
+
+		<center style="width:100%;">
+			$$L = \sum_{(i,j) \neq (k,l)} \color{red}{e^{-\dfrac{||(i,j) - (k,l)||^2}{\sigma^2}}} \sqrt{ \color{green}{|| E^{i,j} - E^{k,l} ||^2} } $$
+		</center>
+
+
+		<div class="fragment">
+		<ul>
+			<li style="margin-bottom: 0.5em;;">We found L2 to give better results
+			</li>
+		</ul>
+
+		<center>
+		<div style="display:flex; justify-content:space-around; width:100%;">
+			<center style="width:420px;height:200px;">
+				<img id="new_loss_img_01" class="pixelated" width="200px" style="margin-top:0px;" src="img/loss/mask_sl2.png" />
+				<canvas id="new_loss_fft_01" style="width:200px; height:200px; border:solid 1px black;" width="128" height="128"></canvas>
+				<br />
+				<div style="font-size:0.6em;">squared L2 (old)</div>
+			</center>
+			<center style="width:420px;height:200px;">
+				<img id="new_loss_img_02"  class="pixelated" width="200px" style="margin-top:0px;" src="img/loss/mask_l2.png" />
+				<canvas id="new_loss_fft_02" style="width:200px; height:200px; border:solid 1px black;" width="128" height="128"></canvas>
+				<br />
+				<div style="font-size:0.6em;;">L2 (new)</div>
+			</center>
+		</div><br />
+		<div style="font-size:0.6em;">Optimizing 1D dither masks</div><br />
+		</center>
+		</div>
+
+		
+			<script>
+			Reveal.addEventListener( 'ready', function( event ) {
+				$('#new_loss_img_01').ready(function() {
+					var fft_cnv = document.getElementById('new_loss_fft_01');
+					var fft_ctx = fft_cnv.getContext('2d');
+					fft_ctx.drawImage(document.getElementById('new_loss_img_01'), 0, 0, 128, 128, 0, 0, 128, 128);
+					canvasFFT(fft_cnv, 100);
+				});
+		
+				$('#new_loss_img_02').ready(function() {
+					var fft_cnv = document.getElementById('new_loss_fft_02');
+					var fft_ctx = fft_cnv.getContext('2d');
+					fft_ctx.drawImage(document.getElementById('new_loss_img_02'), 0, 0, 128, 128, 0, 0, 128, 128);
+					canvasFFT(fft_cnv, 100);
+				});
+			});
+			</script>
+
+	<aside class="notes">
+		We realized that using the L2 distance (so the square root of the square L2) to
+		optimize dither mask yeld better results. The improvement for optimizing many
+		test integrands is not as much, but we still advocate using it.
+		<strong>*click*</strong> <br /><br />
+	</aside>
+</section>
+-->
+
+
+<!-- Request #1: Everybody wants the code for the optimizer -->
+<section>
+	<div style="width:60%; padding:15% 0% 0% 20%;">Request #1 </div><br />
+	<div style="width:60%; padding:0% 0% 0% 25%;">
+
+	<div style="width:650px; display:flex; flex-flow:wrap; justify-content:flex-start;">
+		<div style="width:50px; align-self:end; margin-right:15px; font-size:2em;">
+			👩‍💻
+		</div>
+		<div style="width:500px; border-radius: 30px 30px 30px 0px; background-color:rgb(205,205,205); padding:30px; font-size: 0.8em;;">
+			Plz share the optimizer code!
+		</div>
+
+		<div style="width:50px; align-self:end; margin-right:15px;">	
+		</div>
+		<div style="width:500px; font-size:0.5em;">
+			<a href="">@SpeedyCoder</a> - 2s after publishing the talk.
+		</div> 
+	</div>
+	</div>
+	<aside class="notes">
+		We have improved the quality of the blue-noise by changing the
+		sequence and scrambling scheme. But maybe there is still 
+		much to be done. In order to enable people to experiment
+		with new sequences or ideas, we are releasing our optimizer.
+		We even provide a parallel version running on the GPU for
+		quick iterations.
+	</aside>
+</section>
+<section>
+	<h3>Old Optimizer</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul>
+			<li>A Genetic Algorithm
+				<ul>
+					<li>Swap random scrambles according to loss</li>
+					<li>Extremely <strong>slow to converge!</strong></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+
+	<aside class="notes">
+		Our 2019 optimizer was build as a genetic algorithm. We would
+		sequentially swap randomly selected pairs in the mask. But it
+		was really slow. To reach a good quality you need many many
+		mutations.
+		<strong>*click*</strong>
+	</aside>
+</section>
+
+<section>
+	<h3>GPU-friendly Optimizer</h3>
+	<!-- Define all the fragments -->
+	<div id="optim1_frag_3" class="fragment" data-fragment-index="4"></div>
+	<div id="optim1_frag_4" class="fragment" data-fragment-index="5"></div>
+	<div id="optim1_frag_5" class="fragment" data-fragment-index="6"></div>
+
+
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul>
+			<li id="gpu-frendly-text1" style="opacity:1;" class="fragment fade-in" data-fragment-index="1">Start with almost perfect mask
+				<ul>
+					<li>Only one pixel to move</li>
+					<li>We only need to randomly find it ...</li>
+				</ul>
+			</li>
+			<li class="fragment fade-in-then-semi-out" data-fragment-index="6">Can we try all possible swap?
+				<ul>
+					<li>We need a <strong>collisions-free</strong> scheme</li>
+					<li>We need to <strong>preserve neighbourhoods</strong></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+
+
+	<div style="position:absolute; width:100%; left:20%; top:26%; display:flex; justify-content:space-evenly;">
+		<!-- Scrambling and sorting masks -->
+		<center class="fragment" data-fragment-index="1"  style="width:30%; font-size:0.7em;">
+			<div>
+
+				<div style="position:relative; width:300px; height:300px;">
+					<img class="pixelated" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:100%; height:100%;" src="img/optimizer/dither.jpg" />
+					<div class="fragment" data-fragment-index="2" id="optim1_pixelA" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:15px; height:15px; border:solid 3px red;"></div>
+					<div class="fragment" data-fragment-index="3" id="optim1_pixelB1" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:15px; height:15px; border:solid 3px green;"></div>
+					<div class="fragment" data-fragment-index="3" id="optim1_pixelB2" style="position:absolute; top:0px; left:0px; margin: 14px 0px 0px 0px; width:15px; height:15px; border:solid 3px green;"></div>
+				</div>
+				<br />
+				<div style="width:200px; text-align:center; font-size:0.6em;">Dither tile</div>
+			</div>
+		</center>
+	</div>
+	<script>
+		/* At the init, recopy the content of the previous frame canvas */
+		Reveal.addEventListener( 'ready', function( event ) {
+			var i=10, j=6;
+			movePixelTo('optim1_pixelA',  i, j, 16, 16);
+
+			var i=14, j=3;
+			var k=4, l=5;
+			movePixelTo('optim1_pixelB1',  i, j, 16, 16);
+			movePixelTo('optim1_pixelB2',  k, l, 16, 16);
+		});
+
+		/* Fragments handling */
+		var results_test_integrands_timerId;
+		Reveal.addEventListener( 'fragmentshown', function( event ) {
+			if(event.fragment.id == "optim1_frag_3") {
+				var i=3, j=10;
+				var k=9, l=9;
+				movePixelTo('optim1_pixelB1',  i, j, 16, 16);
+				movePixelTo('optim1_pixelB2',  k, l, 16, 16);
+			}
+			else if(event.fragment.id == "optim1_frag_4") {
+				var i=5, j=7;
+				var k=10, l=8;
+				movePixelTo('optim1_pixelB1',  i, j, 16, 16);
+				movePixelTo('optim1_pixelB2',  k, l, 16, 16);
+			}
+			else if(event.fragment.id == "optim1_frag_5") {
+				console.log($('gpu-frendly-text1'));
+				$('#gpu-frendly-text1').animate({ opacity: 0.5 }, 500);
+			}
+		});
+		Reveal.addEventListener( 'fragmenthidden', function( event ) {
+			if(event.fragment.id == "optim1_frag_3") {
+				var i=14, j=3;
+				var k=4, l=5;
+				movePixelTo('optim1_pixelB1',  i, j, 16, 16);
+				movePixelTo('optim1_pixelB2',  k, l, 16, 16);
+			}
+			else if(event.fragment.id == "optim1_frag_4") {
+				var i=3, j=10;
+				var k=9, l=9;
+				movePixelTo('optim1_pixelB1',  i, j, 16, 16);
+				movePixelTo('optim1_pixelB2',  k, l, 16, 16);
+			}
+			else if(event.fragment.id == "optim1_frag_5") {
+				console.log($('gpu-frendly-text1'));
+				$('#gpu-frendly-text1').animate({ opacity: 1.0 }, 500);
+			}
+		});
+	</script>
+	<aside class="notes">
+		So we decided to build a parallel version of the optimizer.
+		<strong>*click*</strong><br /><br />
+
+		But this isn't so easy. Let say that
+		what we have here is an almost converged dither mask.
+		<strong>*click*</strong><br /><br />
+
+		And let's assume that there is only one pixel to be
+		swapped to reach the global optimum for the optimization.
+		<strong>*click*</strong><br /><br />
+
+		The iterative algorithm would randomly pick two pixels
+		and test whether they need to be swapped.
+		<strong>*click*</strong><br /><br />
+
+		Since they should not, it will test another pair.
+		<strong>*click*</strong><br /><br />
+
+		And another pair until finaly it randomly select the
+		one pixel to change.
+		<strong>*click*</strong><br /><br />
+
+		I hope you see with me that this scheme is unoptimal.
+		In this his context, if we could test all possible
+		combinaisons, we would find the last mutation needed and
+		ends the algorithm.<br /><br />
+
+		But testing all possible mutations has two issues:
+		first it creates data races. So we need to find a collision
+		free swapping scheme. Second, we need to preserve neighbourhoods.
+		If many close pixels are swapped at the same time
+		they might not reduce the loss globally.
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+<section data-transition="slide-out">
+	<h3>Collision Free Scheme</h3>
+
+	<div style="position:absolute; width:100%; top:26%; display:flex; justify-content:space-evenly;">
+		<!-- Scrambling and sorting masks -->
+		<center style="width:30%; font-size:0.7em;">
+			<div>
+				<div style="position:relative; width:300px; height:300px;">
+					<canvas class="pixelated" id="gpu_scrambling_mask_cnv" width="16px" height="16px" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:100%; height:100%;"></canvas>
+				</div>
+				<br />
+				<div style="width:200px; text-align:center; font-size:0.6em;">Dither tile</div>
+			</div>
+		</center>
+	</div>
+	<aside class="notes">
+		ALet see how we build a collision-free scheme.
+		At each step of the optimization ...
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+<section data-transition="slide">
+	<div style="position:relative; left:5%; top:7%;">
+		<div style="padding-top: 18.5%;">
+			<div  class="fragment" data-fragment-index="1" style="width:200px; text-align:left; font-size:0.6em;">scramble pairs</div>
+			<div style="position:relative; width:5000px; height:20px;">
+				<canvas class="pixelated" id="gpu_pairing_cnv" width="256px" height="1px" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:100%; height:100%;"></canvas>
+			</div>
+			<br />
+			<div style="width:400px; text-align:left; font-size:0.6em;"><strong>Linearized and permuted</strong> dither tile</div>
+
+
+		</div>
+
+		<div class="fragment" data-fragment-index="1">
+		<div style="position:absolute; top:257px; left:17px;">
+			<div style="width:30px; height:30px; transform:rotate(90deg); font-size:1.5em;">{</div>
+		</div>
+		<div style="position:absolute; top:257px; left:57px;">
+			<div style="width:30px; height:30px; transform:rotate(90deg); font-size:1.5em;">{</div>
+		</div>
+		<div style="position:absolute; top:257px; left:97px;">
+			<div style="width:30px; height:30px; transform:rotate(90deg); font-size:1.5em;">{</div>
+		</div>
+		<div style="position:absolute; top:257px; left:136px;">
+			<div style="width:30px; height:30px; transform:rotate(90deg); font-size:1.5em;">{</div>
+		</div>
+		<div style="position:absolute; top:257px; left:175px; opacity:0.5;">
+			<div style="width:30px; height:30px; transform:rotate(90deg); font-size:1.5em;">{</div>
+		</div>
+		<div style="position:absolute; top:257px; left:215px; opacity:0.25;">
+			<div style="width:30px; height:30px; transform:rotate(90deg); font-size:1.5em;">{</div>
+		</div>
+		<div style="position:absolute; top:257px; left:253px; opacity:0.125;">
+			<div style="width:30px; height:30px; transform:rotate(90deg); font-size:1.5em;">{</div>
+		</div>
+		<div style="position:absolute; top:257px; left:292px; opacity:0.0725;">
+			<div style="width:30px; height:30px; transform:rotate(90deg); font-size:1.5em;">{</div>
+		</div>
+		</div>
+	</div>
+	<script>
+		Reveal.addEventListener( 'ready', function( event ) {
+			/* Generate the scrambling mask */
+			var width  = 16;
+			var height = 16;
+			var cnv = document.getElementById('gpu_scrambling_mask_cnv');
+			var ctx = cnv.getContext('2d');
+			var img = ctx.createImageData(width, height);
+			for(var j=0; j<height; ++j)
+				for(var i=0; i<width; ++i)
+				{
+					var r  = Math.random();
+					var g  = Math.random();
+					var id = 4*(j*width + i);
+					img.data[id + 0]  = 255.0*r;
+					img.data[id + 1]  = 255.0*g;
+					img.data[id + 2]  = 0.0;
+					img.data[id + 3]  = 255.0;
+				}
+			ctx.putImageData(img, 0, 0);
+			cnv.image = img;
+
+			/* Duplicate data */
+			var cnv  = document.getElementById('gpu_scrambling_mask2_cnv');
+			var ctx  = cnv.getContext('2d');
+			var img2 = ctx.createImageData(width, height);
+			for(var k=0; k<4*width*height; ++k) {
+				img2.data[k] = img.data[k];
+			}
+			ctx.putImageData(img2, 0, 0);
+
+			/* Generating the pairing mask */
+			var width  = 256;
+			var height = 1;
+			var cnv = document.getElementById('gpu_pairing_cnv');
+			var ctx = cnv.getContext('2d');
+			var img2 = ctx.createImageData(width, height);
+			ctx.putImageData(img2, 0, 0);
+			for(var k=0; k<4*width*height; ++k) {
+				img2.data[k] = img.data[k];
+			}
+			ctx.putImageData(img2, 0, 0);
+			cnv.image = img2;
+		});
+
+	</script>
+	<aside class="notes">
+		We linearize this mask and permute the order of its pixels.
+		This gives us a list of pixels to swap.
+		<strong>*click*</strong><br /><br />
+
+		What we do next is we pair consecutive pixels together
+		and test them for swapping. This gives us a collision-free
+		mutation scheme.
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+<section data-transition="slide-in">
+	<h3>Preserving Neighbourhoods</h3>
+
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul>
+			<li class="fragment fade-in-then-semi-out">Still not optimal w.r.t the loss
+				<ul>
+					<li>Permutation might <strong>break neighboors</strong></li>
+				</ul>
+			</li>
+			<li class="fragment fade-in-then-semi-out" id="neighbourhood_frag_01">Not a big deal
+				<ul>
+					<li>Solution: only <strong>permute a half of the pairs</strong></li>
+					<li>We even got <strong>simulated annealing for free</strong></li>
+				</ul>
+			</li>
+			<li class="fragment fade-in-then-semi-out">Allows quick iteration
+				<ul>
+					<li><strong>~9 times faster</strong> than our CPU-sequential version</li>
+				</ul>
+			</li>
+			<li class="fragment fade-in">Available for all!
+				<ul>
+					<li>Check our projet webpage</li>
+					<li>Implementation by Sylvain Durand</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+
+	<div style="position:absolute; width:70%; left:30%; top:26%; display:flex; justify-content:space-evenly;">
+		<!-- Scrambling and sorting masks -->
+		<center style="width:30%; font-size:0.7em;">
+			<div>
+				<div style="position:relative; width:300px; height:300px;">
+					<canvas class="pixelated" id="gpu_scrambling_mask2_cnv" width="16px" height="16px" style="position:absolute; top:0px; left:0px; box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2); margin: 15px 0px 0px 0px; border: solid 1px black; width:100%; height:100%;"></canvas>
+				</div>
+				<br />
+				<div style="width:200px; text-align:center; font-size:0.6em;">Dither tile</div>
+			</div>
+		</center>
+	</div>
+
+	<script>
+		Reveal.addEventListener( 'fragmentshown', function( event ) {
+			if(event.fragment.id == "neighbourhood_frag_01") {
+				/* Generate the scrambling mask */
+				var width  = 16;
+				var height = 16;
+				var cnv = document.getElementById('gpu_scrambling_mask_cnv');
+				var img = cnv.image;
+				for(var j=0; j<height; ++j)
+					for(var i=0; i<width; ++i)
+					{
+						var r  = Math.random();
+						var id = 4*(j*width + i);
+						if(r < 0.5)
+						img.data[id + 3]  = 25.0;
+					}
+
+				/* Duplicate data */
+				var cnv  = document.getElementById('gpu_scrambling_mask2_cnv');
+				var ctx  = cnv.getContext('2d');
+				ctx.putImageData(img, 0, 0);
+			}
+		});
+		Reveal.addEventListener( 'fragmenthidden', function( event ) {
+			if(event.fragment.id == "neighbourhood_frag_01") {
+				/* Generate the scrambling mask */
+				var width  = 16;
+				var height = 16;
+				var cnv = document.getElementById('gpu_scrambling_mask_cnv');
+				var img = cnv.image;
+				for(var j=0; j<height; ++j)
+					for(var i=0; i<width; ++i)
+					{
+						var r  = Math.random();
+						var id = 4*(j*width + i);
+						img.data[id + 3]  = 255.0;
+					}
+
+				/* Duplicate data */
+				var cnv  = document.getElementById('gpu_scrambling_mask2_cnv');
+				var ctx  = cnv.getContext('2d');
+				ctx.putImageData(img, 0, 0);
+			}
+		});
+	</script>
+
+	<aside class="notes">
+		Now we need to find a way to preserve neighbourhoods.
+		<strong>*click*</strong><br /><br />
+
+		However, we found that this is actually not a big deal.
+		By simply reducing the number of pairs to test
+		the algorithm would always converge. In our implementation we
+		test only half the possible pairs.
+		This even introduces some simulated annealing effect at the
+		beginning of the optimization when almost all the pairs are swapped.
+		<strong>*click*</strong><br /><br />
+
+		Porting this algorithm on the GPU allowed us to perform quicker
+		iterations. We wait only minutes for good quality masks, and not
+		hours.
+		<strong>*click*</strong><br /><br />
+
+		We are also releasing the implementation of our research engineer
+		Sylvain Durand on the project's webpage.
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+
+
+
+<!-- Global section: Making better decisions -->
+<section>
+	<div style="width:60%; padding:15% 0% 0% 20%;">Question #F </div><br />
+	<div style="width:60%; padding:0% 0% 0% 25%;">
+
+	<div style="width:650px; display:flex; flex-flow:wrap; justify-content:flex-start;">
+		<div style="width:50px; align-self:end; margin-right:15px; font-size:2em;">
+			👩‍🎨
+		</div>
+		<div style="width:500px; border-radius: 30px 30px 30px 0px; background-color:rgb(205,205,205); padding:30px; font-size: 0.8em;;">
+			How can I know if my tile is of good quality?
+		</div>
+
+		<div style="width:50px; align-self:end; margin-right:15px;">	
+		</div>
+		<div style="width:500px; font-size:0.5em;">
+			<a href="">@QA</a> - too often.
+		</div> 
+	</div>
+	</div>
+	<aside class="notes">
+		While our goal is to increase the perceptual quality of our renderings,
+		we wanted to have a way to quantify improvements.
+	</aside>
+</section>
+<section>
+	<h3>Quality Criterion</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:88%;">
+			<li class="fragment">Assessing blue-noise quality is <strong>perceptual</strong>
+				<ul>
+					<li>Depends on the medium (screen, printed paper, ...)</li>
+					<li>Depends on the conditions (resolution, ...)</li>
+					<li class="fragment">We need a <strong>numerical criterion</strong></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+
+	<aside class="notes">
+		So we developped a quality criterion to be able to assess
+		if a screen-space sampler is better or worse than another
+		without having to look at tons of renderings.
+		<strong>*click*</strong><br /><br />
+
+		To do so, we had to remove the constraints and bias 
+		of a perceptual metric: our criterion
+		has to be free of medium or viewing conditions.
+		<strong>*click*</strong><br /><br />
+
+		Thus we develop a criterion that is purely numeric.
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+
+<section>
+	<h3>Quality Criterion</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:88%;">
+			<li style="opacity: 0.5;;">Assessing blue-noise quality is <strong>perceptual</strong>
+				<ul>
+					<li>Depends on the medium (screen, printed paper, ...)</li>
+					<li>Depends on the conditions (resolution, ...)</li>
+					<li>We need a <strong>numerical criterion</strong></li>
+				</ul>
+			</li>
+
+			<li>The idea is to <strong>look at denoising</strong>  [<a href="https://arxiv.org/abs/2012.02344">Chizhov et al. 2020</a>]
+				<ul>
+					<li>Blue-noise improves L2 after denoising</li>
+					<li class="fragment fade-in">But how can we make it scene agnostic?</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+
+	<aside class="notes">
+		Inspired by Chizhov and colleagues, the main idea is to
+		look at denoising. Since in the end,
+		the rendering is likely to be denoised, we leverage the
+		fact that blue-noise improves the RMSE after denoising.
+		This is similar to the idea of Chizhov and colleagues
+		who included such idea in the optimization loss. We did
+		not include it in the loss due to high computational cost
+		it adds.
+		<strong>*click*</strong><br /><br />
+
+		The only remaining issue was to produce a criterion that
+		does not rely on a specific scene. And for that we go
+		back to our test integrands.
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+<section>
+	<h3>Blur Criterion on Test Integrands</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+	</div>
+
+	<div style="position:relative; width:100%;">
+		<svg class="fragment" data-fragment-index="4" style="position:absolute; top:150px; left:-150px; width:100%;"  width="100%" height="400px">
+			<g>
+				<path
+				style="opacity:1;fill:#e7e7e7;fill-opacity:1;stroke:none;stroke-width:1.99999988;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+				d="M 482.90765,-22.871094 V 0 L 0,0 v 113.13672 l 482.90765,0 v 22.87305 L 551.70452,96.289062 620.50335,56.568359 551.70452,16.847656 Z"
+				transform="translate(350, 50)"
+				id="rect817" />
+			</g>
+		</svg>
+
+		<img class="pixelated" width="20%" style="position: absolute; top:100px; left:200px;" src="img/criterion/TestFunction2DHeavisideXY_8spp_SequenceSiggraph.jpg">
+		<img class="fragment" data-fragment-index="2" width="20%" style="position: absolute; top:100px; left:200px;" src="img/criterion/TestFunction2DHeavisideXY_8spp_SequenceSiggraph_blur0.jpg">
+		<img class="fragment" data-fragment-index="3" width="20%" style="position: absolute; top:100px; left:200px;" src="img/criterion/TestFunction2DHeavisideXY_8spp_SequenceSiggraph_blur1.jpg">
+
+		<div class="fragment" data-fragment-index="1">
+			<img class="pixelated" width="10%" style="position: absolute; top:150px; left:020px;" src="img/criterion/TestFunction2DHeavisideXY.jpg">
+			<div style="width:3px; height:3px; border:solid black 1px; position: absolute; top:247px; left:248px;"></div>
+			<div style="width:98px; height:0px; border-top:solid black 1px; position: absolute; top:249px; left:150px;"></div>
+
+			<div style="background-color: brown; border-radius: 5px; width:5px; height:5px; position: absolute; top:287px; left:021px;"></div>
+			<div style="background-color: brown; border-radius: 5px; width:5px; height:5px; position: absolute; top:259px; left:131px;"></div>
+			<div style="background-color: brown; border-radius: 5px; width:5px; height:5px; position: absolute; top:275px; left:051px;"></div>
+			<div style="background-color: brown; border-radius: 5px; width:5px; height:5px; position: absolute; top:243px; left:099px;"></div>
+			<div style="background-color: brown; border-radius: 5px; width:5px; height:5px; position: absolute; top:227px; left:083px;"></div>
+			<div style="background-color: brown; border-radius: 5px; width:5px; height:5px; position: absolute; top:195px; left:035px;"></div>
+			<div style="background-color: brown; border-radius: 5px; width:5px; height:5px; position: absolute; top:211px; left:115px;"></div>
+			<div style="background-color: brown; border-radius: 5px; width:5px; height:5px; position: absolute; top:179px; left:067px;"></div>
+		</div>
+
+		<small style="position: absolute; top:390px; left:200px;">integrated test function at 8 spp</small> 
+		
+		<div class="fragment" data-fragment-index="4">
+		<img class="pixelated" width="342px" style="position: absolute; top:100px; left:800px;" src="img/criterion/convergence_heavisides_8spp.svg"><br />
+		<small style="position: absolute; top:390px; left:900px;">error after blurring</small> 
+		</div>
+	</div>
+
+	<aside class="notes">
+		Lets take the example of this test rendering.
+		<strong>*click*</strong><br /><br />
+
+		Each pixel is the integral of the Test
+		integrand on the left with a different sequence of points.
+		<strong>*click*</strong><br /><br />
+
+		If we blur this image with a gaussian kernel, it has the effect of reducing the
+		variance in the image and move each pixel closer to the ground truth value.
+		<strong>*click*</strong><br /><br />
+
+		With larger blur, we get closer and closer.
+		<strong>*click*</strong><br /><br />
+
+		Our criterion consists in looking at the convergence of the tile toward the ground
+		truth for an increasing wider kernel. Because we cannot rely on a single test
+		integrand, we average the convergence of many randomly choosen test integrands.
+	</aside>
+</section>
+<section data-auto-animate>
+	<h3>Blur Criterion on Test Integrands</h3>
+	<center>
+		<object data-id="stratif_01" width="700px" data="img/criterion/convergence_heavisides_16spp.svg" style="border:solid black 1px;;" type="image/svg+xml"></object>
+	</center>
+	<aside class="notes">
+		Here is a comparison between our new sampler and the old sampler
+		at 16 samples per pixel. What we can see is that both
+		start around the same value. This is expected since, for
+		test integrands, the rank-1 sequence and the sobol sequence
+		share the same convergence. As we start to blur the image
+		the two curves separates and we start to see the effect
+		of the optimization.
+
+		For larger and larger blur we can see that the rank-1
+		sampler provides a steeper slope. This means that
+		the denoised image with be closer to the reference.
+	</aside>
+</section>
+<section data-auto-animate>
+	<h3>Is Stratification the Ultimate Goal?</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:88%;">
+			<li class="fragment fade-in-then-semi-out">Dyadicity is a hot topic
+			</li>
+
+			<li class="fragment fade-in-then-semi-out">Its only about per pixel convergence
+				<ul>
+					<li>Misses <strong>convergence after denoising</strong></li>
+					<li>Maybe not so important?</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<center style="position: absolute; top:180px; left:700px;;">
+		<object data-id="stratif_01" width="500px" data="img/criterion/convergence_heavisides_16spp.svg" style="border:solid black 1px;;" type="image/svg+xml"></object>
+	</center>
+	<aside class="notes">
+		All this analysis left us with a question about the
+		current trend of research.
+		<strong>*click*</strong><br /><br />
+
+		There have been a lot of efforts so far build
+		pseudo-random sequences with strong stratification
+		to reduce as much as possible the error of a single
+		pixel.
+		<strong>*click*</strong><br /><br />
+
+		But very little research was done on whether this
+		level of refinement is needed if after denoising the
+		convergence of the whole image is not very good.
+		<strong>*click*</strong><br /><br />
+	</aside>
+</section>
+
+
+
+<!-- Bad usages -->
+<!-- Request #1: Everybody wants the code for the optimizer -->
+<section>
+	<div style="width:60%; padding:15% 0% 0% 20%;">Request #2 </div><br />
+	<div style="width:60%; padding:0% 0% 0% 25%;">
+
+	<div style="width:650px; display:flex; flex-flow:wrap; justify-content:flex-start;">
+		<div style="width:50px; align-self:end; margin-right:15px; font-size:2em;">
+			🧑‍🎓
+		</div>
+		<div style="width:500px; border-radius: 30px 30px 30px 0px; background-color:rgb(205,205,205); padding:30px; font-size: 0.8em;;">
+			It tried it using BDPT, it doesn't work! Can you debug my code?
+		</div>
+
+		<div style="width:50px; align-self:end; margin-right:15px;">	
+		</div>
+		<div style="width:500px; font-size:0.5em;">
+			<a href="">@GeekyStudent</a> - 5min before sending his homework.
+		</div> 
+	</div>
+	</div>
+	<aside class="notes">
+		We have heavily optimized our samplers and their
+		distribution in screen-space. 
+		But, I would like to talk about their use now.
+		<strong>*click*</strong>
+	</aside>
+</section>
+<section>
+	<!-- Fragments -->
+	<div id="bidir_frag_01" class="fragment" data-fragment-index="1"></div>
+	<div id="bidir_frag_02" class="fragment" data-fragment-index="2"></div>
+
+	<h3>Use Your Sampler Wisely</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:48%;">
+			<li class="fragment" data-fragment-index="0">BDPT: Dimensions <strong>must match</strong>
+				<ul class="fragment" data-fragment-index="2">
+					<li>Sub-paths must share random numbers</li>
+					<li>Not vanilla!</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<center class="fragment" data-fragment-index="0" style="position:absolute; top:350px; width:100%;">
+	<object id="bidir_svg_01" data="img/bidir/bidir01.svg" width="1000px" type="image/svg+xml"></object>
+	</center>
+
+	<script>
+		Reveal.addEventListener( 'fragmentshown', function( event ) {
+			if(event.fragment.id == "bidir_frag_01") {
+				var snap = Snap('#bidir_svg_01');
+				snap.select('#connection').attr({ opacity: 1 });
+			}
+			else if(event.fragment.id == "bidir_frag_02") {
+				var snap = Snap('#bidir_svg_01');
+				snap.select('#highlight').attr({ opacity: 1 });
+			}
+		});
+		Reveal.addEventListener( 'fragmenthidden', function( event ) {
+			if(event.fragment.id == "bidir_frag_01") {
+				var snap = Snap('#bidir_svg_01');
+				snap.select('#connection').attr({ opacity: 0 });
+			}
+			else if(event.fragment.id == "bidir_frag_02") {
+				var snap = Snap('#bidir_svg_01');
+				snap.select('#highlight').attr({ opacity: 0 });
+			}
+		});
+	</script>
+	<aside class="notes">
+		The first point I would like to make here is that
+		you should use a screen-space sampler wisely.
+		There is no point in optimizing with such
+		a care the arangement of sequences if in the end
+		this correlation is wasted by how you use
+		them.
+		<strong>*click*</strong><br /><br />
+
+		One example of such misuse is to use
+		a screen-space sampler in a bidirectionnal path
+		tracer. A fundemental concept that
+		you must remember is that with a screen-space
+		sampler, random values must be consumed at the same
+		time and for the same dimensions across pixels.
+		If we take the example of this eye and light paths.
+		<strong>*click*</strong><br /><br />
+
+		There is two ways to create length 5 paths.
+		<strong>*click*</strong><br /><br />
+
+		It means that we must ensure that both end
+		point vertices share the same dimensions
+		in our sampler. If not, we will mix together
+		two dimensions that are spatially uncorrelated.
+		And this will be detrimental to the blue-noise
+		distribution.
+	</aside>
+</section>
+<section>
+	<h3>More Please!</h3>
+	<div style="display:flex; justify-content:flex-start; width:100%;">
+		<ul style="width:48%;">
+			<li class="fragment fade-in-then-semi-out">More dimensions
+				<ul>
+					<li>Not best quality for direct illumination</li>
+					<li>Takes time to optimize</li>
+				</ul>
+			</li>
+			<li class="fragment fade-in-then-semi-out">We advise to pad dimensions
+				<ul>
+					<li>We only optimize <strong>2D tiles</strong></li>
+					<li><strong>Pad</strong> with random tile shifts</li>
+				</ul>
+			</li>
+			<li class="fragment fade-in-then-semi-out">More samples
+				<ul>
+					<li><strong>Tune your sampler</strong> to you SPPs!</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<aside class="notes">
+		People often requested to have blue-noise sampler
+		with very high dimensions.
+		<strong>*click*</strong><br /><br />
+
+		For our 2019 sampler, we provided 8 dimensions in our
+		sampler. But we did not directly optimize for 8D.
+		This would reduce the quality
+		we can achieve for low dimensions (for example direct
+		illumination). And it would take ages to optimize.
+
+		<strong>*click*</strong><br /><br />
+		Instead of looking for more and more dimensions, we
+		advise to padd 2D sequences with random offsets.
+		This has the benefit of preserving a little more the
+		correlation in higher dimension (if it is really
+		needed). 
+		<strong>*click*</strong><br /><br />
+		
+		Another request was to get higher sample count sequences.
+		If doing so, please remind that the best quality is obtained
+		at the target sample count.
+
+		Intermediate sample counts are only partially good
+		thanks to the sorting.
+		
+	</aside>
+</section>
+
+
+<!-- Summary -->
+<section>
+	<h2>Summary</h2>
+	<!-- <video style="position:absolute; top:0px; left: 330px; margin: 0; border: none; box-shadow: none; height:720px; max-width: 100%; max-height: 100%; z-index: -500;" height="720px" width="100%" data-autoplay loop src="./videos/littlest-tokyo_4spp_bluenoise_sig19.ogg"></video> -->
+	<img style="position:absolute; top:0px; left: 330px; margin: 0; border: none; box-shadow: none; height:720px; max-width: 100%; max-height: 100%; z-index: -500;" height="720px" width="100%" src="img/two_years/viking_tile_ours_spp=64.png">
+	<div style="position:absolute; top:0; left: 0px; margin: 0; max-width: 100%; max-height: 100%; z-index: -5; width: 720px; height:720px; background-color: #ddd; box-shadow: 2px 2px 5px black; ">
+
+		<ul style="padding-top:20%;">
+			<li class="fragment">We <strong>improved</strong> our 2019 screen-space sampler
+				<ul>
+					<li><strong>Better blue-noise </strong> of rendered frames</li>
+					<li><strong>Better quality </strong> after denoising</li>
+					<li>Still <strong>efficient</strong> and <strong>compatible</strong> with real-time</li>
+				</ul>
+			</li>
+			<li class="fragment">Our <strong>contributions</strong>
+				<ul>
+					<li>New <strong>insights</strong> on the optimization process</li>
+					<li><strong>Changed</strong> the sequence and scrambling</li>
+					<li><strong>Accelerated</strong> optimization using GPU </li>
+				</ul>
+			</li>
+			<li class="fragment">Thanks to <strong>you</strong>
+				<ul>
+					<li>Interaction with a lot of interested folks</li>
+				</ul>
+			</li>
+		</ul>
+		<center class="fragment" style="padding-top: 10%;;">
+			Project available at <a href="https://belcour.github.io/blog">belcour.github.io/blog</a>
+		</center>
+	</div>
+	<aside class="notes">
+		As a summary, with two years of feedback from the
+		community, we were able to
+		<strong>*click*</strong><br /><br />
+
+		Improve our screen-space sampler. It now better distributes
+		the error in screen-space.
+		<strong>*click*</strong><br /><br />
+
+		We were able to do it from new insights we got from
+		the optimization of test integrands. This lead us to
+		change the sequence of pseudo random numbers. We also
+		improved our optimization code to be faster and GPU
+		friendly.
+		<strong>*click*</strong><br /><br />
+
+		One key point that drived us is the feedback and
+		interest we got from the community, so thank you
+		to everyone who reached to us with questions /
+		request and so on.
+		<strong>*click*</strong><br /><br />
+
+		Thank you for your attention and if you want to dig
+		deeper into this subject, I encourage you to go
+		to the project webpage where you will find all
+		our material.
+	</aside>
+</section>
+			</div>
+		</div>	
+
+
+		<script src="js/juxtapose.min.js"></script>
+		<script src="js/plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+				width: 1280,
+				height: 720,
+				margin: 0,
+				// showNotes: "separate-page",
+				slideNumber: "c/t",
+				transition: 'fade',
+
+				pdfMaxPagesPerSlide: 1,
+				pdfSeparateFragments: false,
+
+				math: {
+					config: 'TeX-AMS_SVG-full',
+				},
+
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				// plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+				plugins: [ 	RevealHighlight,
+							RevealMath,
+							RevealNotes ]
+			});
+		</script>
+	</body>
+</html>
