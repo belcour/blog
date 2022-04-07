@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <style>
+img {
+  width: 256px;
+  height: 256px;
+  object-fit: cover; /* Do not scale the image */
+  object-position: center; /* Center the image within the element */
+  border: 1px solid black;
+}      
+   </style>
+</head>
+<body>
+**Supplemental Material**
+
+In this supplemental document, we provide render grids to compare our shading model to a stochastic reference. We validate different componnents (energy, distribution, multilayer) with difference scenes. In each render grid, we display side-by-side the elements we compare against. To access a specific render grid, please click on the inset close to the title.
+
+In all this validation, we used our Mitsuba implementations and only used direct illumination renderings.
+
+# Dimension Reduction Validation
+<center>
+   <table>
+      <!-- White furnace -->
+      <tr>
+         <td style="width:256px;"><a href="html/pca.html"><img height="256" src="html/pca/white_furnace_fit2D_1.1_0.9.jpg"/></a></td>
+         <td style="width:60%;">
+            <div>
+               <strong>Dimension reduction (4 basis + 2 basis)</strong><br />
+               We validate the quality of the dimension reduction compared to the full table. In this test, we render a sphere with a rough coated Lambertian material lit by a white environment. We compare rendering using full dimensional tables against using our iteratively reduced tables. In this specific test, we used 2 basis for the absorption and 4 basis for the roughness.
+            </div>
+         </td>
+      </tr>
+      <tr>
+         <td style="width:256px;"><a href="html/pca_2.html"><img height="256" src="html/pca/white_furnace_fit2D_1.1_0.9.jpg"/></a></td>
+         <td style="width:60%;">
+            <div>
+               <strong>Dimension reduction (2 basis + 2 basis)</strong><br />
+               We validate the quality of the dimension reduction compared to the full table. In this test, we render a sphere with a rough coated Lambertian material lit by a white environment. We compare rendering using full dimensional tables against using our iteratively reduced tables. In this specific test, we used 2 basis for the absorption and 2 basis for the roughness.
+            </div>
+         </td>
+      </tr>
+   </table>
+</center>
+
+# Rough Coated Lambertian Validation
+<center>
+   <table>
+      <!-- White furnace -->
+      <tr>
+         <td style="width:256px;"><a href="html/whitefurnace.html"><img height="256" src="html/whitefurnace/white_furnace_oursb_1.1_0.9.jpg"/></a></td>
+         <td style="width:60%;">
+            <div>
+               <strong>White Furnace $\eta > 1$</strong><br />
+               We validate that our mitsuba implementation of our rough coated Lambertian compared to a stochastic reference in a whitefurnace environment. In this setup, we vary the index of refraction <strong>when the index of the coating is superior to the index of the air</strong>, and we vary the roughness of the dieletric coating.
+            </div>
+         </td>
+      </tr>
+      <tr>
+         <td style="width:256px;"><a href="html/whitefurnace_smalleta.html"><img height="256" src="html/whitefurnace/white_furnace_oursb_0.25_0.3.jpg"/></a></td>
+         <td style="width:60%;">
+            <div>
+               <strong>White Furnace $\eta < 1$</strong><br />
+               We validate that our mitsuba implementation of our rough coated Lambertian compared to a stochastic reference in a whitefurnace environment. In this setup, we vary the index of refraction <strong>when the index of the coating is superior to the index of the air</strong>, and we vary the roughness of the dieletric coating.
+            </div>
+         </td>
+      </tr>
+
+      <!-- Area light -->
+      <tr>
+         <td style="width:256px;"><a href="html/area_light.html"><img height="256" src="html/area_light/area_light_complete_oursb_3.0_0.05.jpg"/></a></td>
+         <td style="width:60%;">
+            <div>
+               <strong>Area light $\eta > 1$</strong><br />
+               We validate that our mitsuba implementation of our rough coated Lambertian compared to a stochastic reference in a scene where a sphere is lit by two extended area lights. In this setup, we vary the index of refraction <strong>when the index of the coating is superior to the index of the air</strong>, and we vary the roughness of the dieletric coating.
+            </div>
+         </td>
+      </tr>
+      <tr>
+         <td style="width:256px;"><a href="html/area_light_smalleta.html"><img height="256" src="html/area_light/area_light_complete_oursb_0.6_0.05.jpg"/></a></td>
+         <td style="width:60%;">
+            <div>
+               <strong>Area light $\eta < 1$</strong><br />
+               We validate that our mitsuba implementation of our rough coated Lambertian compared to a stochastic reference in a scene where a sphere is lit by two extended area lights. In this setup, we vary the index of refraction <strong>when the index of the coating is superior to the index of the air</strong>, and we vary the roughness of the dieletric coating.
+            </div>
+         </td>
+      </tr>
+   </table>
+</center><br />
+
+# Multilayer Validation
+<center>
+   <table>
+      <tr>
+         <td style="width:256px;"><a href="html/shaderball.html"><img height="256" src="html/shaderball/shaderball_n0=1.50_a1=0.05_hel64.jpg"/></a></td>
+         <td style="width:60%;">
+            <div>
+               <strong>Shaderball</strong><br />
+               We validate that our mitsuba implementation of a two layers stack of a rough dieletric and our rough coated Lambertian is visualy close to the stochastic reference. Note that this configuration is equivalent to a three layer one (for example in LayerLab). In this setup we vary the index of refraction of the first dieletric layer and the roughness of the rough Lambertian coating.
+            </div>
+         </td>
+      </tr>
+   </table><br />
+</center>
+
+   <!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="js/markdeep.min.js" charset="utf-8"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Area Light</title>
+    </head>
+    <body>
+
+        <div id="table" style="width:1808px; display:flex; flex-wrap:wrap">          
+        </div>
+
+        <script>
+            var scene_name = 'area_light_complete';
+
+            function addAlpha(alpha) {
+                var e = document.getElementById('table');
+                var d = document.createElement('center');
+                d.style = 'width:256px; height:16px;';
+                d.innerText = 'α = ' + (alpha);
+                e.appendChild(d);
+            }
+
+            function addEta(eta) {
+                var e = document.getElementById('table');
+                var d = document.createElement('center');
+                d.style = 'width:16px; height:256px; writing-mode: vertical-lr;';
+                d.innerText = 'η = ' + (eta);
+                e.appendChild(d);
+            }
+            function addVoid() {
+                var e = document.getElementById('table');
+                var d = document.createElement('center');
+                d.style = 'width:16px; height:16px;';
+                e.appendChild(d);
+            }
+
+            function addImages(eta, alpha) {
+                var e = document.getElementById('table');
+                var d = document.createElement('div');
+                d.style = 'width:256px; height:256px;';
+                var i1 = document.createElement('img');
+                i1.src = 'area_light/' + scene_name + '_ref_' + eta + '_' + alpha + '.jpg'
+                // i1.src = 'outputs/area_light_oursa_' + eta + '_' + alpha + '.jpg'
+                i1.width = "256";
+                i1.height = "256";
+                i1.style = "position:absolute; clip-path:polygon( 0% 0%,  50% 0%,  50% 100%,  0% 100%);"
+                var i2 = document.createElement('img');
+                i2.width = "256";
+                i2.height = "256";
+                i2.src = 'area_light/' + scene_name + '_oursb_' + eta + '_' + alpha + '.jpg'
+                i2.style = "position:absolute; clip-path:polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%);"
+
+                // Add label
+                var d1 = document.createElement('div');
+                d1.innerHTML = "Reference"
+                d1.style = "position:absolute; width:128px; height:15px; text-align:center; margin-top:231px; font-size:15px; color:white;"
+
+                // Add label
+                var d2 = document.createElement('div');
+                d2.innerHTML = "Ours"
+                d2.style = "position:absolute; width:128px; height:15px; text-align:center; margin-top:231px; margin-left:128px; font-size:15px; color:white;"
+
+                d.appendChild(i1);
+                d.appendChild(i2);
+                d.appendChild(d1);
+                d.appendChild(d2);
+                e.appendChild(d);
+            }
+
+            var etas = ['1.1', '1.2', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0'];
+            var alphas = ['0.01', '0.05', '0.1', '0.3', '0.5', '0.8', '0.9'];
+            addVoid();
+            alphas.forEach( alpha => addAlpha(alpha) );
+            etas.forEach( eta => {addEta(eta); alphas.forEach( alpha => addImages(eta, alpha) ); } );
+        </script>
+    </body>
+</html>
