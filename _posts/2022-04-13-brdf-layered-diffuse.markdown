@@ -1,6 +1,6 @@
 ---
 layout: publication
-date:   2022-05-03
+date:   2022-04-13
 title:  "Rendering Layered Materials with Diffuse Interfaces"
 authors: [
     {name: "Heloise de Dinechin"},
