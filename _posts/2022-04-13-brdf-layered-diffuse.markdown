@@ -22,3 +22,13 @@ materials: [
     #{ type: "slides", name: "slides", url: "" },
 ]
 ---
+
+## Abstract
+
+In this work, we introduce a novel method to render, in real-time, Lambertian surfaces with a rough dieletric coating. We show that the appearance of such configurations is faithfully represented with two microfacet lobes accounting for direct and indirect interactions respectively. We numerically fit these lobes based on the first order directional statistics (energy, mean and variance) of light transport using 5D tables and narrow them down to 2D + 1D with analytical forms and dimension reduction. We demonstrate the quality of our method by efficiently rendering rough plastics and ceramics, closely matching ground truth. In addition, we improve a state-of-the-art layered material model to include Lambertian interfaces.
+
+## Teaser Video 
+<center>
+<iframe style="width:80%;" src="https://drive.google.com/file/d/1l_KyhcXGj61xPIbpU_DbCGgyCJqGtIQ4/preview" width="1280" height="720">
+</iframe>
+</center>
