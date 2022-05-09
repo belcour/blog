@@ -19,6 +19,7 @@ thumbnail: "/data/images/thumbnail_layeredDiffuse.png"
 materials: [
     { type: "pdf", name: "paper", url: "https://arxiv.org/pdf/2203.11835" },
     { type: "zip", name: "supp. html", url: "https://belcour.github.io/blog/supp/2022-brdf-layered-diffuse/" },
+    { type: "zip", name: "code", url: "https://drive.google.com/file/d/1L7pK4xvszQ04QQ6PAtA5jvyKZVnBZ_iz/view?usp=sharing" },
     #{ type: "slides", name: "slides", url: "" },
 ]
 ---
