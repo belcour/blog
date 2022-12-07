@@ -31,6 +31,5 @@ In this work, we introduce a novel method to render, in real-time, Lambertian su
 
 ## Teaser Video 
 <center>
-<iframe style="width:80%;" src="https://drive.google.com/file/d/1l_KyhcXGj61xPIbpU_DbCGgyCJqGtIQ4/preview" width="1280" height="720">
-</iframe>
+<iframe width="720px" height=500px src="https://www.youtube.com/embed/P-wRgPe8sDs?start=9255" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </center>
