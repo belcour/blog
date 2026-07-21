@@ -181,7 +181,7 @@ simulation or to adapt the sampling budget locally.
 
         <!-- Generate author list -->
         <div class="publication-authors">
-            {% assign authors_size = {{post.authors.size | minus: 1 }} %}
+            {% assign authors_size = post.authors.size | minus: 1 %}
             {% for index in (0..authors_size) %}
 
             {% assign author = post.authors[index] %}
@@ -206,9 +206,9 @@ simulation or to adapt the sampling budget locally.
         <span style="font-style:italic;">
             {% if post.tags contains 'published' %}
                 Published in
-            {% elsif contains 'to_appear' %}
+          {% elsif post.tags contains 'to_appear' %}
                 To appear in
-            {% elsif contains 'techreport' %}
+          {% elsif post.tags contains 'techreport' %}
               Technical Report
             {% endif %}
             {{ post.journal }}
@@ -218,7 +218,7 @@ simulation or to adapt the sampling budget locally.
         <!-- Link to material -->
         {% if post.materials %}
         <span>
-            {% assign materials_size = {{post.materials.size | minus: 1 }} %}
+            {% assign materials_size = post.materials.size | minus: 1 %}
             {% for index in (0..materials_size) %}
                 {% assign material = post.materials[index] %}
                 <span><a class="publication-material {{ material.type }}" href="{{ material.url }}">{{ material.name }}</a>{% if index < materials_size %},&nbsp;{% endif %}</span>

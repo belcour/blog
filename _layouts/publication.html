@@ -15,7 +15,7 @@
             {{ page.title }}
         </div>
         <div class="publication-authors">
-            {% assign authors_size = {{page.authors.size | minus: 1 }} %}
+            {% assign authors_size = page.authors.size | minus: 1 %}
             {% for index in (0..authors_size) %}
 
                 {% assign author = page.authors[index] %}
@@ -47,9 +47,9 @@
         <div class="publication-journal">
             {% if page.tags contains 'published' %}
                 Published in
-            {% elsif contains 'to_appear' %}
+            {% elsif page.tags contains 'to_appear' %}
                 To appear in
-            {% elsif contains 'techreport' %}
+            {% elsif page.tags contains 'techreport' %}
             {% endif %}
             {{ page.journal }}
         </div><br />
@@ -57,7 +57,7 @@
         <!-- Link to material -->
         {% if page.materials %}
         <div>
-            {% assign materials_size = {{page.materials.size | minus: 1 }} %}
+            {% assign materials_size = page.materials.size | minus: 1 %}
             {% for index in (0..materials_size) %}
                {% assign material = page.materials[index] %}
                 <span>
